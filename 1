@@ -1,893 +1,1115 @@
-# src/game_engine/game_state.py
-import json
-from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional
-from datetime import datetime
-import pickle
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronicles of Aethelgard | Choice-Based Adventure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header Section -->
+        <header>
+            <h1><i class="fas fa-dragon"></i> Chronicles of Aethelgard</h1>
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Chapter:</span>
+                    <span id="chapter-counter">1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Choices:</span>
+                    <span id="choice-counter">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time:</span>
+                    <span id="time-display">Morning</span>
+                </div>
+            </div>
+        </header>
 
-@dataclass
-class GameState:
-    """Tracks all game variables and NPC states"""
-    player_name: str = "Player"
-    game_time: int = 0  # In-game hours
-    location: str = "town_square"
-    global_flags: Dict[str, bool] = field(default_factory=dict)
-    variables: Dict[str, Any] = field(default_factory=dict)
-    npc_states: Dict[str, Dict] = field(default_factory=dict)
-    conversation_history: List[Dict] = field(default_factory=list)
-    
-    def to_dict(self):
-        return {
-            'player_name': self.player_name,
-            'game_time': self.game_time,
-            'location': self.location,
-            'global_flags': self.global_flags,
-            'variables': self.variables,
-            'npc_states': self.npc_states,
-            'conversation_history': self.conversation_history
-        }
-    
-    def save(self, filename: str):
-        with open(filename, 'wb') as f:
-            pickle.dump(self.to_dict(), f)
-    
-    def load(self, filename: str):
-        with open(filename, 'rb') as f:
-            data = pickle.load(f)
-            self.__dict__.update(data)
+        <!-- Main Game Area -->
+        <main>
+            <!-- Scene Display -->
+            <div class="scene-container">
+                <div class="scene-image" id="scene-image">
+                    <!-- Background image will be set via CSS -->
+                </div>
+                <div class="scene-description" id="scene-text">
+                    You awaken in a stone chamber, torchlight flickering on damp walls. 
+                    The air smells of moss and ancient secrets. Your head throbs with 
+                    forgotten memories. Three paths lie before you...
+                </div>
+            </div>
 
-            # second copy
-
-            # src/game_engine/npc_manager.py
-from typing import Dict, List, Callable, Any
-from enum import Enum
-import random
-
-class NPCMood(Enum):
-    NEUTRAL = "neutral"
-    HAPPY = "happy"
-    ANGRY = "angry"
-    SAD = "sad"
-    AFRAID = "afraid"
-    TRUSTING = "trusting"
-
-class NPCTrait(Enum):
-    HONEST = "honest"
-    DECEPTIVE = "deceptive"
-    BRAVE = "brave"
-    COWARDLY = "cowardly"
-    FRIENDLY = "friendly"
-    HOSTILE = "hostile"
-    CURIOUS = "curious"
-
-class NPC:
-    def __init__(self, name: str, traits: List[NPCTrait]):
-        self.name = name
-        self.traits = traits
-        self.mood = NPCMood.NEUTRAL
-        self.relationship_score = 50  # 0-100
-        self.knowledge: Dict[str, Any] = {}
-        self.daily_routine: List[Dict] = []
-        self.current_goal: Optional[str] = None
-        self.memory = []
-        
-    def calculate_mood_modifier(self) -> float:
-        """Calculate how mood affects decisions"""
-        modifiers = {
-            NPCMood.HAPPY: 1.2,
-            NPCMood.ANGRY: 0.7,
-            NPCMood.SAD: 0.8,
-            NPCMood.AFRAID: 0.6,
-            NPCMood.TRUSTING: 1.3,
-            NPCMood.NEUTRAL: 1.0
-        }
-        return modifiers[self.mood]
-    
-    def decide_action(self, context: Dict) -> str:
-        """Base decision-making method to be overridden by AI systems"""
-        raise NotImplementedError("Use a specific AI system")
-    
-    def update_relationship(self, change: int):
-        self.relationship_score = max(0, min(100, self.relationship_score + change))
-        self._update_mood_based_on_relationship()
-    
-    def _update_mood_based_on_relationship(self):
-        if self.relationship_score > 75:
-            self.mood = NPCMood.TRUSTING
-        elif self.relationship_score > 60:
-            self.mood = NPCMood.HAPPY
-        elif self.relationship_score < 30:
-            self.mood = NPCMood.ANGRY
-        elif self.relationship_score < 50:
-            self.mood = NPCMood.SAD
-        else:
-            self.mood = NPCMood.NEUTRAL
-
-            # src/ai_systems/deterministic_ai.py
-from ..game_engine.npc_manager import NPC, NPCTrait, NPCMood
-from typing import Dict, List, Callable
-
-class DeterministicNPC(NPC):
-    """NPC with scripted, predictable behavior"""
-    
-    def __init__(self, name: str, traits: List[NPCTrait], script: Dict):
-        super().__init__(name, traits)
-        self.script = script  # Contains dialogue and action trees
-        self.current_script_node = "start"
-        
-    def decide_action(self, context: Dict) -> Dict:
-        """
-        Returns action based on current script node and game state
-        Format: {'action': 'speak', 'dialogue': '...', 'next_node': '...'}
-        """
-        current_node = self.script.get(self.current_script_node, {})
-        
-        # Check conditions for each possible next action
-        for option in current_node.get('options', []):
-            if self._check_conditions(option.get('conditions', {}), context):
-                action = option['action']
+            <!-- Player Stats -->
+            <div class="player-info">
+                <div class="inventory">
+                    <h3><i class="fas fa-backpack"></i> Inventory</h3>
+                    <div id="inventory-items">
+                        <div class="item">🗡️ Rusty Dagger</div>
+                        <div class="item">🕯️ Torch</div>
+                    </div>
+                </div>
                 
-                # Update relationship if specified
-                if 'relationship_change' in option:
-                    self.update_relationship(option['relationship_change'])
-                
-                # Move to next node if specified
-                if 'next_node' in option:
-                    self.current_script_node = option['next_node']
-                
-                return {
-                    'action': action['type'],
-                    'dialogue': action.get('dialogue', ''),
-                    'mood': self.mood.value,
-                    'animation': action.get('animation', 'idle')
-                }
-        
-        # Default action if no conditions met
-        return {
-            'action': 'idle',
-            'dialogue': current_node.get('default_dialogue', '...'),
-            'mood': self.mood.value
-        }
-    
-    def _check_conditions(self, conditions: Dict, context: Dict) -> bool:
-        """Check if all conditions are met"""
-        for key, value in conditions.items():
-            if key == 'relationship_gt':
-                if not (self.relationship_score > value):
-                    return False
-            elif key == 'has_item':
-                if not context.get('player_inventory', {}).get(value, False):
-                    return False
-            elif key == 'time_of_day':
-                if not (context.get('game_time', 0) % 24 in value):
-                    return False
-            elif key == 'global_flag':
-                if not context.get('global_flags', {}).get(value, False):
-                    return False
-        return True
+                <div class="relationships">
+                    <h3><i class="fas fa-users"></i> Relationships</h3>
+                    <div class="relationship-bar">
+                        <div class="label">Guild Trust:</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="guild-trust" style="width: 30%"></div>
+                        </div>
+                        <span class="percentage">30%</span>
+                    </div>
+                    <div class="relationship-bar">
+                        <div class="label">Arcane Knowledge:</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" id="knowledge" style="width: 15%"></div>
+                        </div>
+                        <span class="percentage">15%</span>
+                    </div>
+                </div>
+            </div>
 
-# Example script for a deterministic NPC
-EXAMPLE_SCRIPT = {
-    "start": {
-        "default_dialogue": "Hello there.",
-        "options": [
-            {
-                "conditions": {"relationship_gt": 70},
-                "action": {
-                    "type": "speak",
-                    "dialogue": "My friend! So good to see you again!",
-                    "animation": "wave"
-                },
-                "relationship_change": 5,
-                "next_node": "friendly"
-            },
-            {
-                "conditions": {"relationship_gt": 30},
-                "action": {
-                    "type": "speak", 
-                    "dialogue": "Oh, it's you. What do you want?",
-                    "animation": "cross_arms"
-                },
-                "next_node": "neutral"
-            },
-            {
-                "conditions": {},
-                "action": {
-                    "type": "speak",
-                    "dialogue": "I don't know you. Please leave me alone.",
-                    "animation": "step_back"
-                },
-                "relationship_change": -10,
-                "next_node": "hostile"
-            }
-        ]
+            <!-- Choices Section -->
+            <div class="choices-container">
+                <h3><i class="fas fa-crossroads"></i> What will you do?</h3>
+                <div class="choices-grid" id="choices-container">
+                    <!-- Choices will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Game History -->
+            <div class="history-container">
+                <h3><i class="fas fa-scroll"></i> Journey Log</h3>
+                <div class="history-log" id="history-log">
+                    <div class="log-entry">[Morning] You awaken in an unfamiliar chamber...</div>
+                </div>
+                <button class="btn-secondary" onclick="toggleHistory()">
+                    <i class="fas fa-chevron-down"></i> Show/Hide Log
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer Controls -->
+        <footer>
+            <div class="controls">
+                <button class="btn-control" onclick="saveGame()" title="Save Game">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn-control" onclick="loadGame()" title="Load Game">
+                    <i class="fas fa-folder-open"></i> Load
+                </button>
+                <button class="btn-control" onclick="resetGame()" title="Restart">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+                <button class="btn-control" onclick="showEndings()" title="View Endings">
+                    <i class="fas fa-trophy"></i> Endings
+                </button>
+                <div class="volume-control">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" id="volume" min="0" max="100" value="70">
+                </div>
+            </div>
+            <div class="game-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 10%"></div>
+                </div>
+                <div class="progress-label">Story Progress: <span id="progress-text">10%</span></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Endings Modal -->
+    <div id="endings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2><i class="fas fa-crown"></i> Discovered Endings</h2>
+            <div id="endings-list">
+                <div class="ending locked">
+                    <i class="fas fa-lock"></i> The King's Favor
+                </div>
+                <div class="ending locked">
+                    <i class="fas fa-lock"></i> Master Wizard
+                </div>
+                <div class="ending locked">
+                    <i class="fas fa-lock"></i> Shadow Lord
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e6e6e6;
+    min-height: 100vh;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(25, 25, 35, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    border: 1px solid #444;
+}
+
+/* Header */
+header {
+    background: linear-gradient(to right, #2d2d44, #3d3d5c);
+    padding: 20px 30px;
+    border-bottom: 2px solid #00a8ff;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #00a8ff, #9c88ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.game-stats {
+    display: flex;
+    gap: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+}
+
+.stat-label {
+    color: #00a8ff;
+    font-weight: bold;
+}
+
+/* Main Content Layout */
+main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+    padding: 25px;
+}
+
+/* Scene Display */
+.scene-container {
+    grid-column: 1;
+    grid-row: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #444;
+}
+
+.scene-image {
+    height: 250px;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)),
+                url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.scene-description {
+    padding: 25px;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #f0f0f0;
+    background: rgba(20, 20, 30, 0.9);
+    min-height: 180px;
+}
+
+/* Player Info */
+.player-info {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.inventory, .relationships {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #444;
+}
+
+.inventory h3, .relationships h3 {
+    color: #00a8ff;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+}
+
+#inventory-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.item {
+    background: rgba(0, 168, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #00a8ff;
+    font-size: 0.9rem;
+}
+
+.relationship-bar {
+    margin-bottom: 15px;
+}
+
+.relationship-bar .label {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.bar-container {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #00a8ff, #9c88ff);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.percentage {
+    font-size: 0.9rem;
+    color: #00a8ff;
+    float: right;
+}
+
+/* Choices Section */
+.choices-container {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid #444;
+}
+
+.choices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.choice-btn {
+    background: linear-gradient(135deg, #2d2d44, #3d3d5c);
+    border: 2px solid #00a8ff;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 100px;
+}
+
+.choice-btn:hover {
+    transform: translateY(-5px);
+    background: linear-gradient(135deg, #3d3d5c, #4d4d6c);
+    box-shadow: 0 5px 15px rgba(0, 168, 255, 0.3);
+    border-color: #9c88ff;
+}
+
+.choice-btn i {
+    font-size: 1.5rem;
+    color: #00a8ff;
+}
+
+.choice-btn.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #666;
+}
+
+.choice-btn.locked:hover {
+    transform: none;
+    background: linear-gradient(135deg, #2d2d44, #3d3d5c);
+    box-shadow: none;
+}
+
+/* History Log */
+.history-container {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #444;
+    margin-top: 10px;
+}
+
+.history-log {
+    max-height: 150px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+}
+
+.log-entry {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+/* Footer Controls */
+footer {
+    background: linear-gradient(to right, #2d2d44, #3d3d5c);
+    padding: 20px 30px;
+    border-top: 2px solid #00a8ff;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-control, .btn-secondary {
+    background: rgba(0, 168, 255, 0.2);
+    border: 1px solid #00a8ff;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+}
+
+.btn-control:hover, .btn-secondary:hover {
+    background: rgba(0, 168, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+.volume-control input {
+    width: 100px;
+}
+
+.game-progress {
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, #00a8ff, #9c88ff);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.progress-label {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #2d2d44;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 2px solid #00a8ff;
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+    color: #00a8ff;
+}
+
+.ending {
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ending.unlocked {
+    border-left: 4px solid #00a8ff;
+    background: rgba(0, 168, 255, 0.1);
+}
+
+.ending.locked {
+    color: #666;
+    border-left: 4px solid #444;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+    
+    .scene-container, .player-info, .choices-container, .history-container {
+        grid-column: 1;
+    }
+    
+    .choices-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .game-stats {
+        flex-direction: column;
+        gap: 10px;
     }
 }
-# src/ai_systems/behavior_tree_ai.py
-from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
-from enum import Enum
-import random
+// Game State
+const gameState = {
+    chapter: 1,
+    scene: 'start',
+    choices: 0,
+    time: 'Morning',
+    progress: 10,
+    inventory: ['🗡️ Rusty Dagger', '🕯️ Torch', '🧭 Basic Compass'],
+    stats: {
+        guildTrust: 30,
+        arcaneKnowledge: 15,
+        shadowInfluence: 0,
+        royalFavor: 0
+    },
+    history: ['[Morning] You awaken in an unfamiliar chamber...'],
+    flags: {
+        metMysteriousStranger: false,
+        foundAncientTome: false,
+        joinedThievesGuild: false,
+        helpedGuardCaptain: false
+    },
+    endings: []
+};
 
-class NodeStatus(Enum):
-    SUCCESS = "success"
-    FAILURE = "failure" 
-    RUNNING = "running"
-
-class BehaviorNode(ABC):
-    """Base class for all behavior tree nodes"""
-    
-    @abstractmethod
-    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
-        pass
-
-class ActionNode(BehaviorNode):
-    """Leaf node that performs an action"""
-    
-    def __init__(self, action_name: str, action_func: callable):
-        self.action_name = action_name
-        self.action_func = action_func
-    
-    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
-        result = self.action_func(npc, context)
-        return NodeStatus.SUCCESS if result else NodeStatus.FAILURE
-
-class ConditionNode(BehaviorNode):
-    """Checks a condition"""
-    
-    def __init__(self, condition_name: str, condition_func: callable):
-        self.condition_name = condition_name
-        self.condition_func = condition_func
-    
-    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
-        return NodeStatus.SUCCESS if self.condition_func(npc, context) else NodeStatus.FAILURE
-
-class SelectorNode(BehaviorNode):
-    """Tries children in order until one succeeds (OR logic)"""
-    
-    def __init__(self, children: List[BehaviorNode]):
-        self.children = children
-    
-    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
-        for child in self.children:
-            status = child.tick(npc, context)
-            if status == NodeStatus.SUCCESS:
-                return NodeStatus.SUCCESS
-        return NodeStatus.FAILURE
-
-class SequenceNode(BehaviorNode):
-    """Runs all children, fails if any child fails (AND logic)"""
-    
-    def __init__(self, children: List[BehaviorNode]):
-        self.children = children
-    
-    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
-        for child in self.children:
-            status = child.tick(npc, context)
-            if status == NodeStatus.FAILURE:
-                return NodeStatus.FAILURE
-        return NodeStatus.SUCCESS
-
-class BehaviorTreeNPC(NPC):
-    """NPC controlled by a behavior tree"""
-    
-    def __init__(self, name: str, traits: List[NPCTrait]):
-        super().__init__(name, traits)
-        self.behavior_tree = self._build_behavior_tree()
-        self.current_action = None
-        
-    def _build_behavior_tree(self) -> BehaviorNode:
-        """Build the NPC's behavior tree"""
-        # Example: Guard NPC behavior tree
-        return SelectorNode([
-            # Priority 1: Combat if threatened
-            SequenceNode([
-                ConditionNode("is_threatened", self._is_threatened),
-                SelectorNode([
-                    SequenceNode([
-                        ConditionNode("has_backup", self._has_backup),
-                        ActionNode("call_backup", self._call_backup)
-                    ]),
-                    ActionNode("attack", self._attack)
-                ])
-            ]),
-            # Priority 2: Social interactions
-            SequenceNode([
-                ConditionNode("player_nearby", self._player_nearby),
-                SelectorNode([
-                    SequenceNode([
-                        ConditionNode("player_is_friend", self._player_is_friend),
-                        ActionNode("greet_friend", self._greet_friend)
-                    ]),
-                    ActionNode("greet_stranger", self._greet_stranger)
-                ])
-            ]),
-            # Priority 3: Daily routine
-            SelectorNode([
-                SequenceNode([
-                    ConditionNode("is_time_to_patrol", self._is_time_to_patrol),
-                    ActionNode("patrol", self._patrol)
-                ]),
-                ActionNode("idle", self._idle)
-            ])
-        ])
-    
-    def decide_action(self, context: Dict) -> Dict:
-        """Execute behavior tree and return action"""
-        status = self.behavior_tree.tick(self, context)
-        
-        if self.current_action:
-            action = self.current_action
-            self.current_action = None
-            return action
-        
-        return {
-            'action': 'idle',
-            'dialogue': '...',
-            'mood': self.mood.value
-        }
-    
-    # Condition methods
-    def _is_threatened(self, npc, context) -> bool:
-        return context.get('combat_mode', False) or self.relationship_score < 20
-    
-    def _player_nearby(self, npc, context) -> bool:
-        return context.get('player_location') == context.get('npc_location')
-    
-    def _player_is_friend(self, npc, context) -> bool:
-        return self.relationship_score > 60
-    
-    def _is_time_to_patrol(self, npc, context) -> bool:
-        hour = context.get('game_time', 0) % 24
-        return 8 <= hour < 18  # Patrol during daytime
-    
-    # Action methods
-    def _greet_friend(self, npc, context) -> bool:
-        self.current_action = {
-            'action': 'speak',
-            'dialogue': f'Hello {context.get("player_name", "friend")}! Good to see you!',
-            'mood': NPCMood.HAPPY.value,
-            'animation': 'wave'
-        }
-        return True
-    
-    def _greet_stranger(self, npc, context) -> bool:
-        self.current_action = {
-            'action': 'speak',
-            'dialogue': 'Halt! State your business.',
-            'mood': NPCMood.NEUTRAL.value,
-            'animation': 'guard_stance'
-        }
-        return True
-    
-    def _attack(self, npc, context) -> bool:
-        self.current_action = {
-            'action': 'combat',
-            'dialogue': 'You shall not pass!',
-            'mood': NPCMood.ANGRY.value,
-            'animation': 'draw_weapon'
-        }
-        return True
-    
-    def _patrol(self, npc, context) -> bool:
-        self.current_action = {
-            'action': 'move',
-            'dialogue': '',
-            'target_location': 'market_district',
-            'animation': 'walk'
-        }
-        return True
-    
-    def _idle(self, npc, context) -> bool:
-        # Choose random idle behavior
-        behaviors = [
-            {'action': 'speak', 'dialogue': 'Hmm...', 'animation': 'think'},
-            {'action': 'speak', 'dialogue': '*whistles*', 'animation': 'whistle'},
-            {'action': 'move', 'target_location': 'current', 'animation': 'stretch'}
-        ]
-        self.current_action = random.choice(behaviors)
-        return True
-
-        # src/ai_systems/generative_ai.py
-import openai
-import os
-from typing import Dict, List, Optional
-import json
-from dataclasses import dataclass
-from ..game_engine.npc_manager import NPC, NPCTrait, NPCMood
-
-@dataclass
-class CharacterPersona:
-    """Defines an AI character's personality and knowledge"""
-    name: str
-    background: str
-    personality_traits: List[str]
-    speech_patterns: List[str]
-    secrets: List[str] = None
-    goals: List[str] = None
-    relationships: Dict[str, str] = None
-    
-    def to_prompt(self) -> str:
-        prompt = f"You are {self.name}.\n\nBACKGROUND:\n{self.background}\n\n"
-        prompt += f"PERSONALITY TRAITS:\n" + "\n".join(f"- {trait}" for trait in self.personality_traits) + "\n\n"
-        prompt += f"SPEECH PATTERNS:\n" + "\n".join(f"- {pattern}" for pattern in self.speech_patterns) + "\n\n"
-        
-        if self.secrets:
-            prompt += f"SECRETS (unknown to player):\n" + "\n".join(f"- {secret}" for secret in self.secrets) + "\n\n"
-        
-        if self.goals:
-            prompt += f"PERSONAL GOALS:\n" + "\n".join(f"- {goal}" for goal in self.goals) + "\n\n"
-        
-        return prompt
-
-class GenerativeAI_NPC(NPC):
-    """NPC powered by generative AI (OpenAI GPT)"""
-    
-    def __init__(self, name: str, traits: List[NPCTrait], persona: CharacterPersona, 
-                 api_key: Optional[str] = None):
-        super().__init__(name, traits)
-        self.persona = persona
-        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
-        self.client = openai.OpenAI(api_key=self.api_key)
-        self.conversation_history: List[Dict] = []
-        self.system_prompt = self._create_system_prompt()
-        
-    def _create_system_prompt(self) -> str:
-        """Create the system prompt that defines the character"""
-        base_prompt = self.persona.to_prompt()
-        
-        base_prompt += """
-RULES:
-1. Stay in character at all times. Never break the fourth wall.
-2. Your knowledge is limited to what your character would know.
-3. Your emotional state and relationships affect your responses.
-4. Remember previous conversations with the player.
-5. If you don't know something, make something up that fits your character.
-6. Keep responses concise (1-3 sentences typically).
-
-Current game context will be provided before each of your responses.
-Respond ONLY with what your character says or does, no explanations.
-"""
-        return base_prompt
-    
-    def decide_action(self, context: Dict) -> Dict:
-        """
-        Generate a response using OpenAI's API
-        Returns: {'action': 'speak', 'dialogue': '...', 'mood': '...'}
-        """
-        try:
-            # Prepare the conversation with context
-            messages = [
-                {"role": "system", "content": self.system_prompt},
-                *self.conversation_history[-6:],  # Last 6 exchanges for context
-                {"role": "user", "content": self._format_context_prompt(context)}
+// Game Data - Scenes and Choices
+const gameData = {
+    scenes: {
+        start: {
+            id: 'start',
+            title: 'The Awakening',
+            description: 'You awaken in a stone chamber, torchlight flickering on damp walls. The air smells of moss and ancient secrets. Your head throbs with forgotten memories. Three paths lie before you...',
+            image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            choices: [
+                {
+                    id: 'explore_tunnels',
+                    text: 'Explore the dark tunnels to the east',
+                    icon: 'fas fa-torii-gate',
+                    nextScene: 'tunnels',
+                    requirements: null,
+                    effects: {
+                        arcaneKnowledge: 5,
+                        history: '[Choice] You venture into the dark eastern tunnels...'
+                    }
+                },
+                {
+                    id: 'climb_stairs',
+                    text: 'Climb the crumbling stone stairs upward',
+                    icon: 'fas fa-stairs',
+                    nextScene: 'tower',
+                    requirements: null,
+                    effects: {
+                        guildTrust: 10,
+                        history: '[Choice] You ascend the ancient stone stairs...'
+                    }
+                },
+                {
+                    id: 'examine_symbols',
+                    text: 'Examine the strange symbols on the wall',
+                    icon: 'fas fa-book',
+                    nextScene: 'symbols',
+                    requirements: { arcaneKnowledge: 10 },
+                    effects: {
+                        arcaneKnowledge: 15,
+                        history: '[Choice] You study the mysterious wall symbols...'
+                    }
+                }
             ]
-            
-            # Call OpenAI API
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",  # or "gpt-4" for better quality
-                messages=messages,
-                max_tokens=150,
-                temperature=0.7 + (self.relationship_score / 200),  # More random if relationship is high
-                presence_penalty=0.2 if self.mood == NPCMood.ANGRY else 0.0
-            )
-            
-            ai_response = response.choices[0].message.content.strip()
-            
-            # Update conversation history
-            self.conversation_history.append({"role": "user", "content": context.get('player_input', '')})
-            self.conversation_history.append({"role": "assistant", "content": ai_response})
-            
-            # Analyze mood from response (simple keyword matching)
-            detected_mood = self._detect_mood_from_response(ai_response)
-            if detected_mood:
-                self.mood = detected_mood
-            
-            return {
-                'action': 'speak',
-                'dialogue': ai_response,
-                'mood': self.mood.value,
-                'animation': self._get_animation_for_mood()
-            }
-            
-        except Exception as e:
-            print(f"AI Error: {e}")
-            # Fallback to deterministic behavior
-            return {
-                'action': 'speak',
-                'dialogue': "I'm having trouble thinking right now...",
-                'mood': self.mood.value,
-                'animation': 'confused'
-            }
-    
-    def _format_context_prompt(self, context: Dict) -> str:
-        """Format game context into a prompt for the AI"""
-        prompt = f"[GAME CONTEXT]\n"
-        prompt += f"Time: {context.get('game_time', 0)} ({(context.get('game_time', 0) % 24):02d}:00)\n"
-        prompt += f"Location: {context.get('location', 'unknown')}\n"
-        prompt += f"Player's relationship with you: {self.relationship_score}/100\n"
-        prompt += f"Your current mood: {self.mood.value}\n"
-        
-        if context.get('recent_events'):
-            prompt += f"Recent events: {', '.join(context['recent_events'][-3:])}\n"
-        
-        prompt += f"\nPlayer says: {context.get('player_input', '...')}\n"
-        prompt += f"\n{self.name} responds:"
-        
-        return prompt
-    
-    def _detect_mood_from_response(self, response: str) -> Optional[NPCMood]:
-        """Simple mood detection from response text"""
-        response_lower = response.lower()
-        
-        positive_words = ['happy', 'glad', 'great', 'wonderful', 'love', 'thanks']
-        negative_words = ['angry', 'mad', 'hate', 'never', 'stop', 'leave']
-        sad_words = ['sad', 'sorry', 'miss', 'alone', 'cry']
-        fear_words = ['scared', 'afraid', 'fear', 'danger', 'help']
-        
-        if any(word in response_lower for word in positive_words):
-            return NPCMood.HAPPY
-        elif any(word in response_lower for word in negative_words):
-            return NPCMood.ANGRY
-        elif any(word in response_lower for word in sad_words):
-            return NPCMood.SAD
-        elif any(word in response_lower for word in fear_words):
-            return NPCMood.AFRAID
-        
-        return None
-    
-    def _get_animation_for_mood(self) -> str:
-        """Map mood to animation name"""
-        animations = {
-            NPCMood.HAPPY: 'smile',
-            NPCMood.ANGRY: 'angry_gesture',
-            NPCMood.SAD: 'look_down',
-            NPCMood.AFRAID: 'step_back',
-            NPCMood.TRUSTING: 'open_arms',
-            NPCMood.NEUTRAL: 'idle'
-        }
-        return animations.get(self.mood, 'idle')
-
-# Example persona for a generative AI NPC
-ELARA_PERSONA = CharacterPersona(
-    name="Elara",
-    background="A mysterious scholar who studies ancient magic. She lives in a tower outside town and is known for her cryptic advice.",
-    personality_traits=[
-        "Wise but enigmatic",
-        "Patient with genuine seekers",
-        "Impatient with fools",
-        "Has seen centuries pass",
-        "Guards dangerous knowledge"
-    ],
-    speech_patterns=[
-        "Speaks in metaphors",
-        "References ancient lore",
-        "Asks questions instead of giving direct answers",
-        "Voice is calm and measured"
-    ],
-    secrets=[
-        "Is actually over 300 years old due to a magic ritual",
-        "Knows the location of a forgotten kingdom's treasure",
-        "Is being hunted by a secret society"
-    ],
-    goals=[
-        "Find a wort# src/utils/memory_system.py
-import json
-from datetime import datetime
-from typing import Dict, List, Any
-from collections import deque
-
-class NPCMemory:
-    """Tracks what NPCs remember about interactions"""
-    
-    def __init__(self, max_memories: int = 100):
-        self.memories: deque = deque(maxlen=max_memories)
-        self.important_facts: Dict[str, Any] = {}
-        self.relationship_memory: Dict[str, List[Dict]] = {}
-        
-    def add_memory(self, event_type: str, details: Dict, importance: int = 1):
-        """Add a new memory"""
-        memory = {
-            'timestamp': datetime.now().isoformat(),
-            'type': event_type,
-            'details': details,
-            'importance': importance,
-            'decay_rate': 0.1 if importance > 5 else 0.3
-        }
-        self.memories.append(memory)
-        
-        # Store important facts separately
-        if importance > 7:
-            key = f"{event_type}_{len(self.important_facts)}"
-            self.important_facts[key] = details
-    
-    def add_interaction_memory(self, npc_name: str, interaction: Dict):
-        """Remember an interaction with another NPC or player"""
-        if npc_name not in self.relationship_memory:
-            self.relationship_memory[npc_name] = []
-        
-        self.relationship_memory[npc_name].append({
-            'timestamp': datetime.now().isoformat(),
-            'interaction': interaction
-        })
-    
-    def recall(self, query: str, recency_weight: float = 0.7) -> List[Dict]:
-        """Recall memories relevant to a query"""
-        relevant = []
-        for memory in self.memories:
-            # Simple keyword matching (could be improved with embeddings)
-            if any(keyword in str(memory).lower() for keyword in query.lower().split()):
-                relevant.append(memory)
-        
-        # Sort by importance and recency
-        relevant.sort(key=lambda m: (
-            m['importance'] * 0.3 + 
-            (1 / (1 + self._hours_since(m['timestamp']))) * recency_weight
-        ), reverse=True)
-        
-        return relevant[:5]  # Return top 5 most relevant memories
-    
-    def get_relationship_summary(self, npc_name: str) -> Dict:
-        """Get summary of relationship with another NPC"""
-        if npc_name not in self.relationship_memory:
-            return {'interaction_count': 0, 'last_interaction': None, 'trend': 'neutral'}
-        
-        interactions = self.relationship_memory[npc_name]
-        recent = interactions[-10:] if len(interactions) > 10 else interactions
-        
-        # Analyze interaction trend
-        positive_count = sum(1 for i in recent if i['interaction'].get('positive', False))
-        trend = 'positive' if positive_count > len(recent) * 0.7 else \
-                'negative' if positive_count < len(recent) * 0.3 else 'neutral'
-        
-        return {
-            'interaction_count': len(interactions),
-            'last_interaction': interactions[-1]['timestamp'] if interactions else None,
-            'trend': trend,
-            'recent_positive_ratio': positive_count / len(recent) if recent else 0
-        }
-    
-    def _hours_since(self, timestamp: str) -> float:
-        """Calculate hours since timestamp"""
-        try:
-            dt = datetime.fromisoformat(timestamp)
-            return (datetime.now() - dt).total_seconds() / 3600
-        except:
-            return 999  # Large number for invalid timestamps
-    
-    def to_dict(self) -> Dict:
-        """Serialize memory for saving"""
-        return {
-            'memories': list(self.memories),
-            'important_facts': self.important_facts,
-            'relationship_memory': self.relationship_memory
-        }hy apprentice to pass knowledge to",
-        "Prevent a ancient evil from awakening",
-        "Decode the last chapter of the Celestial Codex"
-    ]
-
-# main.py
-#!/usr/bin/env python3
-"""
-Advanced NPC AI System Demo for Visual Novel
-Run: python main.py [demo_type]
-Demo types: deterministic, behavior, generative
-"""
-
-import sys
-import time
-from src.ai_systems.deterministic_ai import DeterministicNPC, EXAMPLE_SCRIPT
-from src.ai_systems.behavior_tree_ai import BehaviorTreeNPC
-from src.ai_systems.generative_ai import GenerativeAI_NPC, ELARA_PERSONA, CharacterPersona
-from src.game_engine.npc_manager import NPCTrait
-from src.game_engine.game_state import GameState
-
-def demo_deterministic():
-    """Demo the deterministic AI system"""
-    print("\n" + "="*60)
-    print("DETERMINISTIC AI DEMO")
-    print("="*60)
-    
-    # Create NPC with scripted behavior
-    guard = DeterministicNPC(
-        name="Captain Renault",
-        traits=[NPCTrait.HONEST, NPCTrait.BRAVE],
-        script=EXAMPLE_SCRIPT
-    )
-    
-    # Simulate different relationship levels
-    test_contexts = [
-        {"relationship": 80, "player_name": "Hero"},
-        {"relationship": 50, "player_name": "Traveler"},
-        {"relationship": 10, "player_name": "Stranger"}
-    ]
-    
-    for context in test_contexts:
-        guard.relationship_score = context["relationship"]
-        print(f"\nPlayer ({context['player_name']}) approaches. Relationship: {guard.relationship_score}")
-        
-        action = guard.decide_action(context)
-        print(f"Guard: {action['dialogue']}")
-        print(f"  [Action: {action['action']}, Mood: {action['mood']}]")
-        time.sleep(1)
-
-def demo_behavior_tree():
-    """Demo the behavior tree AI system"""
-    print("\n" + "="*60)
-    print("BEHAVIOR TREE AI DEMO")
-    print("="*60)
-    
-    # Create guard NPC with behavior tree
-    guard = BehaviorTreeNPC(
-        name="Sergeant Miller",
-        traits=[NPCTrait.BRAVE, NPCTrait.FRIENDLY]
-    )
-    
-    # Test different scenarios
-    scenarios = [
-        {
-            "name": "Friendly player during patrol",
-            "context": {
-                "player_location": "guard_post",
-                "npc_location": "guard_post",
-                "game_time": 14,  # 2 PM
-                "player_name": "Friend",
-                "combat_mode": False
-            },
-            "setup": lambda: setattr(guard, 'relationship_score', 75)
         },
-        {
-            "name": "Stranger at night",
-            "context": {
-                "player_location": "alley",
-                "npc_location": "alley", 
-                "game_time": 2,  # 2 AM
-                "player_name": "Shadowy Figure",
-                "combat_mode": False
-            },
-            "setup": lambda: setattr(guard, 'relationship_score', 30)
-        },
-        {
-            "name": "Combat situation",
-            "context": {
-                "player_location": "gate",
-                "npc_location": "gate",
-                "game_time": 10,
-                "player_name": "Intruder",
-                "combat_mode": True
-            },
-            "setup": lambda: setattr(guard, 'relationship_score', 10)
-        }
-    ]
-    
-    for scenario in scenarios:
-        scenario["setup"]()  # Setup NPC state
-        print(f"\nScenario: {scenario['name']}")
-        print(f"Relationship: {guard.relationship_score}, Time: {scenario['context']['game_time']}:00")
         
-        action = guard.decide_action(scenario['context'])
-        print(f"Guard: {action.get('dialogue', '(action)')}")
-        print(f"  [Action: {action['action']}, Mood: {action['mood']}]")
-        time.sleep(1)
+        tunnels: {
+            id: 'tunnels',
+            title: 'Forgotten Tunnels',
+            description: 'The tunnels wind deeper into darkness. The air grows colder, and you hear distant dripping water. A faint blue glow emanates from a side passage.',
+            image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            choices: [
+                {
+                    id: 'follow_glow',
+                    text: 'Follow the mysterious blue glow',
+                    icon: 'fas fa-magic',
+                    nextScene: 'glowing_chamber',
+                    effects: {
+                        arcaneKnowledge: 20,
+                        history: '[Choice] You follow the eerie blue glow...'
+                    }
+                },
+                {
+                    id: 'listen_water',
+                    text: 'Follow the sound of dripping water',
+                    icon: 'fas fa-tint',
+                    nextScene: 'underground_river',
+                    effects: {
+                        inventory: '💧 Mysterious Water',
+                        history: '[Choice] You follow the sound of water...'
+                    }
+                },
+                {
+                    id: 'return_chamber',
+                    text: 'Return to the starting chamber',
+                    icon: 'fas fa-undo',
+                    nextScene: 'start',
+                    effects: {
+                        history: '[Choice] You retreat back to the starting chamber...'
+                    }
+                }
+            ]
+        },
+        
+        tower: {
+            id: 'tower',
+            title: 'The Watchtower',
+            description: 'You emerge into a circular room at the top of a tower. Through arrow slits, you see a sprawling medieval city below. A figure stands silhouetted against the window.',
+            image: 'https://images.unsplash.com/photo-1533134486753-c833f0ed4866?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            choices: [
+                {
+                    id: 'approach_figure',
+                    text: 'Approach the mysterious figure',
+                    icon: 'fas fa-user',
+                    nextScene: 'captain_meeting',
+                    effects: {
+                        guildTrust: 20,
+                        history: '[Choice] You approach the shadowy figure...'
+                    }
+                },
+                {
+                    id: 'look_out_window',
+                    text: 'Look out the window at the city',
+                    icon: 'fas fa-city',
+                    nextScene: 'city_view',
+                    effects: {
+                        inventory: '🗺️ City Map',
+                        history: '[Choice] You study the city layout from above...'
+                    }
+                },
+                {
+                    id: 'search_room',
+                    text: 'Search the room for clues',
+                    icon: 'fas fa-search',
+                    nextScene: 'tower_search',
+                    effects: {
+                        arcaneKnowledge: 10,
+                        inventory: '🔑 Rusty Key',
+                        history: '[Choice] You search the tower room thoroughly...'
+                    }
+                }
+            ]
+        },
+        
+        glowing_chamber: {
+            id: 'glowing_chamber',
+            title: 'The Glowing Chamber',
+            description: 'The chamber pulses with blue energy. Ancient runes cover every surface, and a pedestal holds a glowing crystal. The air crackles with magical energy.',
+            image: 'https://images.unsplash.com/photo-1531306728370-e2ebd9d7bbcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            choices: [
+                {
+                    id: 'touch_crystal',
+                    text: 'Touch the glowing crystal',
+                    icon: 'fas fa-gem',
+                    nextScene: 'crystal_vision',
+                    requirements: { arcaneKnowledge: 25 },
+                    effects: {
+                        arcaneKnowledge: 30,
+                        history: '[Choice] You reach for the pulsating crystal...'
+                    }
+                },
+                {
+                    id: 'study_runes',
+                    text: 'Study the ancient runes',
+                    icon: 'fas fa-scroll',
+                    nextScene: 'rune_study',
+                    effects: {
+                        arcaneKnowledge: 25,
+                        history: '[Choice] You decipher the ancient runes...'
+                    }
+                },
+                {
+                    id: 'leave_chamber',
+                    text: 'Leave this unnatural place',
+                    icon: 'fas fa-running',
+                    nextScene: 'tunnels',
+                    effects: {
+                        history: '[Choice] You flee from the eerie chamber...'
+                    }
+                }
+            ]
+        },
+        
+        captain_meeting: {
+            id: 'captain_meeting',
+            title: 'The Guard Captain',
+            description: 'The figure turns - it\'s Captain Valerius of the City Guard. "You shouldn\'t be here," he says sternly. "But since you are... I could use someone with your apparent... curiosity."',
+            image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+            choices: [
+                {
+                    id: 'accept_mission',
+                    text: 'Accept the Captain\'s mission',
+                    icon: 'fas fa-handshake',
+                    nextScene: 'guard_mission',
+                    effects: {
+                        guildTrust: 40,
+                        royalFavor: 20,
+                        history: '[Choice] You agree to help the Guard Captain...'
+                    }
+                },
+                {
+                    id: 'ask_questions',
+                    text: 'Ask why you were imprisoned',
+                    icon: 'fas fa-question',
+                    nextScene: 'interrogation',
+                    effects: {
+                        arcaneKnowledge: 15,
+                        history: '[Choice] You demand answers from the Captain...'
+                    }
+                },
+                {
+                    id: 'refuse_mission',
+                    text: 'Refuse and try to leave',
+                    icon: 'fas fa-door-closed',
+                    nextScene: 'tower_escape',
+                    effects: {
+                        guildTrust: -20,
+                        history: '[Choice] You refuse the Captain and try to escape...'
+                    }
+                }
+            ]
+        }
+    },
+    
+    endings: {
+        wizard: {
+            id: 'wizard',
+            title: 'Archmage of Aethelgard',
+            description: 'Your pursuit of arcane knowledge leads you to master ancient magic. You become the court wizard, advising kings and shaping history with your power.',
+            requirement: { arcaneKnowledge: 80 }
+        },
+        king: {
+            id: 'king',
+            title: 'Royal Advisor',
+            description: 'Through loyalty and service, you earn the king\'s trust. You become a powerful advisor, helping to rule the kingdom with wisdom and justice.',
+            requirement: { royalFavor: 70, guildTrust: 60 }
+        },
+        shadow: {
+            id: 'shadow',
+            title: 'Shadow Master',
+            description: 'You embrace the underworld, building a network of spies and assassins. From the shadows, you control the fate of nations unseen.',
+            requirement: { shadowInfluence: 75 }
+        }
+    }
+};
 
-def demo_generative():
-    """Demo the generative AI system (requires OpenAI API key)"""
-    print("\n" + "="*60)
-    print("GENERATIVE AI DEMO")
-    print("="*60)
+// DOM Elements
+const sceneText = document.getElementById('scene-text');
+const choicesContainer = document.getElementById('choices-container');
+const historyLog = document.getElementById('history-log');
+const chapterCounter = document.getElementById('chapter-counter');
+const choiceCounter = document.getElementById('choice-counter');
+const timeDisplay = document.getElementById('time-display');
+const inventoryItems = document.getElementById('inventory-items');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
+const guildTrustBar = document.getElementById('guild-trust');
+const knowledgeBar = document.getElementById('knowledge');
+
+// Initialize Game
+function initGame() {
+    loadGame(); // Try to load saved game
+    renderScene(gameState.scene);
+    updateUI();
+}
+
+// Render Current Scene
+function renderScene(sceneId) {
+    const scene = gameData.scenes[sceneId];
+    if (!scene) return;
     
-    # Check for API key
-    import os
-    api_key = os.getenv('OPENAI_API_KEY')
-    if not api_key:
-        print("⚠️  OpenAI API key not found in OPENAI_API_KEY environment variable")
-        print("Using simulated responses instead")
-        api_key = "simulated"
+    // Update scene display
+    sceneText.textContent = scene.description;
+    document.getElementById('scene-image').style.backgroundImage = 
+        `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('${scene.image}')`;
     
-    # Create AI-powered NPC
-    elara = GenerativeAI_NPC(
-        name="Elara",
-        traits=[NPCTrait.WISE, NPCTrait.CURIOUS],
-        persona=ELARA_PERSONA,
-        api_key=api_key if api_key != "simulated" else None
-    )
+    // Clear previous choices
+    choicesContainer.innerHTML = '';
     
-    # Test conversation
-    test_conversation = [
-        "Hello, I seek knowledge.",
-        "What do you know about the ancient kingdom?",
-        "I found this strange artifact. What is it?",
-        "Will you teach me your magic?"
-    ]
+    // Render available choices
+    scene.choices.forEach(choice => {
+        const isAvailable = checkRequirements(choice.requirements);
+        
+        const choiceElement = document.createElement('button');
+        choiceElement.className = `choice-btn ${!isAvailable ? 'locked' : ''}`;
+        choiceElement.innerHTML = `
+            <i class="${choice.icon}"></i>
+            <span>${choice.text}</span>
+        `;
+        
+        if (isAvailable) {
+            choiceElement.onclick = () => makeChoice(choice);
+        } else {
+            choiceElement.onclick = null;
+            choiceElement.title = 'Requires more arcane knowledge';
+        }
+        
+        choicesContainer.appendChild(choiceElement);
+    });
     
-    context = {
-        "location": "mystical_tower",
-        "game_time": 20,  # 8 PM
-        "player_name": "Acolyte"
+    // Add to history
+    addToHistory(`[${gameState.time}] Arrived at: ${scene.title}`);
+}
+
+// Make a Choice
+function makeChoice(choice) {
+    // Update game state
+    gameState.choices++;
+    gameState.chapter++;
+    gameState.scene = choice.nextScene;
+    
+    // Apply choice effects
+    if (choice.effects) {
+        Object.keys(choice.effects).forEach(effect => {
+            if (effect === 'history') {
+                addToHistory(choice.effects[effect]);
+            } else if (effect === 'inventory' && typeof choice.effects[effect] === 'string') {
+                if (!gameState.inventory.includes(choice.effects[effect])) {
+                    gameState.inventory.push(choice.effects[effect]);
+                }
+            } else if (gameState.stats[effect] !== undefined) {
+                gameState.stats[effect] += choice.effects[effect];
+                gameState.stats[effect] = Math.max(0, Math.min(100, gameState.stats[effect]));
+            }
+        });
     }
     
-    print("You approach Elara in her tower...\n")
+    // Update time
+    updateTime();
     
-    for i, player_input in enumerate(test_conversation):
-        context['player_input'] = player_input
-        elara.relationship_score = 30 + (i * 10)  # Relationship grows
-        
-        print(f"You: {player_input}")
-        
-        action = elara.decide_action(context)
-        print(f"Elara: {action['dialogue']}")
-        print(f"  [Mood: {action['mood']}, Relationship: {elara.relationship_score}]")
-        
-        if i < len(test_conversation) - 1:
-            input("\nPress Enter to continue...")
-        print()
+    // Update progress
+    gameState.progress = Math.min(100, gameState.progress + Math.floor(Math.random() * 5) + 3);
+    
+    // Check for endings
+    checkEndings();
+    
+    // Update UI and render next scene
+    updateUI();
+    renderScene(gameState.scene);
+}
 
-def main():
-    """Main demo selector"""
-    if len(sys.argv) > 1:
-        demo_type = sys.argv[1].lower()
-    else:
-        print("Select demo type:")
-        print("1. Deterministic AI")
-        print("2. Behavior Tree AI")
-        print("3. Generative AI")
-        choice = input("\nEnter choice (1-3): ").strip()
-        
-        demos = {'1': 'deterministic', '2': 'behavior', '3': 'generative'}
-        demo_type = demos.get(choice, 'deterministic')
+// Check Requirements for Choices
+function checkRequirements(requirements) {
+    if (!requirements) return true;
     
-    demos = {
-        'deterministic': demo_deterministic,
-        'behavior': demo_behavior_tree,
-        'generative': demo_generative
+    for (const [stat, value] of Object.entries(requirements)) {
+        if (gameState.stats[stat] < value) {
+            return false;
+        }
     }
+    return true;
+}
+
+// Update Game Time
+function updateTime() {
+    const times = ['Morning', 'Afternoon', 'Evening', 'Night'];
+    const currentIndex = times.indexOf(gameState.time);
+    gameState.time = times[(currentIndex + 1) % times.length];
+}
+
+// Update UI Elements
+function updateUI() {
+    chapterCounter.textContent = gameState.chapter;
+    choiceCounter.textContent = gameState.choices;
+    timeDisplay.textContent = gameState.time;
     
-    if demo_type in demos:
-        demos[demo_type]()
-    else:
-        print(f"Unknown demo type: {demo_type}")
-        print("Available: deterministic, behavior, generative")
-
-if __name__ == "__main__":
-    main()
-    # requirements.txt
-openai>=1.0.0
-python-dotenv>=1.0.0
-numpy>=1.24.0
-pydantic>=2.0.0
-typing-extensions>=4.7.0
-pytest>=7.4.0
-
-# .gitignore
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Game files
-saves/
-*.save
-*.sav
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# API keys
-.env
-secrets.py
-config.local.py
+    // Update inventory
+    inventoryItems.innerHTML = '';
+    gameState.inventory.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'item';
+        itemElement.textContent = item;
+        inventoryItems.appendChild(itemElement);
+    });
     
-  
+    // Update stats bars
+    guildTrustBar.style.width = `${gameState.stats.guildTrust}%`;
+    guildTrustBar.nextElementSibling.textContent = `${gameState.stats.guildTrust}%`;
+    
+    knowledgeBar.style.width = `${gameState.stats.arcaneKnowledge}%`;
+    knowledgeBar.nextElementSibling.textContent = `${gameState.stats.arcaneKnowledge}%`;
+    
+    // Update progress
+    progressFill.style.width = `${gameState.progress}%`;
+    progressText.textContent = `${gameState.progress}%`;
+    
+    // Auto-scroll history to bottom
+    historyLog.scrollTop = historyLog.scrollHeight;
+}
+
+// Add Entry to History
+function addToHistory(entry) {
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    gameState.history.push(`[${now}] ${entry}`);
+    
+    // Update history display
+    historyLog.innerHTML = '';
+    gameState.history.slice(-10).forEach(entry => {
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+        logEntry.textContent = entry;
+        historyLog.appendChild(logEntry);
+    });
+}
+
+// Check for Endings
+function checkEndings() {
+    Object.entries(gameData.endings).forEach(([endingId, ending]) => {
+        if (!gameState.endings.includes(endingId) && checkRequirements(ending.requirement)) {
+            gameState.endings.push(endingId);
+            showEnding(ending);
+        }
+    });
+}
+
+// Show Ending
+function showEnding(ending) {
+    addToHistory(`🎉 ACHIEVEMENT UNLOCKED: ${ending.title}`);
+    
+    // Update endings modal
+    const endingsList = document.getElementById('endings-list');
+    const endingElement = document.createElement('div');
+    endingElement.className = 'ending unlocked';
+    endingElement.innerHTML = `
+        <i class="fas fa-crown"></i>
+        <div>
+            <strong>${ending.title}</strong><br>
+            <small>${ending.description}</small>
+        </div>
+    `;
+    endingsList.appendChild(endingElement);
+    
+    // Show modal
+    document.getElementById('endings-modal').style.display = 'flex';
+}
+
+// Save Game
+function saveGame() {
+    localStorage.setItem('choiceGameSave', JSON.stringify(gameState));
+    addToHistory('Game saved successfully');
+    
+    // Visual feedback
+    const saveBtn = document.querySelector('[onclick="saveGame()"]');
+    const originalHTML = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+    setTimeout(() => {
+        saveBtn.innerHTML = originalHTML;
+    }, 1500);
+}
+
+// Load Game
+function loadGame() {
+    const saved = localStorage.getItem('choiceGameSave');
+    if (saved) {
+        try {
+            const loadedState = JSON.parse(saved);
+            Object.assign(gameState, loadedState);
+            addToHistory('Game loaded from save');
+        } catch (e) {
+            console.error('Failed to load save:', e);
+        }
+    }
+}
+
+// Reset Game
+function resetGame() {
+    if (confirm('Are you sure you want to restart? All progress will be lost.')) {
+        localStorage.removeItem('choiceGameSave');
+        
+        // Reset game state
+        Object.assign(gameState, {
+            chapter: 1,
+            scene: 'start',
+            choices: 0,
+            time: 'Morning',
+            progress: 10,
+            inventory: ['🗡️ Rusty Dagger', '🕯️ Torch', '🧭 Basic Compass'],
+            stats: {
+                guildTrust: 30,
+                arcaneKnowledge: 15,
+                shadowInfluence: 0,
+                royalFavor: 0
+            },
+            history: ['[Morning] You awaken in an unfamiliar chamber...'],
+            flags: {
+                metMysteriousStranger: false,
+                foundAncientTome: false,
+                joinedThievesGuild: false,
+                helpedGuardCaptain: false
+            },
+            endings: []
+        });
+        
+        // Reset UI
+        const endingsList = document.getElementById('endings-list');
+        endingsList.innerHTML = `
+            <div class="ending locked">
+                <i class="fas fa-lock"></i> The King's Favor
+            </div>
+            <div class="ending locked">
+                <i class="fas fa-lock"></i> Master Wizard
+            </div>
+            <div class="ending locked">
+                <i class="fas fa-lock"></i> Shadow Lord
+            </div>
+        `;
+        
+        // Restart game
+        renderScene('start');
+        updateUI();
+        addToHistory('Game restarted from beginning');
+    }
+}
+
+// Toggle History Log
+function toggleHistory() {
+    const historyContainer = document.querySelector('.history-container');
+    const historyLog = document.querySelector('.history-log');
+    const toggleBtn = document.querySelector('[onclick="toggleHistory()"]');
+    
+    if (historyLog.style.maxHeight === '0px' || !historyLog.style.maxHeight) {
+        historyLog.style.maxHeight = '150px';
+        historyLog.style.overflowY = 'auto';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Log';
+    } else {
+        historyLog.style.maxHeight = '0';
+        historyLog.style.overflowY = 'hidden';
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Show Log';
+    }
+}
+
+// Show Endings Modal
+function showEndings() {
+    document.getElementById('endings-modal').style.display = 'flex';
+}
+
+// Close Modal
+function closeModal() {
+    document.getElementById('endings-modal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('endings-modal');
+    if (event.target === modal) {
+        closeModal();
+    }
+};
+
+// Volume Control
+document.getElementById('volume').addEventListener('input', function(e) {
+    const value = e.target.value;
+    // In a real game, you would adjust audio volume here
+    console.log(`Volume set to ${value}%`);
+});
+
+// Initialize game when page loads
+window.onload = initGame;
