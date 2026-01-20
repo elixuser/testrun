@@ -1,1 +1,893 @@
+# src/game_engine/game_state.py
+import json
+from dataclasses import dataclass, field
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+import pickle
 
+@dataclass
+class GameState:
+    """Tracks all game variables and NPC states"""
+    player_name: str = "Player"
+    game_time: int = 0  # In-game hours
+    location: str = "town_square"
+    global_flags: Dict[str, bool] = field(default_factory=dict)
+    variables: Dict[str, Any] = field(default_factory=dict)
+    npc_states: Dict[str, Dict] = field(default_factory=dict)
+    conversation_history: List[Dict] = field(default_factory=list)
+    
+    def to_dict(self):
+        return {
+            'player_name': self.player_name,
+            'game_time': self.game_time,
+            'location': self.location,
+            'global_flags': self.global_flags,
+            'variables': self.variables,
+            'npc_states': self.npc_states,
+            'conversation_history': self.conversation_history
+        }
+    
+    def save(self, filename: str):
+        with open(filename, 'wb') as f:
+            pickle.dump(self.to_dict(), f)
+    
+    def load(self, filename: str):
+        with open(filename, 'rb') as f:
+            data = pickle.load(f)
+            self.__dict__.update(data)
+
+            # second copy
+
+            # src/game_engine/npc_manager.py
+from typing import Dict, List, Callable, Any
+from enum import Enum
+import random
+
+class NPCMood(Enum):
+    NEUTRAL = "neutral"
+    HAPPY = "happy"
+    ANGRY = "angry"
+    SAD = "sad"
+    AFRAID = "afraid"
+    TRUSTING = "trusting"
+
+class NPCTrait(Enum):
+    HONEST = "honest"
+    DECEPTIVE = "deceptive"
+    BRAVE = "brave"
+    COWARDLY = "cowardly"
+    FRIENDLY = "friendly"
+    HOSTILE = "hostile"
+    CURIOUS = "curious"
+
+class NPC:
+    def __init__(self, name: str, traits: List[NPCTrait]):
+        self.name = name
+        self.traits = traits
+        self.mood = NPCMood.NEUTRAL
+        self.relationship_score = 50  # 0-100
+        self.knowledge: Dict[str, Any] = {}
+        self.daily_routine: List[Dict] = []
+        self.current_goal: Optional[str] = None
+        self.memory = []
+        
+    def calculate_mood_modifier(self) -> float:
+        """Calculate how mood affects decisions"""
+        modifiers = {
+            NPCMood.HAPPY: 1.2,
+            NPCMood.ANGRY: 0.7,
+            NPCMood.SAD: 0.8,
+            NPCMood.AFRAID: 0.6,
+            NPCMood.TRUSTING: 1.3,
+            NPCMood.NEUTRAL: 1.0
+        }
+        return modifiers[self.mood]
+    
+    def decide_action(self, context: Dict) -> str:
+        """Base decision-making method to be overridden by AI systems"""
+        raise NotImplementedError("Use a specific AI system")
+    
+    def update_relationship(self, change: int):
+        self.relationship_score = max(0, min(100, self.relationship_score + change))
+        self._update_mood_based_on_relationship()
+    
+    def _update_mood_based_on_relationship(self):
+        if self.relationship_score > 75:
+            self.mood = NPCMood.TRUSTING
+        elif self.relationship_score > 60:
+            self.mood = NPCMood.HAPPY
+        elif self.relationship_score < 30:
+            self.mood = NPCMood.ANGRY
+        elif self.relationship_score < 50:
+            self.mood = NPCMood.SAD
+        else:
+            self.mood = NPCMood.NEUTRAL
+
+            # src/ai_systems/deterministic_ai.py
+from ..game_engine.npc_manager import NPC, NPCTrait, NPCMood
+from typing import Dict, List, Callable
+
+class DeterministicNPC(NPC):
+    """NPC with scripted, predictable behavior"""
+    
+    def __init__(self, name: str, traits: List[NPCTrait], script: Dict):
+        super().__init__(name, traits)
+        self.script = script  # Contains dialogue and action trees
+        self.current_script_node = "start"
+        
+    def decide_action(self, context: Dict) -> Dict:
+        """
+        Returns action based on current script node and game state
+        Format: {'action': 'speak', 'dialogue': '...', 'next_node': '...'}
+        """
+        current_node = self.script.get(self.current_script_node, {})
+        
+        # Check conditions for each possible next action
+        for option in current_node.get('options', []):
+            if self._check_conditions(option.get('conditions', {}), context):
+                action = option['action']
+                
+                # Update relationship if specified
+                if 'relationship_change' in option:
+                    self.update_relationship(option['relationship_change'])
+                
+                # Move to next node if specified
+                if 'next_node' in option:
+                    self.current_script_node = option['next_node']
+                
+                return {
+                    'action': action['type'],
+                    'dialogue': action.get('dialogue', ''),
+                    'mood': self.mood.value,
+                    'animation': action.get('animation', 'idle')
+                }
+        
+        # Default action if no conditions met
+        return {
+            'action': 'idle',
+            'dialogue': current_node.get('default_dialogue', '...'),
+            'mood': self.mood.value
+        }
+    
+    def _check_conditions(self, conditions: Dict, context: Dict) -> bool:
+        """Check if all conditions are met"""
+        for key, value in conditions.items():
+            if key == 'relationship_gt':
+                if not (self.relationship_score > value):
+                    return False
+            elif key == 'has_item':
+                if not context.get('player_inventory', {}).get(value, False):
+                    return False
+            elif key == 'time_of_day':
+                if not (context.get('game_time', 0) % 24 in value):
+                    return False
+            elif key == 'global_flag':
+                if not context.get('global_flags', {}).get(value, False):
+                    return False
+        return True
+
+# Example script for a deterministic NPC
+EXAMPLE_SCRIPT = {
+    "start": {
+        "default_dialogue": "Hello there.",
+        "options": [
+            {
+                "conditions": {"relationship_gt": 70},
+                "action": {
+                    "type": "speak",
+                    "dialogue": "My friend! So good to see you again!",
+                    "animation": "wave"
+                },
+                "relationship_change": 5,
+                "next_node": "friendly"
+            },
+            {
+                "conditions": {"relationship_gt": 30},
+                "action": {
+                    "type": "speak", 
+                    "dialogue": "Oh, it's you. What do you want?",
+                    "animation": "cross_arms"
+                },
+                "next_node": "neutral"
+            },
+            {
+                "conditions": {},
+                "action": {
+                    "type": "speak",
+                    "dialogue": "I don't know you. Please leave me alone.",
+                    "animation": "step_back"
+                },
+                "relationship_change": -10,
+                "next_node": "hostile"
+            }
+        ]
+    }
+}
+# src/ai_systems/behavior_tree_ai.py
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any, Optional
+from enum import Enum
+import random
+
+class NodeStatus(Enum):
+    SUCCESS = "success"
+    FAILURE = "failure" 
+    RUNNING = "running"
+
+class BehaviorNode(ABC):
+    """Base class for all behavior tree nodes"""
+    
+    @abstractmethod
+    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
+        pass
+
+class ActionNode(BehaviorNode):
+    """Leaf node that performs an action"""
+    
+    def __init__(self, action_name: str, action_func: callable):
+        self.action_name = action_name
+        self.action_func = action_func
+    
+    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
+        result = self.action_func(npc, context)
+        return NodeStatus.SUCCESS if result else NodeStatus.FAILURE
+
+class ConditionNode(BehaviorNode):
+    """Checks a condition"""
+    
+    def __init__(self, condition_name: str, condition_func: callable):
+        self.condition_name = condition_name
+        self.condition_func = condition_func
+    
+    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
+        return NodeStatus.SUCCESS if self.condition_func(npc, context) else NodeStatus.FAILURE
+
+class SelectorNode(BehaviorNode):
+    """Tries children in order until one succeeds (OR logic)"""
+    
+    def __init__(self, children: List[BehaviorNode]):
+        self.children = children
+    
+    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
+        for child in self.children:
+            status = child.tick(npc, context)
+            if status == NodeStatus.SUCCESS:
+                return NodeStatus.SUCCESS
+        return NodeStatus.FAILURE
+
+class SequenceNode(BehaviorNode):
+    """Runs all children, fails if any child fails (AND logic)"""
+    
+    def __init__(self, children: List[BehaviorNode]):
+        self.children = children
+    
+    def tick(self, npc: 'BehaviorTreeNPC', context: Dict) -> NodeStatus:
+        for child in self.children:
+            status = child.tick(npc, context)
+            if status == NodeStatus.FAILURE:
+                return NodeStatus.FAILURE
+        return NodeStatus.SUCCESS
+
+class BehaviorTreeNPC(NPC):
+    """NPC controlled by a behavior tree"""
+    
+    def __init__(self, name: str, traits: List[NPCTrait]):
+        super().__init__(name, traits)
+        self.behavior_tree = self._build_behavior_tree()
+        self.current_action = None
+        
+    def _build_behavior_tree(self) -> BehaviorNode:
+        """Build the NPC's behavior tree"""
+        # Example: Guard NPC behavior tree
+        return SelectorNode([
+            # Priority 1: Combat if threatened
+            SequenceNode([
+                ConditionNode("is_threatened", self._is_threatened),
+                SelectorNode([
+                    SequenceNode([
+                        ConditionNode("has_backup", self._has_backup),
+                        ActionNode("call_backup", self._call_backup)
+                    ]),
+                    ActionNode("attack", self._attack)
+                ])
+            ]),
+            # Priority 2: Social interactions
+            SequenceNode([
+                ConditionNode("player_nearby", self._player_nearby),
+                SelectorNode([
+                    SequenceNode([
+                        ConditionNode("player_is_friend", self._player_is_friend),
+                        ActionNode("greet_friend", self._greet_friend)
+                    ]),
+                    ActionNode("greet_stranger", self._greet_stranger)
+                ])
+            ]),
+            # Priority 3: Daily routine
+            SelectorNode([
+                SequenceNode([
+                    ConditionNode("is_time_to_patrol", self._is_time_to_patrol),
+                    ActionNode("patrol", self._patrol)
+                ]),
+                ActionNode("idle", self._idle)
+            ])
+        ])
+    
+    def decide_action(self, context: Dict) -> Dict:
+        """Execute behavior tree and return action"""
+        status = self.behavior_tree.tick(self, context)
+        
+        if self.current_action:
+            action = self.current_action
+            self.current_action = None
+            return action
+        
+        return {
+            'action': 'idle',
+            'dialogue': '...',
+            'mood': self.mood.value
+        }
+    
+    # Condition methods
+    def _is_threatened(self, npc, context) -> bool:
+        return context.get('combat_mode', False) or self.relationship_score < 20
+    
+    def _player_nearby(self, npc, context) -> bool:
+        return context.get('player_location') == context.get('npc_location')
+    
+    def _player_is_friend(self, npc, context) -> bool:
+        return self.relationship_score > 60
+    
+    def _is_time_to_patrol(self, npc, context) -> bool:
+        hour = context.get('game_time', 0) % 24
+        return 8 <= hour < 18  # Patrol during daytime
+    
+    # Action methods
+    def _greet_friend(self, npc, context) -> bool:
+        self.current_action = {
+            'action': 'speak',
+            'dialogue': f'Hello {context.get("player_name", "friend")}! Good to see you!',
+            'mood': NPCMood.HAPPY.value,
+            'animation': 'wave'
+        }
+        return True
+    
+    def _greet_stranger(self, npc, context) -> bool:
+        self.current_action = {
+            'action': 'speak',
+            'dialogue': 'Halt! State your business.',
+            'mood': NPCMood.NEUTRAL.value,
+            'animation': 'guard_stance'
+        }
+        return True
+    
+    def _attack(self, npc, context) -> bool:
+        self.current_action = {
+            'action': 'combat',
+            'dialogue': 'You shall not pass!',
+            'mood': NPCMood.ANGRY.value,
+            'animation': 'draw_weapon'
+        }
+        return True
+    
+    def _patrol(self, npc, context) -> bool:
+        self.current_action = {
+            'action': 'move',
+            'dialogue': '',
+            'target_location': 'market_district',
+            'animation': 'walk'
+        }
+        return True
+    
+    def _idle(self, npc, context) -> bool:
+        # Choose random idle behavior
+        behaviors = [
+            {'action': 'speak', 'dialogue': 'Hmm...', 'animation': 'think'},
+            {'action': 'speak', 'dialogue': '*whistles*', 'animation': 'whistle'},
+            {'action': 'move', 'target_location': 'current', 'animation': 'stretch'}
+        ]
+        self.current_action = random.choice(behaviors)
+        return True
+
+        # src/ai_systems/generative_ai.py
+import openai
+import os
+from typing import Dict, List, Optional
+import json
+from dataclasses import dataclass
+from ..game_engine.npc_manager import NPC, NPCTrait, NPCMood
+
+@dataclass
+class CharacterPersona:
+    """Defines an AI character's personality and knowledge"""
+    name: str
+    background: str
+    personality_traits: List[str]
+    speech_patterns: List[str]
+    secrets: List[str] = None
+    goals: List[str] = None
+    relationships: Dict[str, str] = None
+    
+    def to_prompt(self) -> str:
+        prompt = f"You are {self.name}.\n\nBACKGROUND:\n{self.background}\n\n"
+        prompt += f"PERSONALITY TRAITS:\n" + "\n".join(f"- {trait}" for trait in self.personality_traits) + "\n\n"
+        prompt += f"SPEECH PATTERNS:\n" + "\n".join(f"- {pattern}" for pattern in self.speech_patterns) + "\n\n"
+        
+        if self.secrets:
+            prompt += f"SECRETS (unknown to player):\n" + "\n".join(f"- {secret}" for secret in self.secrets) + "\n\n"
+        
+        if self.goals:
+            prompt += f"PERSONAL GOALS:\n" + "\n".join(f"- {goal}" for goal in self.goals) + "\n\n"
+        
+        return prompt
+
+class GenerativeAI_NPC(NPC):
+    """NPC powered by generative AI (OpenAI GPT)"""
+    
+    def __init__(self, name: str, traits: List[NPCTrait], persona: CharacterPersona, 
+                 api_key: Optional[str] = None):
+        super().__init__(name, traits)
+        self.persona = persona
+        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
+        self.client = openai.OpenAI(api_key=self.api_key)
+        self.conversation_history: List[Dict] = []
+        self.system_prompt = self._create_system_prompt()
+        
+    def _create_system_prompt(self) -> str:
+        """Create the system prompt that defines the character"""
+        base_prompt = self.persona.to_prompt()
+        
+        base_prompt += """
+RULES:
+1. Stay in character at all times. Never break the fourth wall.
+2. Your knowledge is limited to what your character would know.
+3. Your emotional state and relationships affect your responses.
+4. Remember previous conversations with the player.
+5. If you don't know something, make something up that fits your character.
+6. Keep responses concise (1-3 sentences typically).
+
+Current game context will be provided before each of your responses.
+Respond ONLY with what your character says or does, no explanations.
+"""
+        return base_prompt
+    
+    def decide_action(self, context: Dict) -> Dict:
+        """
+        Generate a response using OpenAI's API
+        Returns: {'action': 'speak', 'dialogue': '...', 'mood': '...'}
+        """
+        try:
+            # Prepare the conversation with context
+            messages = [
+                {"role": "system", "content": self.system_prompt},
+                *self.conversation_history[-6:],  # Last 6 exchanges for context
+                {"role": "user", "content": self._format_context_prompt(context)}
+            ]
+            
+            # Call OpenAI API
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",  # or "gpt-4" for better quality
+                messages=messages,
+                max_tokens=150,
+                temperature=0.7 + (self.relationship_score / 200),  # More random if relationship is high
+                presence_penalty=0.2 if self.mood == NPCMood.ANGRY else 0.0
+            )
+            
+            ai_response = response.choices[0].message.content.strip()
+            
+            # Update conversation history
+            self.conversation_history.append({"role": "user", "content": context.get('player_input', '')})
+            self.conversation_history.append({"role": "assistant", "content": ai_response})
+            
+            # Analyze mood from response (simple keyword matching)
+            detected_mood = self._detect_mood_from_response(ai_response)
+            if detected_mood:
+                self.mood = detected_mood
+            
+            return {
+                'action': 'speak',
+                'dialogue': ai_response,
+                'mood': self.mood.value,
+                'animation': self._get_animation_for_mood()
+            }
+            
+        except Exception as e:
+            print(f"AI Error: {e}")
+            # Fallback to deterministic behavior
+            return {
+                'action': 'speak',
+                'dialogue': "I'm having trouble thinking right now...",
+                'mood': self.mood.value,
+                'animation': 'confused'
+            }
+    
+    def _format_context_prompt(self, context: Dict) -> str:
+        """Format game context into a prompt for the AI"""
+        prompt = f"[GAME CONTEXT]\n"
+        prompt += f"Time: {context.get('game_time', 0)} ({(context.get('game_time', 0) % 24):02d}:00)\n"
+        prompt += f"Location: {context.get('location', 'unknown')}\n"
+        prompt += f"Player's relationship with you: {self.relationship_score}/100\n"
+        prompt += f"Your current mood: {self.mood.value}\n"
+        
+        if context.get('recent_events'):
+            prompt += f"Recent events: {', '.join(context['recent_events'][-3:])}\n"
+        
+        prompt += f"\nPlayer says: {context.get('player_input', '...')}\n"
+        prompt += f"\n{self.name} responds:"
+        
+        return prompt
+    
+    def _detect_mood_from_response(self, response: str) -> Optional[NPCMood]:
+        """Simple mood detection from response text"""
+        response_lower = response.lower()
+        
+        positive_words = ['happy', 'glad', 'great', 'wonderful', 'love', 'thanks']
+        negative_words = ['angry', 'mad', 'hate', 'never', 'stop', 'leave']
+        sad_words = ['sad', 'sorry', 'miss', 'alone', 'cry']
+        fear_words = ['scared', 'afraid', 'fear', 'danger', 'help']
+        
+        if any(word in response_lower for word in positive_words):
+            return NPCMood.HAPPY
+        elif any(word in response_lower for word in negative_words):
+            return NPCMood.ANGRY
+        elif any(word in response_lower for word in sad_words):
+            return NPCMood.SAD
+        elif any(word in response_lower for word in fear_words):
+            return NPCMood.AFRAID
+        
+        return None
+    
+    def _get_animation_for_mood(self) -> str:
+        """Map mood to animation name"""
+        animations = {
+            NPCMood.HAPPY: 'smile',
+            NPCMood.ANGRY: 'angry_gesture',
+            NPCMood.SAD: 'look_down',
+            NPCMood.AFRAID: 'step_back',
+            NPCMood.TRUSTING: 'open_arms',
+            NPCMood.NEUTRAL: 'idle'
+        }
+        return animations.get(self.mood, 'idle')
+
+# Example persona for a generative AI NPC
+ELARA_PERSONA = CharacterPersona(
+    name="Elara",
+    background="A mysterious scholar who studies ancient magic. She lives in a tower outside town and is known for her cryptic advice.",
+    personality_traits=[
+        "Wise but enigmatic",
+        "Patient with genuine seekers",
+        "Impatient with fools",
+        "Has seen centuries pass",
+        "Guards dangerous knowledge"
+    ],
+    speech_patterns=[
+        "Speaks in metaphors",
+        "References ancient lore",
+        "Asks questions instead of giving direct answers",
+        "Voice is calm and measured"
+    ],
+    secrets=[
+        "Is actually over 300 years old due to a magic ritual",
+        "Knows the location of a forgotten kingdom's treasure",
+        "Is being hunted by a secret society"
+    ],
+    goals=[
+        "Find a wort# src/utils/memory_system.py
+import json
+from datetime import datetime
+from typing import Dict, List, Any
+from collections import deque
+
+class NPCMemory:
+    """Tracks what NPCs remember about interactions"""
+    
+    def __init__(self, max_memories: int = 100):
+        self.memories: deque = deque(maxlen=max_memories)
+        self.important_facts: Dict[str, Any] = {}
+        self.relationship_memory: Dict[str, List[Dict]] = {}
+        
+    def add_memory(self, event_type: str, details: Dict, importance: int = 1):
+        """Add a new memory"""
+        memory = {
+            'timestamp': datetime.now().isoformat(),
+            'type': event_type,
+            'details': details,
+            'importance': importance,
+            'decay_rate': 0.1 if importance > 5 else 0.3
+        }
+        self.memories.append(memory)
+        
+        # Store important facts separately
+        if importance > 7:
+            key = f"{event_type}_{len(self.important_facts)}"
+            self.important_facts[key] = details
+    
+    def add_interaction_memory(self, npc_name: str, interaction: Dict):
+        """Remember an interaction with another NPC or player"""
+        if npc_name not in self.relationship_memory:
+            self.relationship_memory[npc_name] = []
+        
+        self.relationship_memory[npc_name].append({
+            'timestamp': datetime.now().isoformat(),
+            'interaction': interaction
+        })
+    
+    def recall(self, query: str, recency_weight: float = 0.7) -> List[Dict]:
+        """Recall memories relevant to a query"""
+        relevant = []
+        for memory in self.memories:
+            # Simple keyword matching (could be improved with embeddings)
+            if any(keyword in str(memory).lower() for keyword in query.lower().split()):
+                relevant.append(memory)
+        
+        # Sort by importance and recency
+        relevant.sort(key=lambda m: (
+            m['importance'] * 0.3 + 
+            (1 / (1 + self._hours_since(m['timestamp']))) * recency_weight
+        ), reverse=True)
+        
+        return relevant[:5]  # Return top 5 most relevant memories
+    
+    def get_relationship_summary(self, npc_name: str) -> Dict:
+        """Get summary of relationship with another NPC"""
+        if npc_name not in self.relationship_memory:
+            return {'interaction_count': 0, 'last_interaction': None, 'trend': 'neutral'}
+        
+        interactions = self.relationship_memory[npc_name]
+        recent = interactions[-10:] if len(interactions) > 10 else interactions
+        
+        # Analyze interaction trend
+        positive_count = sum(1 for i in recent if i['interaction'].get('positive', False))
+        trend = 'positive' if positive_count > len(recent) * 0.7 else \
+                'negative' if positive_count < len(recent) * 0.3 else 'neutral'
+        
+        return {
+            'interaction_count': len(interactions),
+            'last_interaction': interactions[-1]['timestamp'] if interactions else None,
+            'trend': trend,
+            'recent_positive_ratio': positive_count / len(recent) if recent else 0
+        }
+    
+    def _hours_since(self, timestamp: str) -> float:
+        """Calculate hours since timestamp"""
+        try:
+            dt = datetime.fromisoformat(timestamp)
+            return (datetime.now() - dt).total_seconds() / 3600
+        except:
+            return 999  # Large number for invalid timestamps
+    
+    def to_dict(self) -> Dict:
+        """Serialize memory for saving"""
+        return {
+            'memories': list(self.memories),
+            'important_facts': self.important_facts,
+            'relationship_memory': self.relationship_memory
+        }hy apprentice to pass knowledge to",
+        "Prevent a ancient evil from awakening",
+        "Decode the last chapter of the Celestial Codex"
+    ]
+
+# main.py
+#!/usr/bin/env python3
+"""
+Advanced NPC AI System Demo for Visual Novel
+Run: python main.py [demo_type]
+Demo types: deterministic, behavior, generative
+"""
+
+import sys
+import time
+from src.ai_systems.deterministic_ai import DeterministicNPC, EXAMPLE_SCRIPT
+from src.ai_systems.behavior_tree_ai import BehaviorTreeNPC
+from src.ai_systems.generative_ai import GenerativeAI_NPC, ELARA_PERSONA, CharacterPersona
+from src.game_engine.npc_manager import NPCTrait
+from src.game_engine.game_state import GameState
+
+def demo_deterministic():
+    """Demo the deterministic AI system"""
+    print("\n" + "="*60)
+    print("DETERMINISTIC AI DEMO")
+    print("="*60)
+    
+    # Create NPC with scripted behavior
+    guard = DeterministicNPC(
+        name="Captain Renault",
+        traits=[NPCTrait.HONEST, NPCTrait.BRAVE],
+        script=EXAMPLE_SCRIPT
+    )
+    
+    # Simulate different relationship levels
+    test_contexts = [
+        {"relationship": 80, "player_name": "Hero"},
+        {"relationship": 50, "player_name": "Traveler"},
+        {"relationship": 10, "player_name": "Stranger"}
+    ]
+    
+    for context in test_contexts:
+        guard.relationship_score = context["relationship"]
+        print(f"\nPlayer ({context['player_name']}) approaches. Relationship: {guard.relationship_score}")
+        
+        action = guard.decide_action(context)
+        print(f"Guard: {action['dialogue']}")
+        print(f"  [Action: {action['action']}, Mood: {action['mood']}]")
+        time.sleep(1)
+
+def demo_behavior_tree():
+    """Demo the behavior tree AI system"""
+    print("\n" + "="*60)
+    print("BEHAVIOR TREE AI DEMO")
+    print("="*60)
+    
+    # Create guard NPC with behavior tree
+    guard = BehaviorTreeNPC(
+        name="Sergeant Miller",
+        traits=[NPCTrait.BRAVE, NPCTrait.FRIENDLY]
+    )
+    
+    # Test different scenarios
+    scenarios = [
+        {
+            "name": "Friendly player during patrol",
+            "context": {
+                "player_location": "guard_post",
+                "npc_location": "guard_post",
+                "game_time": 14,  # 2 PM
+                "player_name": "Friend",
+                "combat_mode": False
+            },
+            "setup": lambda: setattr(guard, 'relationship_score', 75)
+        },
+        {
+            "name": "Stranger at night",
+            "context": {
+                "player_location": "alley",
+                "npc_location": "alley", 
+                "game_time": 2,  # 2 AM
+                "player_name": "Shadowy Figure",
+                "combat_mode": False
+            },
+            "setup": lambda: setattr(guard, 'relationship_score', 30)
+        },
+        {
+            "name": "Combat situation",
+            "context": {
+                "player_location": "gate",
+                "npc_location": "gate",
+                "game_time": 10,
+                "player_name": "Intruder",
+                "combat_mode": True
+            },
+            "setup": lambda: setattr(guard, 'relationship_score', 10)
+        }
+    ]
+    
+    for scenario in scenarios:
+        scenario["setup"]()  # Setup NPC state
+        print(f"\nScenario: {scenario['name']}")
+        print(f"Relationship: {guard.relationship_score}, Time: {scenario['context']['game_time']}:00")
+        
+        action = guard.decide_action(scenario['context'])
+        print(f"Guard: {action.get('dialogue', '(action)')}")
+        print(f"  [Action: {action['action']}, Mood: {action['mood']}]")
+        time.sleep(1)
+
+def demo_generative():
+    """Demo the generative AI system (requires OpenAI API key)"""
+    print("\n" + "="*60)
+    print("GENERATIVE AI DEMO")
+    print("="*60)
+    
+    # Check for API key
+    import os
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not api_key:
+        print("⚠️  OpenAI API key not found in OPENAI_API_KEY environment variable")
+        print("Using simulated responses instead")
+        api_key = "simulated"
+    
+    # Create AI-powered NPC
+    elara = GenerativeAI_NPC(
+        name="Elara",
+        traits=[NPCTrait.WISE, NPCTrait.CURIOUS],
+        persona=ELARA_PERSONA,
+        api_key=api_key if api_key != "simulated" else None
+    )
+    
+    # Test conversation
+    test_conversation = [
+        "Hello, I seek knowledge.",
+        "What do you know about the ancient kingdom?",
+        "I found this strange artifact. What is it?",
+        "Will you teach me your magic?"
+    ]
+    
+    context = {
+        "location": "mystical_tower",
+        "game_time": 20,  # 8 PM
+        "player_name": "Acolyte"
+    }
+    
+    print("You approach Elara in her tower...\n")
+    
+    for i, player_input in enumerate(test_conversation):
+        context['player_input'] = player_input
+        elara.relationship_score = 30 + (i * 10)  # Relationship grows
+        
+        print(f"You: {player_input}")
+        
+        action = elara.decide_action(context)
+        print(f"Elara: {action['dialogue']}")
+        print(f"  [Mood: {action['mood']}, Relationship: {elara.relationship_score}]")
+        
+        if i < len(test_conversation) - 1:
+            input("\nPress Enter to continue...")
+        print()
+
+def main():
+    """Main demo selector"""
+    if len(sys.argv) > 1:
+        demo_type = sys.argv[1].lower()
+    else:
+        print("Select demo type:")
+        print("1. Deterministic AI")
+        print("2. Behavior Tree AI")
+        print("3. Generative AI")
+        choice = input("\nEnter choice (1-3): ").strip()
+        
+        demos = {'1': 'deterministic', '2': 'behavior', '3': 'generative'}
+        demo_type = demos.get(choice, 'deterministic')
+    
+    demos = {
+        'deterministic': demo_deterministic,
+        'behavior': demo_behavior_tree,
+        'generative': demo_generative
+    }
+    
+    if demo_type in demos:
+        demos[demo_type]()
+    else:
+        print(f"Unknown demo type: {demo_type}")
+        print("Available: deterministic, behavior, generative")
+
+if __name__ == "__main__":
+    main()
+    # requirements.txt
+openai>=1.0.0
+python-dotenv>=1.0.0
+numpy>=1.24.0
+pydantic>=2.0.0
+typing-extensions>=4.7.0
+pytest>=7.4.0
+
+# .gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Game files
+saves/
+*.save
+*.sav
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# API keys
+.env
+secrets.py
+config.local.py
+    
+  
