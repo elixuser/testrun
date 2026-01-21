@@ -1,18 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Visual Novel</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visual Novel — Classroom Demo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="app">
+    <div id="bg"></div>
 
-  <div id="game">
-    <div id="background"></div>
+    <div id="hotspots"></div>
 
-    <div id="dialogue-box">
-      <p id="dialogue-text"></p>
-      <div id="choices"></div>
+    <div id="ui">
+      <div id="portrait" aria-hidden="true"></div>
+
+      <div id="dialog">
+        <div id="namebox" aria-live="polite"></div>
+        <div id="textbox" tabindex="0"><p id="text"></p></div>
+
+        <div id="choices" aria-live="polite"></div>
+
+        <div id="controls">
+          <button id="saveBtn">Save</button>
+          <button id="loadBtn">Load</button>
+          <button id="restartBtn">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="error-banner" class="hidden"></div>
+
+    <!-- Hotspot modal -->
+    <div id="hotspot-modal" class="hidden" role="dialog" aria-modal="true">
+      <div class="modal-inner">
+        <div id="hs-name" class="hs-name"></div>
+        <div id="hs-text" class="hs-text"></div>
+        <div id="hs-choices" class="hs-choices"></div>
+        <button id="hs-close">Close</button>
+      </div>
     </div>
   </div>
 
