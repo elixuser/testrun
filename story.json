@@ -1,29 +1,86 @@
 {
-  "start": {
-    "background": "assets/backgrounds/classroom.jpg",
-    "text": "You sit alone in the classroom. It's too quiet.",
-    "next": "hallway"
-  },
+  "start": "wakeup",
+  "nodes": {
+    "wakeup": {
+      "id": "wakeup",
+      "name": "You",
+      "background": "backgrounds/classroom.jpg",
+      "portrait": "",
+      "text": "You wake up in a familiar classroom. It's quiet.",
+      "hotspots": [
+        {
+          "id": "desk",
+          "label": "Desk",
+          "x": 44,
+          "y": 62,
+          "w": 18,
+          "h": 14,
+          "action": {
+            "type": "dialogue",
+            "text": "A folded note sits on the desk.",
+            "choices": [
+              { "text": "Read the note", "next": "read_note" },
+              { "text": "Leave it", "next": "look_around" }
+            ]
+          }
+        },
+        {
+          "id": "door",
+          "label": "Door",
+          "x": 82,
+          "y": 36,
+          "w": 10,
+          "h": 42,
+          "action": { "type": "goto", "next": "locked_door" }
+        }
+      ],
+      "choices": [{ "text": "Look around", "next": "look_around" }]
+    },
 
-  "hallway": {
-    "background": "assets/backgrounds/hallway.jpg",
-    "text": "The hallway stretches endlessly before you.",
-    "choices": [
-      {
-        "text": "Walk forward",
-        "next": "redroom"
-      }
-    ]
-  },
+    "read_note": {
+      "id": "read_note",
+      "name": "You",
+      "background": "backgrounds/classroom.jpg",
+      "portrait": "",
+      "text": "The note says: 'Trust no one.'",
+      "setFlag": { "paranoid": true },
+      "choices": [{ "text": "Stand up", "next": "hallway" }, { "text": "Ignore note", "next": "sleep" }]
+    },
 
-  "redroom": {
-    "background": "assets/backgrounds/red_room.jpg",
-    "text": "The world is bathed in red. Something is wrong.",
-    "choices": [
-      {
-        "text": "Restart",
-        "next": "start"
-      }
-    ]
+    "look_around": {
+      "id": "look_around",
+      "name": "You",
+      "background": "backgrounds/classroom.jpg",
+      "portrait": "",
+      "text": "You see posters and a locked door.",
+      "choices": [{ "text": "Try the door", "next": "locked_door" }, { "text": "Read the note", "next": "read_note" }]
+    },
+
+    "locked_door": {
+      "id": "locked_door",
+      "name": "You",
+      "background": "backgrounds/hallway.jpg",
+      "portrait": "",
+      "text": "The hallway stretches ahead.",
+      "choices": [{ "text": "Walk forward", "next": "red_room" }]
+    },
+
+    "red_room": {
+      "id": "red_room",
+      "name": "You",
+      "background": "backgrounds/red_room.jpg",
+      "portrait": "",
+      "text": "Everything turns red.",
+      "choices": [{ "text": "Restart", "next": "wakeup" }]
+    },
+
+    "sleep": {
+      "id": "sleep",
+      "name": "You",
+      "background": "backgrounds/classroom.jpg",
+      "portrait": "",
+      "text": "You sleep... (bad ending)",
+      "choices": [{ "text": "Restart", "next": "wakeup" }]
+    }
   }
 }
