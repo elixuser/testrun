@@ -1,0 +1,166 @@
+{
+  "start": "wakeup",
+  "nodes": {
+    "wakeup": {
+      "id": "wakeup",
+      "name": "You",
+      "background": "bg_room.jpg",
+      "portrait": "portray_neutral.png",
+      "text": "You wake up in a strange classroom. The room is quiet.",
+      "hotspots": [
+        {
+          "id": "desk",
+          "label": "Desk",
+          "x": 45,
+          "y": 62,
+          "w": 20,
+          "h": 14,
+          "action": {
+            "type": "dialogue",
+            "text": "There's a folded note on the desk.",
+            "choices": [
+              { "text": "Read the note", "next": "read_note" },
+              { "text": "Leave it", "next": "look_around" }
+            ]
+          }
+        },
+        {
+          "id": "door",
+          "label": "Door",
+          "x": 82,
+          "y": 40,
+          "w": 14,
+          "h": 40,
+          "action": { "type": "goto", "next": "locked_door" }
+        }
+      ],
+      "choices": [
+        { "text": "Look around", "next": "look_around" }
+      ]
+    },
+
+    "read_note": {
+      "id": "read_note",
+      "name": "You",
+      "background": "bg_room.jpg",
+      "portrait": "portray_neutral.png",
+      "text": "The note reads: 'Trust no one.' You now feel uneasy.",
+      "setFlag": { "paranoid": true },
+      "choices": [
+        { "text": "Stand up", "next": "hall" },
+        { "text": "Ignore note", "next": "sleep" }
+      ]
+    },
+
+    "look_around": {
+      "id": "look_around",
+      "name": "You",
+      "background": "bg_room.jpg",
+      "portrait": "portray_smile.png",
+      "text": "You see posters and a locked door.",
+      "choices": [
+        { "text": "Try the door", "next": "locked_door" },
+        { "text": "Read the note", "next": "read_note" }
+      ]
+    },
+
+    "locked_door": {
+      "id": "locked_door",
+      "name": "You",
+      "background": "bg_hall.jpg",
+      "portrait": "portray_worried.png",
+      "text": "The door is locked. Someone speaks behind you.",
+      "choices": [
+        { "text": "Turn around", "next": "mysterious_person" }
+      ]
+    },
+
+    "mysterious_person": {
+      "id": "mysterious_person",
+      "name": "???:",
+      "background": "bg_hall.jpg",
+      "portrait": "portray_mystery.png",
+      "text": "A masked figure: 'Let's play a game.'",
+      "choices": [
+        { "text": "Agree", "next": "agree_game" },
+        { "text": "Refuse", "next": "refuse_game" }
+      ]
+    },
+
+    "agree_game": {
+      "id": "agree_game",
+      "name": "You",
+      "background": "bg_hall.jpg",
+      "portrait": "portray_neutral.png",
+      "text": "You nod. The game begins.",
+      "choices": [{ "text": "Continue", "next": "ending_good" }]
+    },
+
+    "refuse_game": {
+      "id": "refuse_game",
+      "name": "You",
+      "background": "bg_hall.jpg",
+      "portrait": "portray_sad.png",
+      "text": "You refuse. Silence returns.",
+      "choices": [{ "text": "Keep looking", "next": "hall" }]
+    },
+
+    "sleep": {
+      "id": "sleep",
+      "name": "You",
+      "background": "bg_room_dark.jpg",
+      "portrait": "portray_sleep.png",
+      "text": "You sleep again. Bad ending.",
+      "choices": [{ "text": "Restart", "next": "wakeup" }]
+    },
+
+    "hall": {
+      "id": "hall",
+      "name": "You",
+      "background": "bg_hall.jpg",
+      "portrait": "portray_neutral.png",
+      "text": "A long hallway stretches ahead.",
+      "choices": [
+        { "text": "Open red door", "next": "red_room", "requiredFlag": "paranoid", "requiredValue": true },
+        { "text": "Open red door (force)", "next": "red_room_force" },
+        { "text": "Go back", "next": "wakeup" }
+      ]
+    },
+
+    "red_room": {
+      "id": "red_room",
+      "name": "You",
+      "background": "bg_red.jpg",
+      "portrait": "portray_shock.png",
+      "text": "A lever reveals itself. Secret path.",
+      "choices": [{ "text": "Pull lever", "next": "secret_end" }]
+    },
+
+    "red_room_force": {
+      "id": "red_room_force",
+      "name": "You",
+      "background": "bg_red.jpg",
+      "portrait": "portray_angry.png",
+      "text": "A trap triggers. Bad ending.",
+      "choices": [{ "text": "Restart", "next": "wakeup" }]
+    },
+
+    "secret_end": {
+      "id": "secret_end",
+      "name": "Narrator",
+      "background": "bg_secret.jpg",
+      "portrait": "portray_smile.png",
+      "text": "You discovered a secret. Good ending.",
+      "choices": [{ "text": "Play again", "next": "wakeup" }]
+    },
+
+    "ending_good": {
+      "id": "ending_good",
+      "name": "Narrator",
+      "background": "bg_stage.jpg",
+      "portrait": "portray_smile.png",
+      "text": "The game ends for now.",
+      "choices": [{ "text": "Play again", "next": "wakeup" }]
+    }
+  }
+}
