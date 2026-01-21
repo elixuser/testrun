@@ -1,13 +1,16 @@
-// Interactive VN engine that loads story.json if present, else fallback to built-in data.
+// Interactive VN engine (robust defaults, improved contrast & layout)
 
-const STORY_FILE = "story.json"; // if present in the repo, it will be loaded
+// Config
+const STORY_FILE = "story.json";
+const textSpeed = 18; // ms per char
 
 // DOM
-const background = document.getElementById("background");
+const bgEl = document.getElementById("bg");
 const hotspotsEl = document.getElementById("hotspots");
-const portrait = document.getElementById("portrait");
-const namebox = document.getElementById("namebox");
+const portraitEl = document.getElementById("portrait");
+const nameEl = document.getElementById("namebox");
 const textEl = document.getElementById("text");
+const textboxEl = document.getElementById("textbox");
 const choicesEl = document.getElementById("choices");
 const saveBtn = document.getElementById("saveBtn");
 const loadBtn = document.getElementById("loadBtn");
@@ -19,135 +22,127 @@ const hsText = document.getElementById("hs-text");
 const hsChoices = document.getElementById("hs-choices");
 const hsClose = document.getElementById("hs-close");
 
-// engine state
+// State
 let gameData = null;
 let currentNode = null;
 let flags = {};
 let typing = false;
-const textSpeed = 20;
 
-// ---------- Helpers ----------
-function assetPath(name) {
-  return name ? `assets/${name}` : "";
-}
-function setBackground(img) {
-  background.style.backgroundImage = img ? `url('${assetPath(img)}')` : "none";
-}
-function setPortrait(img) {
-  portrait.innerHTML = img ? `<img src="${assetPath(img)}" alt="portrait">` : "";
-}
-function applySetFlag(setFlagObj) {
-  if (!setFlagObj) return;
-  for (const k in setFlagObj) flags[k] = setFlagObj[k];
+// Helpers
+function assetPath(filename){
+  // if user provided nested path (backgrounds/foo.svg) keep as-is, otherwise prefix assets/
+  if (!filename) return "";
+  return filename.includes("/") ? `assets/${filename}` : `assets/${filename}`;
 }
 
-// simple typewriter
-function typeText(fullText, done) {
+function setBackground(img){
+  if (!img) {
+    bgEl.style.backgroundImage = "none";
+    return;
+  }
+  bgEl.style.backgroundImage = `url('${assetPath(img)}')`;
+}
+
+function setPortrait(img){
+  if (!img) {
+    portraitEl.innerHTML = "";
+    return;
+  }
+  portraitEl.innerHTML = `<img src="${assetPath(img)}" alt="portrait">`;
+}
+
+function applyFlags(obj){
+  if (!obj) return;
+  Object.keys(obj).forEach(k => flags[k] = obj[k]);
+}
+
+// Typewriter (safe: clicking textbox completes)
+function typeText(full, done){
   typing = true;
   textEl.textContent = "";
   let i = 0;
   const t = setInterval(() => {
-    textEl.textContent += fullText[i++] || "";
-    if (i >= fullText.length) {
-      clearInterval(t);
-      typing = false;
-      if (done) done();
-    }
+    textEl.textContent += full.charAt(i++);
+    if (i >= full.length) { clearInterval(t); typing = false; if (done) done(); }
   }, textSpeed);
 
-  // clicking textbox skips
-  textEl.onclick = () => {
+  textboxEl.onclick = () => {
     if (!typing) return;
     clearInterval(t);
-    textEl.textContent = fullText;
+    textEl.textContent = full;
     typing = false;
     if (done) done();
   };
 }
 
-// render node choices with flag checks
-function renderChoices(choices = []) {
+// Render choices
+function renderChoices(choices = []){
   choicesEl.innerHTML = "";
-  (choices || []).forEach(choice => {
-    if (choice.requiredFlag) {
-      const val = flags[choice.requiredFlag];
-      if (val !== choice.requiredValue) return;
+  (choices || []).forEach(c => {
+    // conditional display
+    if (c.requiredFlag) {
+      const val = flags[c.requiredFlag];
+      if (val !== c.requiredValue) return; // skip choice
     }
     const btn = document.createElement("button");
     btn.className = "choice-btn";
-    btn.textContent = choice.text;
+    btn.textContent = c.text || "Choice";
     btn.onclick = () => {
-      if (choice.setFlag) applySetFlag(choice.setFlag);
-      if (choice.next) goTo(choice.next);
+      if (c.setFlag) applyFlags(c.setFlag);
+      if (c.next) goTo(c.next);
     };
     choicesEl.appendChild(btn);
   });
 }
 
-// Create hotspot DOM elements for current node
-function renderHotspots(node) {
+// Hotspots
+function renderHotspots(node){
   hotspotsEl.innerHTML = "";
   if (!node.hotspots || !Array.isArray(node.hotspots)) return;
 
   node.hotspots.forEach(hs => {
-    const div = document.createElement("div");
-    div.className = "hotspot";
-    // percent coords
-    div.style.left = hs.x + "%";
-    div.style.top = hs.y + "%";
-    div.style.width = hs.w + "%";
-    div.style.height = hs.h + "%";
-    div.title = hs.label || hs.id || "Hotspot";
-    // label inside (optional)
-    const label = document.createElement("span");
-    label.textContent = hs.label || "";
-    div.appendChild(label);
+    const el = document.createElement("div");
+    el.className = "hotspot";
+    el.style.left = hs.x + "%";
+    el.style.top = hs.y + "%";
+    el.style.width = hs.w + "%";
+    el.style.height = hs.h + "%";
+    el.title = hs.label || hs.id || "Hotspot";
+    el.innerHTML = `<span>${hs.label || ""}</span>`;
 
-    div.onclick = (e) => {
-      e.stopPropagation();
-      handleHotspot(hs);
-    };
-
-    hotspotsEl.appendChild(div);
+    el.onclick = (e) => { e.stopPropagation(); handleHotspot(hs); };
+    hotspotsEl.appendChild(el);
   });
 }
 
-// Hotspot action handler
-function handleHotspot(hs) {
-  if (!hs.action) return;
-  const act = hs.action;
+function handleHotspot(hs){
+  if (!hs || !hs.action) return;
+  const a = hs.action;
+  if (a.setFlag) applyFlags(a.setFlag);
 
-  // optionally set flags
-  if (act.setFlag) applySetFlag(act.setFlag);
-
-  if (act.type === "goto") {
-    if (act.next) goTo(act.next);
+  if (a.type === "goto") {
+    if (a.next) goTo(a.next);
     return;
   }
 
-  if (act.type === "dialogue") {
-    // open modal
-    hsName.textContent = hs.label || act.name || "";
-    hsText.textContent = act.text || "";
+  if (a.type === "dialogue") {
+    hsName.textContent = hs.label || a.name || "";
+    hsText.textContent = a.text || "";
     hsChoices.innerHTML = "";
-    if (act.choices && act.choices.length) {
-      act.choices.forEach(c => {
+
+    if (a.choices && a.choices.length) {
+      a.choices.forEach(c => {
         const b = document.createElement("button");
         b.className = "choice-btn";
         b.textContent = c.text;
         b.onclick = () => {
-          if (c.setFlag) applySetFlag(c.setFlag);
-          if (c.next) {
-            hideHotspotModal();
-            goTo(c.next);
-          } else {
-            hideHotspotModal();
-          }
+          if (c.setFlag) applyFlags(c.setFlag);
+          if (c.next) { hideHotspotModal(); goTo(c.next); }
+          else hideHotspotModal();
         };
         hsChoices.appendChild(b);
       });
     } else {
-      // single 'OK' choice
       const b = document.createElement("button");
       b.className = "choice-btn";
       b.textContent = "OK";
@@ -155,36 +150,25 @@ function handleHotspot(hs) {
       hsChoices.appendChild(b);
     }
     showHotspotModal();
-    return;
   }
-
-  // other action types can be added (e.g., inventory, minigame trigger)
 }
 
-// hotspot modal controls
-function showHotspotModal() {
-  hsModal.classList.remove("hidden");
-}
-function hideHotspotModal() {
-  hsModal.classList.add("hidden");
-}
+// Modal helpers
+function showHotspotModal(){ hsModal.classList.remove("hidden"); }
+function hideHotspotModal(){ hsModal.classList.add("hidden"); }
 hsClose.onclick = hideHotspotModal;
 hsModal.onclick = (e) => { if (e.target === hsModal) hideHotspotModal(); };
 
-// goTo node
-function goTo(nodeId) {
+// Navigation
+function goTo(nodeId){
   const node = gameData.nodes[nodeId];
-  if (!node) {
-    console.error("Node not found:", nodeId);
-    return;
-  }
+  if (!node) { console.error("Unknown node:", nodeId); return; }
   currentNode = nodeId;
-  applySetFlag(node.setFlag);
+  if (node.setFlag) applyFlags(node.setFlag);
 
-  // UI updates
   setBackground(node.background);
   setPortrait(node.portrait);
-  namebox.textContent = node.name || "";
+  nameEl.textContent = node.name || "";
 
   typeText(node.text || "", () => {
     renderChoices(node.choices || []);
@@ -193,33 +177,38 @@ function goTo(nodeId) {
   renderHotspots(node);
 }
 
-// save/load
-function saveGame() {
+// Save/load
+function saveGame(){
   const save = { current: currentNode, flags };
   try {
     localStorage.setItem("vn_save", JSON.stringify(save));
-    alert("Game saved.");
+    alert("Saved.");
   } catch (e) {
     alert("Save failed.");
   }
 }
-function loadGame() {
+function loadGame(){
   const raw = localStorage.getItem("vn_save");
-  if (!raw) { alert("No save found."); return; }
+  if (!raw) { alert("No save."); return; }
   try {
-    const save = JSON.parse(raw);
-    flags = save.flags || {};
-    goTo(save.current || gameData.start);
-    alert("Game loaded.");
-  } catch (e) { alert("Failed to load save."); }
+    const s = JSON.parse(raw);
+    flags = s.flags || {};
+    goTo(s.current || gameData.start);
+    alert("Loaded.");
+  } catch (e) { alert("Load failed."); }
 }
-function restart() {
+function restart(){
   flags = {};
   hideHotspotModal();
   goTo(gameData.start);
 }
 
-// keyboard shortcuts (1..5)
+// UI wiring
+saveBtn.onclick = saveGame;
+loadBtn.onclick = loadGame;
+restartBtn.onclick = restart;
+
+// Keyboard shortcuts for choices (1..5)
 document.addEventListener("keydown", e => {
   const keys = ["1","2","3","4","5"];
   const idx = keys.indexOf(e.key);
@@ -229,54 +218,40 @@ document.addEventListener("keydown", e => {
   }
 });
 
-// wire UI buttons
-saveBtn.onclick = saveGame;
-loadBtn.onclick = loadGame;
-restartBtn.onclick = restart;
-
-// ---------- Load story.json (if present) ----------
-async function loadStory() {
-  // try to fetch external story.json
+// Load story.json or fallback
+async function loadStory(){
   try {
-    const resp = await fetch(STORY_FILE, {cache: "no-store"});
-    if (resp.ok) {
-      const json = await resp.json();
-      gameData = json;
+    const r = await fetch(STORY_FILE, { cache: "no-store" });
+    if (r.ok) {
+      gameData = await r.json();
       return;
     }
   } catch (e) {
-    // no external file — will fallback
+    // ignore
   }
 
-  // fallback built-in data (a small default)
+  // fallback minimal data
   gameData = {
     start: "wakeup",
     nodes: {
       wakeup: {
         id: "wakeup",
         name: "You",
-        background: "bg_room.jpg",
-        portrait: "portray_neutral.png",
-        text: "This is a fallback scene. Replace story.json with your own.",
+        background: "backgrounds/bg_room.svg",
+        portrait: "portraits/neutral.svg",
+        text: "Fallback scene. Replace story.json in repo.",
         hotspots: [
-          { id: "center", label: "Center", x: 45, y: 60, w: 12, h: 12,
-            action: { type: "dialogue", text: "You clicked the center.", choices: [{ text: "Continue", next: "ending" }] } }
+          { id: "desk", label: "Desk", x:45, y:60, w:16, h:12, action: { type:"dialogue", text:"A note lies on the desk.", choices:[{text:"Read",next:"read_note"}] } }
         ],
-        choices: [{ text: "Continue", next: "ending" }]
+        choices: [{ text:"Look around", next:"look_around" }]
       },
-      ending: {
-        id: "ending",
-        name: "Narrator",
-        background: "bg_stage.jpg",
-        portrait: "portray_smile.png",
-        text: "Fallback ending. Add a story.json to replace this.",
-        choices: [{ text: "Restart", next: "wakeup" }]
-      }
+      read_note: { id:"read_note", name:"You", background:"backgrounds/bg_room.svg", portrait:"portraits/neutral.svg", text:"You read the note.", choices:[{text:"Continue", next:"wakeup"}] },
+      look_around: { id:"look_around", name:"You", background:"backgrounds/bg_hall.svg", portrait:"portraits/worried.svg", text:"You look around.", choices:[{text:"Back", next:"wakeup"}] }
     }
   };
 }
 
-// start engine
+// start
 (async () => {
   await loadStory();
   restart();
