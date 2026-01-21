@@ -30,8 +30,8 @@ const textSpeed = 20;
 function assetPath(name) {
   return name ? `assets/${name}` : "";
 }
-function setBackground(bg_room.jpg) {
-  background.style.backgroundImage = bg_room.jpg ? `url('${assetPath(bg_room.jpg)}')` : "none";
+function setBackground(img) {
+  background.style.backgroundImage = img ? `url('${assetPath(img)}')` : "none";
 }
 function setPortrait(img) {
   portrait.innerHTML = img ? `<img src="${assetPath(img)}" alt="portrait">` : "";
