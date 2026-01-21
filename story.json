@@ -1,99 +1,29 @@
 {
-  "start": "wakeup",
-  "nodes": {
-    "wakeup": {
-      "id": "wakeup",
-      "name": "You",
-      "background": "backgrounds/bg_room.svg",
-      "portrait": "portraits/neutral.svg",
-      "text": "You wake up in a strange classroom. The room is quiet.",
-      "hotspots": [
-        {
-          "id": "desk",
-          "label": "Desk",
-          "x": 42,
-          "y": 62,
-          "w": 24,
-          "h": 16,
-          "action": {
-            "type": "dialogue",
-            "text": "There's a folded note on the desk.",
-            "choices": [
-              { "text": "Read the note", "next": "read_note" },
-              { "text": "Ignore it", "next": "look_around" }
-            ]
-          }
-        },
-        {
-          "id": "door",
-          "label": "Door",
-          "x": 82,
-          "y": 38,
-          "w": 10,
-          "h": 40,
-          "action": { "type": "goto", "next": "locked_door" }
-        }
-      ],
-      "choices": [
-        { "text": "Look around", "next": "look_around" }
-      ]
-    },
+  "start": {
+    "background": "assets/backgrounds/classroom.jpg",
+    "text": "You sit alone in the classroom. It's too quiet.",
+    "next": "hallway"
+  },
 
-    "read_note": {
-      "id": "read_note",
-      "name": "You",
-      "background": "backgrounds/bg_room.svg",
-      "portrait": "portraits/neutral.svg",
-      "text": "The note reads: 'Trust no one.'",
-      "setFlag": { "paranoid": true },
-      "choices": [
-        { "text": "Stand up", "next": "hall" },
-        { "text": "Ignore note", "next": "sleep" }
-      ]
-    },
+  "hallway": {
+    "background": "assets/backgrounds/hallway.jpg",
+    "text": "The hallway stretches endlessly before you.",
+    "choices": [
+      {
+        "text": "Walk forward",
+        "next": "redroom"
+      }
+    ]
+  },
 
-    "look_around": {
-      "id": "look_around",
-      "name": "You",
-      "background": "backgrounds/bg_room.svg",
-      "portrait": "portraits/smile.svg",
-      "text": "You see posters and a locked door.",
-      "choices": [
-        { "text": "Try the door", "next": "locked_door" },
-        { "text": "Read the note", "next": "read_note" }
-      ]
-    },
-
-    "locked_door": {
-      "id": "locked_door",
-      "name": "You",
-      "background": "backgrounds/bg_hall.svg",
-      "portrait": "portraits/worried.svg",
-      "text": "The door is locked.",
-      "choices": [{ "text": "Turn around", "next": "mysterious_person" }]
-    },
-
-    "mysterious_person": {
-      "id": "mysterious_person",
-      "name": "???:",
-      "background": "backgrounds/bg_hall.svg",
-      "portrait": "portraits/neutral.svg",
-      "text": "'Let's play a game,' a voice whispers.",
-      "choices": [{ "text": "Agree", "next": "ending_good" }, { "text": "Refuse", "next": "refuse_game" }]
-    },
-
-    "refuse_game": { "id": "refuse_game", "name": "You", "background": "backgrounds/bg_hall.svg", "portrait": "portraits/worried.svg", "text": "You refuse.", "choices": [{ "text": "Back", "next": "wakeup" }] },
-
-    "sleep": { "id": "sleep", "name": "You", "background": "backgrounds/bg_room.svg", "portrait": "portraits/neutral.svg", "text": "You sleep again. (Bad ending)", "choices": [{ "text": "Restart", "next": "wakeup" }] },
-
-    "hall": { "id": "hall", "name": "You", "background": "backgrounds/bg_hall.svg", "portrait": "portraits/neutral.svg", "text": "A long hallway stretches ahead.", "choices": [{ "text": "Open red door", "next": "red_room", "requiredFlag":"paranoid", "requiredValue":true }, { "text":"Open red door (force)", "next":"red_room_force" }, { "text":"Go back", "next":"wakeup" }] },
-
-    "red_room": { "id":"red_room", "name":"You", "background":"backgrounds/bg_red.svg", "portrait":"portraits/neutral.svg", "text":"You found a secret lever.", "choices":[{"text":"Pull lever","next":"secret_end"}] },
-
-    "red_room_force": { "id":"red_room_force","name":"You","background":"backgrounds/bg_red.svg","portrait":"portraits/worried.svg","text":"A trap triggers. (Bad ending)","choices":[{"text":"Restart","next":"wakeup"}] },
-
-    "secret_end": { "id":"secret_end","name":"Narrator","background":"backgrounds/bg_secret.svg","portrait":"portraits/neutral.svg","text":"You discovered a secret. (Good ending)","choices":[{"text":"Play again","next":"wakeup"}] },
-
-    "ending_good": { "id":"ending_good","name":"Narrator","background":"backgrounds/bg_stage.svg","portrait":"portraits/neutral.svg","text":"The game ends for now.","choices":[{"text":"Play again","next":"wakeup"}] }
+  "redroom": {
+    "background": "assets/backgrounds/red_room.jpg",
+    "text": "The world is bathed in red. Something is wrong.",
+    "choices": [
+      {
+        "text": "Restart",
+        "next": "start"
+      }
+    ]
   }
 }
