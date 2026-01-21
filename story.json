@@ -5,7 +5,7 @@
       "id": "wakeup",
       "name": "You",
       "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "You wake up in a strange classroom. The room is quiet.",
       "hotspots": [
         {
@@ -43,7 +43,7 @@
       "id": "read_note",
       "name": "You",
       "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "The note reads: 'Trust no one.'",
       "setFlag": { "paranoid": true },
       "choices": [
@@ -56,7 +56,7 @@
       "id": "look_around",
       "name": "You",
       "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/smile.svg",
+      "portrait": "portraits/smile.jpg",
       "text": "You see posters and a locked door.",
       "choices": [
         { "text": "Try the door", "next": "locked_door" },
@@ -68,7 +68,7 @@
       "id": "locked_door",
       "name": "You",
       "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/worried.svg",
+      "portrait": "portraits/worried.jpg",
       "text": "The door is locked.",
       "choices": [
         { "text": "Turn around", "next": "mysterious_person" }
@@ -79,7 +79,7 @@
       "id": "mysterious_person",
       "name": "???:",
       "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "'Let's play a game,' a voice whispers.",
       "choices": [
         { "text": "Agree", "next": "ending_good" },
@@ -91,7 +91,7 @@
       "id": "refuse_game",
       "name": "You",
       "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/worried.svg",
+      "portrait": "portraits/worried.jpg",
       "text": "You refuse.",
       "choices": [
         { "text": "Back", "next": "wakeup" }
@@ -102,7 +102,7 @@
       "id": "sleep",
       "name": "You",
       "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "You sleep again. (Bad ending)",
       "choices": [
         { "text": "Restart", "next": "wakeup" }
@@ -113,7 +113,7 @@
       "id": "hall",
       "name": "You",
       "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "A long hallway stretches ahead.",
       "choices": [
         {
@@ -131,7 +131,7 @@
       "id": "red_room",
       "name": "You",
       "background": "backgrounds/red_room.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "You found a secret lever.",
       "choices": [
         { "text": "Pull lever", "next": "secret_end" }
@@ -142,7 +142,7 @@
       "id": "red_room_force",
       "name": "You",
       "background": "backgrounds/red_room.jpg",
-      "portrait": "portraits/worried.svg",
+      "portrait": "portraits/worried.jpg",
       "text": "A trap triggers. (Bad ending)",
       "choices": [
         { "text": "Restart", "next": "wakeup" }
@@ -153,7 +153,7 @@
       "id": "secret_end",
       "name": "Narrator",
       "background": "backgrounds/red_room.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "You discovered a secret. (Good ending)",
       "choices": [
         { "text": "Play again", "next": "wakeup" }
@@ -164,7 +164,7 @@
       "id": "ending_good",
       "name": "Narrator",
       "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/neutral.svg",
+      "portrait": "portraits/neutral.jpg",
       "text": "The game ends for now.",
       "choices": [
         { "text": "Play again", "next": "wakeup" }
