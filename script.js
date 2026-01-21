@@ -1,152 +1,10 @@
-// Simple visual novel engine
+// Interactive VN engine that loads story.json if present, else fallback to built-in data.
 
-// ----- Game data (edit this) -----
-const gameData = {
-  start: "wakeup",
-  nodes: {
-    wakeup: {
-      id: "wakeup",
-      name: "You",
-      background: "bg_room.jpg",
-      portrait: "portray_neutral.png",
-      text: "You wake up in a strange classroom. There's a note on the desk.",
-      choices: [
-        { text: "Read the note", next: "read_note" },
-        { text: "Look around", next: "look_around" }
-      ]
-    },
+const STORY_FILE = "story.json"; // if present in the repo, it will be loaded
 
-    read_note: {
-      id: "read_note",
-      name: "You",
-      background: "bg_room.jpg",
-      portrait: "portray_neutral.png",
-      text: "The note says: 'Trust no one.' You feel uneasy.",
-      setFlag: { paranoid: true },
-      choices: [
-        { text: "Stand up", next: "hall" },
-        { text: "Ignore note", next: "sleep" }
-      ]
-    },
-
-    look_around: {
-      id: "look_around",
-      name: "You",
-      background: "bg_room.jpg",
-      portrait: "portray_smile.png",
-      text: "You see posters and a locked door.",
-      choices: [{ text: "Try the door", next: "locked_door" }, { text: "Read the note", next: "read_note" }]
-    },
-
-    locked_door: {
-      id: "locked_door",
-      name: "You",
-      background: "bg_hall.jpg",
-      portrait: "portray_worried.png",
-      text: "The door is locked. A voice behind you says: 'You're finally awake.'",
-      choices: [
-        { text: "Turn around", next: "mysterious_person" }
-      ]
-    },
-
-    mysterious_person: {
-      id: "mysterious_person",
-      name: "???:",
-      background: "bg_hall.jpg",
-      portrait: "portray_mystery.png",
-      text: "A masked figure stands there. 'Let's play a game,' they whisper.",
-      choices: [
-        { text: "Agree", next: "agree_game" },
-        { text: "Refuse", next: "refuse_game" }
-      ]
-    },
-
-    agree_game: {
-      id: "agree_game",
-      name: "You",
-      background: "bg_hall.jpg",
-      portrait: "portray_neutral.png",
-      text: "You nod. The game begins.",
-      choices: [{ text: "Continue", next: "ending_good" }]
-    },
-
-    refuse_game: {
-      id: "refuse_game",
-      name: "You",
-      background: "bg_hall.jpg",
-      portrait: "portray_sad.png",
-      text: "You refuse. The figure disappears. You are alone... or are you?",
-      choices: [{ text: "Keep looking", next: "hall" }]
-    },
-
-    sleep: {
-      id: "sleep",
-      name: "You",
-      background: "bg_room_dark.jpg",
-      portrait: "portray_sleep.png",
-      text: "You sleep again and the world fades. (Bad ending)",
-      choices: [{ text: "Restart", next: "wakeup" }]
-    },
-
-    hall: {
-      id: "hall",
-      name: "You",
-      background: "bg_hall.jpg",
-      portrait: "portray_neutral.png",
-      text: "A long hallway stretches ahead. There is a door with red paint.",
-      choices: [
-        { text: "Open red door", next: "red_room", requiredFlag: "paranoid", requiredValue: true },
-        { text: "Open red door (force)", next: "red_room_force" },
-        { text: "Go back", next: "wakeup" }
-      ]
-    },
-
-    red_room: {
-      id: "red_room",
-      name: "You",
-      background: "bg_red.jpg",
-      portrait: "portray_shock.png",
-      text: "Because you read the note earlier you were cautious... and found a hidden lever. (Secret path)",
-      choices: [{ text: "Pull lever", next: "secret_end" }]
-    },
-
-    red_room_force: {
-      id: "red_room_force",
-      name: "You",
-      background: "bg_red.jpg",
-      portrait: "portray_angry.png",
-      text: "You force the door open and a trap triggers. (Bad ending)",
-      choices: [{ text: "Restart", next: "wakeup" }]
-    },
-
-    secret_end: {
-      id: "secret_end",
-      name: "Narrator",
-      background: "bg_secret.jpg",
-      portrait: "portray_smile.png",
-      text: "You discovered a secret. Well done! (Good ending)",
-      choices: [{ text: "Play again", next: "wakeup" }]
-    },
-
-    ending_good: {
-      id: "ending_good",
-      name: "Narrator",
-      background: "bg_stage.jpg",
-      portrait: "portray_smile.png",
-      text: "The game ends for now — but stories continue.",
-      choices: [{ text: "Play again", next: "wakeup" }]
-    }
-  }
-};
-
-// ----- Engine state -----
-let currentNode = null;
-let flags = {};
-let typing = false;
-const textSpeed = 25; // ms per char (lower = faster)
-
-// ----- DOM elements -----
+// DOM
 const background = document.getElementById("background");
+const hotspotsEl = document.getElementById("hotspots");
 const portrait = document.getElementById("portrait");
 const namebox = document.getElementById("namebox");
 const textEl = document.getElementById("text");
@@ -155,33 +13,48 @@ const saveBtn = document.getElementById("saveBtn");
 const loadBtn = document.getElementById("loadBtn");
 const restartBtn = document.getElementById("restartBtn");
 
-// ----- Helpers -----
+const hsModal = document.getElementById("hotspot-modal");
+const hsName = document.getElementById("hs-name");
+const hsText = document.getElementById("hs-text");
+const hsChoices = document.getElementById("hs-choices");
+const hsClose = document.getElementById("hs-close");
+
+// engine state
+let gameData = null;
+let currentNode = null;
+let flags = {};
+let typing = false;
+const textSpeed = 20;
+
+// ---------- Helpers ----------
 function assetPath(name) {
-  // images are expected in /assets/
   return name ? `assets/${name}` : "";
 }
-
 function setBackground(img) {
   background.style.backgroundImage = img ? `url('${assetPath(img)}')` : "none";
 }
-
 function setPortrait(img) {
   portrait.innerHTML = img ? `<img src="${assetPath(img)}" alt="portrait">` : "";
 }
+function applySetFlag(setFlagObj) {
+  if (!setFlagObj) return;
+  for (const k in setFlagObj) flags[k] = setFlagObj[k];
+}
 
-// typewriter effect
+// simple typewriter
 function typeText(fullText, done) {
   typing = true;
   textEl.textContent = "";
   let i = 0;
   const t = setInterval(() => {
-    textEl.textContent += fullText[i++];
+    textEl.textContent += fullText[i++] || "";
     if (i >= fullText.length) {
       clearInterval(t);
       typing = false;
       if (done) done();
     }
   }, textSpeed);
+
   // clicking textbox skips
   textEl.onclick = () => {
     if (!typing) return;
@@ -192,34 +65,113 @@ function typeText(fullText, done) {
   };
 }
 
-// render choices with condition check
+// render node choices with flag checks
 function renderChoices(choices = []) {
   choicesEl.innerHTML = "";
-  choices.forEach(choice => {
-    // condition: if choice.requiredFlag exists, show only if flag matches requiredValue (or non-null)
+  (choices || []).forEach(choice => {
     if (choice.requiredFlag) {
       const val = flags[choice.requiredFlag];
-      if (val !== choice.requiredValue) return; // skip choice
+      if (val !== choice.requiredValue) return;
     }
-
     const btn = document.createElement("button");
     btn.className = "choice-btn";
     btn.textContent = choice.text;
     btn.onclick = () => {
-      if (typing) { /* prevent choosing while text typing; could auto-skip */ }
-      handleChoice(choice);
+      if (choice.setFlag) applySetFlag(choice.setFlag);
+      if (choice.next) goTo(choice.next);
     };
     choicesEl.appendChild(btn);
   });
 }
 
-// apply flag changes
-function applySetFlag(node) {
-  if (!node.setFlag) return;
-  for (const k in node.setFlag) flags[k] = node.setFlag[k];
+// Create hotspot DOM elements for current node
+function renderHotspots(node) {
+  hotspotsEl.innerHTML = "";
+  if (!node.hotspots || !Array.isArray(node.hotspots)) return;
+
+  node.hotspots.forEach(hs => {
+    const div = document.createElement("div");
+    div.className = "hotspot";
+    // percent coords
+    div.style.left = hs.x + "%";
+    div.style.top = hs.y + "%";
+    div.style.width = hs.w + "%";
+    div.style.height = hs.h + "%";
+    div.title = hs.label || hs.id || "Hotspot";
+    // label inside (optional)
+    const label = document.createElement("span");
+    label.textContent = hs.label || "";
+    div.appendChild(label);
+
+    div.onclick = (e) => {
+      e.stopPropagation();
+      handleHotspot(hs);
+    };
+
+    hotspotsEl.appendChild(div);
+  });
 }
 
-// load/render node by id
+// Hotspot action handler
+function handleHotspot(hs) {
+  if (!hs.action) return;
+  const act = hs.action;
+
+  // optionally set flags
+  if (act.setFlag) applySetFlag(act.setFlag);
+
+  if (act.type === "goto") {
+    if (act.next) goTo(act.next);
+    return;
+  }
+
+  if (act.type === "dialogue") {
+    // open modal
+    hsName.textContent = hs.label || act.name || "";
+    hsText.textContent = act.text || "";
+    hsChoices.innerHTML = "";
+    if (act.choices && act.choices.length) {
+      act.choices.forEach(c => {
+        const b = document.createElement("button");
+        b.className = "choice-btn";
+        b.textContent = c.text;
+        b.onclick = () => {
+          if (c.setFlag) applySetFlag(c.setFlag);
+          if (c.next) {
+            hideHotspotModal();
+            goTo(c.next);
+          } else {
+            hideHotspotModal();
+          }
+        };
+        hsChoices.appendChild(b);
+      });
+    } else {
+      // single 'OK' choice
+      const b = document.createElement("button");
+      b.className = "choice-btn";
+      b.textContent = "OK";
+      b.onclick = hideHotspotModal;
+      hsChoices.appendChild(b);
+    }
+    showHotspotModal();
+    return;
+  }
+
+  // other action types can be added (e.g., inventory, minigame trigger)
+}
+
+// hotspot modal controls
+function showHotspotModal() {
+  hsModal.classList.remove("hidden");
+}
+function hideHotspotModal() {
+  hsModal.classList.add("hidden");
+}
+hsClose.onclick = hideHotspotModal;
+hsModal.onclick = (e) => { if (e.target === hsModal) hideHotspotModal(); };
+
+// goTo node
 function goTo(nodeId) {
   const node = gameData.nodes[nodeId];
   if (!node) {
@@ -227,34 +179,30 @@ function goTo(nodeId) {
     return;
   }
   currentNode = nodeId;
-  applySetFlag(node);
+  applySetFlag(node.setFlag);
 
-  // UI
+  // UI updates
   setBackground(node.background);
   setPortrait(node.portrait);
   namebox.textContent = node.name || "";
 
-  // type text then show choices
   typeText(node.text || "", () => {
     renderChoices(node.choices || []);
   });
-}
 
-// when a choice is clicked
-function handleChoice(choice) {
-  if (choice.setFlag) {
-    for (const k in choice.setFlag) flags[k] = choice.setFlag[k];
-  }
-  if (choice.next) goTo(choice.next);
+  renderHotspots(node);
 }
 
 // save/load
 function saveGame() {
   const save = { current: currentNode, flags };
-  localStorage.setItem("vn_save", JSON.stringify(save));
-  alert("Game saved.");
+  try {
+    localStorage.setItem("vn_save", JSON.stringify(save));
+    alert("Game saved.");
+  } catch (e) {
+    alert("Save failed.");
+  }
 }
-
 function loadGame() {
   const raw = localStorage.getItem("vn_save");
   if (!raw) { alert("No save found."); return; }
@@ -263,24 +211,15 @@ function loadGame() {
     flags = save.flags || {};
     goTo(save.current || gameData.start);
     alert("Game loaded.");
-  } catch (e) {
-    alert("Failed to load save.");
-    console.error(e);
-  }
+  } catch (e) { alert("Failed to load save."); }
 }
-
-// restart
 function restart() {
   flags = {};
+  hideHotspotModal();
   goTo(gameData.start);
 }
 
-// wire buttons
-saveBtn.onclick = saveGame;
-loadBtn.onclick = loadGame;
-restartBtn.onclick = restart;
-
-// keyboard shortcuts for accessibility (1,2,3 to choose first/second/third)
+// keyboard shortcuts (1..5)
 document.addEventListener("keydown", e => {
   const keys = ["1","2","3","4","5"];
   const idx = keys.indexOf(e.key);
@@ -290,5 +229,55 @@ document.addEventListener("keydown", e => {
   }
 });
 
-// start
-restart();
+// wire UI buttons
+saveBtn.onclick = saveGame;
+loadBtn.onclick = loadGame;
+restartBtn.onclick = restart;
+
+// ---------- Load story.json (if present) ----------
+async function loadStory() {
+  // try to fetch external story.json
+  try {
+    const resp = await fetch(STORY_FILE, {cache: "no-store"});
+    if (resp.ok) {
+      const json = await resp.json();
+      gameData = json;
+      return;
+    }
+  } catch (e) {
+    // no external file — will fallback
+  }
+
+  // fallback built-in data (a small default)
+  gameData = {
+    start: "wakeup",
+    nodes: {
+      wakeup: {
+        id: "wakeup",
+        name: "You",
+        background: "bg_room.jpg",
+        portrait: "portray_neutral.png",
+        text: "This is a fallback scene. Replace story.json with your own.",
+        hotspots: [
+          { id: "center", label: "Center", x: 45, y: 60, w: 12, h: 12,
+            action: { type: "dialogue", text: "You clicked the center.", choices: [{ text: "Continue", next: "ending" }] } }
+        ],
+        choices: [{ text: "Continue", next: "ending" }]
+      },
+      ending: {
+        id: "ending",
+        name: "Narrator",
+        background: "bg_stage.jpg",
+        portrait: "portray_smile.png",
+        text: "Fallback ending. Add a story.json to replace this.",
+        choices: [{ text: "Restart", next: "wakeup" }]
+      }
+    }
+  };
+}
+
+// start engine
+(async () => {
+  await loadStory();
+  restart();
+})();
