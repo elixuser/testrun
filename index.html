@@ -3,22 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Interactive VN Template</title>
+  <title>Interactive VN - Template</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="game">
-    <div id="background-wrap">
-      <div id="background"></div>
-      <div id="hotspots"></div> <!-- hotspot containers -->
+  <div id="app">
+    <div id="scene">
+      <div id="bg"></div>
+      <div id="hotspots"></div>
     </div>
 
-    <div id="ui">
-      <div id="portrait"></div>
+    <div id="overlay">
+      <div id="left-column">
+        <div id="portrait" aria-hidden="true"></div>
+      </div>
 
-      <div id="dialogue">
-        <div id="namebox"></div>
-        <div id="textbox">
+      <div id="right-column">
+        <div id="namebox" role="status" aria-live="polite"></div>
+        <div id="textbox" tabindex="0">
           <p id="text"></p>
         </div>
 
@@ -33,7 +35,7 @@
     </div>
   </div>
 
-  <!-- Hotspot modal (shows when a hotspot produces its own dialogue/choices) -->
+  <!-- Hotspot Modal -->
   <div id="hotspot-modal" class="hidden" role="dialog" aria-modal="true">
     <div class="modal-inner">
       <div id="hs-name" class="hs-name"></div>
@@ -46,5 +48,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
