@@ -1,7 +1,6 @@
-// Interactive VN engine (robust defaults, improved contrast & layout)
-
-// Config
+// Interactive VN engine — cutscenes + hotspots + glitch text
 const STORY_FILE = "story.json";
+const ASSETS_DIR = "assets"; // <-- correct folder name
 const textSpeed = 18; // ms per char
 
 // DOM
@@ -12,6 +11,7 @@ const nameEl = document.getElementById("namebox");
 const textEl = document.getElementById("text");
 const textboxEl = document.getElementById("textbox");
 const choicesEl = document.getElementById("choices");
+
 const saveBtn = document.getElementById("saveBtn");
 const loadBtn = document.getElementById("loadBtn");
 const restartBtn = document.getElementById("restartBtn");
@@ -28,14 +28,54 @@ let currentNode = null;
 let flags = {};
 let typing = false;
 
-// Helpers
-function assetPath(filename){
-  // if user provided nested path (backgrounds/foo.svg) keep as-is, otherwise prefix assets/
+let typingInterval = null;
+let autoAdvanceTimer = null;
+let glitchTimers = [];
+
+// ---------- utilities ----------
+function assetPath(filename) {
   if (!filename) return "";
-  return filename.includes("/") ? `assets/${filename}` : `assets/${filename}`;
+  filename = filename.replace(/^\.\//, "");
+  if (filename.startsWith(`${ASSETS_DIR}/`)) return filename;
+  return `${ASSETS_DIR}/${filename}`;
 }
 
-function setBackground(img){
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// Inline effect token: [[glitch:some text]]
+function formatText(raw) {
+  const src = String(raw || "");
+  const plain = src.replace(/\[\[glitch:(.+?)\]\]/g, (_, inner) => inner);
+
+  const htmlEscaped = escapeHtml(src)
+    .replace(/\[\[glitch:(.+?)\]\]/g, (_, inner) => {
+      const safe = escapeHtml(inner);
+      return `<span class="glitch" data-base="${safe}">${safe}</span>`;
+    })
+    .replace(/\n/g, "<br>");
+
+  return { plain, html: htmlEscaped };
+}
+
+function clearTimers() {
+  if (typingInterval) clearInterval(typingInterval);
+  typingInterval = null;
+
+  if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+  autoAdvanceTimer = null;
+
+  glitchTimers.forEach(t => clearInterval(t));
+  glitchTimers = [];
+}
+
+function setBackground(img) {
   if (!img) {
     bgEl.style.backgroundImage = "none";
     return;
@@ -43,64 +83,121 @@ function setBackground(img){
   bgEl.style.backgroundImage = `url('${assetPath(img)}')`;
 }
 
-function setPortrait(img){
-  if (!img) {
-    portraitEl.innerHTML = "";
-    return;
-  }
-  portraitEl.innerHTML = `<img src="${assetPath(img)}" alt="portrait">`;
+function setPortrait(img) {
+  portraitEl.innerHTML = "";
+  if (!img) return;
+
+  const el = document.createElement("img");
+  el.src = assetPath(img);
+  el.alt = "portrait";
+  el.onerror = () => { portraitEl.innerHTML = ""; };
+  portraitEl.appendChild(el);
 }
 
-function applyFlags(obj){
+function applyFlags(obj) {
   if (!obj) return;
-  Object.keys(obj).forEach(k => flags[k] = obj[k]);
+  Object.keys(obj).forEach(k => (flags[k] = obj[k]));
 }
 
-// Typewriter (safe: clicking textbox completes)
-function typeText(full, done){
+// ---------- glitch effect ----------
+function startGlitchEffects() {
+  const glitchEls = textEl.querySelectorAll(".glitch");
+  glitchEls.forEach(el => {
+    const base = el.getAttribute("data-base") || el.textContent || "";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-+=~?";
+
+    const scramble = (s) => {
+      const arr = s.split("");
+      return arr.map(ch => {
+        if (ch === " " || Math.random() < 0.55) return ch;
+        return chars[Math.floor(Math.random() * chars.length)];
+      }).join("");
+    };
+
+    let tick = 0;
+    const timer = setInterval(() => {
+      tick++;
+      if (tick % 9 === 0) el.innerHTML = base;
+      else el.innerHTML = scramble(base);
+    }, 70);
+
+    glitchTimers.push(timer);
+  });
+}
+
+// ---------- typewriter ----------
+function typeText(raw, done) {
+  clearTimers();
   typing = true;
+
+  const { plain, html } = formatText(raw);
   textEl.textContent = "";
+  choicesEl.innerHTML = "";
+
   let i = 0;
-  const t = setInterval(() => {
-    textEl.textContent += full.charAt(i++);
-    if (i >= full.length) { clearInterval(t); typing = false; if (done) done(); }
+  typingInterval = setInterval(() => {
+    textEl.textContent += plain.charAt(i++);
+    if (i >= plain.length) {
+      clearInterval(typingInterval);
+      typingInterval = null;
+      typing = false;
+
+      textEl.innerHTML = html;
+      startGlitchEffects();
+      if (done) done();
+    }
   }, textSpeed);
 
   textboxEl.onclick = () => {
     if (!typing) return;
-    clearInterval(t);
-    textEl.textContent = full;
+    clearInterval(typingInterval);
+    typingInterval = null;
     typing = false;
+
+    textEl.innerHTML = html;
+    startGlitchEffects();
     if (done) done();
   };
 }
 
-// Render choices
-function renderChoices(choices = []){
+// ---------- choices ----------
+function choiceVisible(c) {
+  if (c.requiredFlag) {
+    const val = flags[c.requiredFlag];
+    if (val !== c.requiredValue) return false;
+  }
+  return true;
+}
+
+function renderChoices(choices = []) {
   choicesEl.innerHTML = "";
   (choices || []).forEach(c => {
-    // conditional display
-    if (c.requiredFlag) {
-      const val = flags[c.requiredFlag];
-      if (val !== c.requiredValue) return; // skip choice
-    }
+    if (!choiceVisible(c)) return;
+
     const btn = document.createElement("button");
     btn.className = "choice-btn";
     btn.textContent = c.text || "Choice";
+
     btn.onclick = () => {
       if (c.setFlag) applyFlags(c.setFlag);
       if (c.next) goTo(c.next);
     };
+
     choicesEl.appendChild(btn);
   });
 }
 
-// Hotspots
-function renderHotspots(node){
+// ---------- hotspots ----------
+function renderHotspots(node) {
   hotspotsEl.innerHTML = "";
   if (!node.hotspots || !Array.isArray(node.hotspots)) return;
 
   node.hotspots.forEach(hs => {
+    if (hs.requiredFlag) {
+      const val = flags[hs.requiredFlag];
+      if (val !== hs.requiredValue) return;
+    }
+
     const el = document.createElement("div");
     el.className = "hotspot";
     el.style.left = hs.x + "%";
@@ -109,15 +206,16 @@ function renderHotspots(node){
     el.style.height = hs.h + "%";
     el.title = hs.label || hs.id || "Hotspot";
     el.innerHTML = `<span>${hs.label || ""}</span>`;
-
     el.onclick = (e) => { e.stopPropagation(); handleHotspot(hs); };
+
     hotspotsEl.appendChild(el);
   });
 }
 
-function handleHotspot(hs){
+function handleHotspot(hs) {
   if (!hs || !hs.action) return;
   const a = hs.action;
+
   if (a.setFlag) applyFlags(a.setFlag);
 
   if (a.type === "goto") {
@@ -132,14 +230,18 @@ function handleHotspot(hs){
 
     if (a.choices && a.choices.length) {
       a.choices.forEach(c => {
+        if (!choiceVisible(c)) return;
+
         const b = document.createElement("button");
         b.className = "choice-btn";
         b.textContent = c.text;
+
         b.onclick = () => {
           if (c.setFlag) applyFlags(c.setFlag);
           if (c.next) { hideHotspotModal(); goTo(c.next); }
           else hideHotspotModal();
         };
+
         hsChoices.appendChild(b);
       });
     } else {
@@ -149,45 +251,61 @@ function handleHotspot(hs){
       b.onclick = hideHotspotModal;
       hsChoices.appendChild(b);
     }
+
     showHotspotModal();
   }
 }
 
 // Modal helpers
-function showHotspotModal(){ hsModal.classList.remove("hidden"); }
-function hideHotspotModal(){ hsModal.classList.add("hidden"); }
+function showHotspotModal() { hsModal.classList.remove("hidden"); }
+function hideHotspotModal() { hsModal.classList.add("hidden"); }
 hsClose.onclick = hideHotspotModal;
 hsModal.onclick = (e) => { if (e.target === hsModal) hideHotspotModal(); };
 
-// Navigation
-function goTo(nodeId){
-  const node = gameData.nodes[nodeId];
+// Cutscene mode
+function setCutsceneMode(isCutscene) {
+  document.body.classList.toggle("cutscene", !!isCutscene);
+}
+
+// ---------- navigation ----------
+function goTo(nodeId) {
+  const node = gameData?.nodes?.[nodeId];
   if (!node) { console.error("Unknown node:", nodeId); return; }
+
+  clearTimers();
+  hideHotspotModal();
   currentNode = nodeId;
+
   if (node.setFlag) applyFlags(node.setFlag);
 
+  setCutsceneMode(!!node.cutscene);
   setBackground(node.background);
   setPortrait(node.portrait);
   nameEl.textContent = node.name || "";
 
   typeText(node.text || "", () => {
     renderChoices(node.choices || []);
+    if (node.autoNext) {
+      const delay = Number(node.autoDelay ?? 1200);
+      autoAdvanceTimer = setTimeout(() => goTo(node.autoNext), delay);
+    }
   });
 
   renderHotspots(node);
 }
 
-// Save/load
-function saveGame(){
+// ---------- save/load ----------
+function saveGame() {
   const save = { current: currentNode, flags };
   try {
     localStorage.setItem("vn_save", JSON.stringify(save));
     alert("Saved.");
-  } catch (e) {
+  } catch {
     alert("Save failed.");
   }
 }
-function loadGame(){
+
+function loadGame() {
   const raw = localStorage.getItem("vn_save");
   if (!raw) { alert("No save."); return; }
   try {
@@ -195,9 +313,12 @@ function loadGame(){
     flags = s.flags || {};
     goTo(s.current || gameData.start);
     alert("Loaded.");
-  } catch (e) { alert("Load failed."); }
+  } catch {
+    alert("Load failed.");
+  }
 }
-function restart(){
+
+function restart() {
   flags = {};
   hideHotspotModal();
   goTo(gameData.start);
@@ -208,7 +329,7 @@ saveBtn.onclick = saveGame;
 loadBtn.onclick = loadGame;
 restartBtn.onclick = restart;
 
-// Keyboard shortcuts for choices (1..5)
+// Keyboard shortcuts
 document.addEventListener("keydown", e => {
   const keys = ["1","2","3","4","5"];
   const idx = keys.indexOf(e.key);
@@ -218,40 +339,13 @@ document.addEventListener("keydown", e => {
   }
 });
 
-// Load story.json or fallback
-async function loadStory(){
-  try {
-    const r = await fetch(STORY_FILE, { cache: "no-store" });
-    if (r.ok) {
-      gameData = await r.json();
-      return;
-    }
-  } catch (e) {
-    // ignore
-  }
-
-  // fallback minimal data
-  gameData = {
-    start: "wakeup",
-    nodes: {
-      wakeup: {
-        id: "wakeup",
-        name: "You",
-        background: "backgrounds/bg_room.svg",
-        portrait: "portraits/neutral.svg",
-        text: "Fallback scene. Replace story.json in repo.",
-        hotspots: [
-          { id: "desk", label: "Desk", x:45, y:60, w:16, h:12, action: { type:"dialogue", text:"A note lies on the desk.", choices:[{text:"Read",next:"read_note"}] } }
-        ],
-        choices: [{ text:"Look around", next:"look_around" }]
-      },
-      read_note: { id:"read_note", name:"You", background:"backgrounds/bg_room.svg", portrait:"portraits/neutral.svg", text:"You read the note.", choices:[{text:"Continue", next:"wakeup"}] },
-      look_around: { id:"look_around", name:"You", background:"backgrounds/bg_hall.svg", portrait:"portraits/worried.svg", text:"You look around.", choices:[{text:"Back", next:"wakeup"}] }
-    }
-  };
+// ---------- load story ----------
+async function loadStory() {
+  const r = await fetch(STORY_FILE, { cache: "no-store" });
+  gameData = await r.json();
 }
 
-// start
+// Start
 (async () => {
   await loadStory();
   restart();
