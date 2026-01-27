@@ -355,13 +355,10 @@ function goTo(nodeId) {
   setPortrait(node.portrait);
   nameEl.textContent = node.name || "";
 
-  // Build pages for this node
-  pages = buildPages(node.text || "");
-  pageIndex = 0;
-
-  // Type first page
-  typeText(pages[pageIndex], () => {
-    showPostTextUI();
+ pages = buildPages(node.text || "");
+pageIndex = 0;
+typeText(pages[pageIndex], showPostTextUI);
+;
 
     // Only auto-advance in cutscenes when there are NO choices and no paging needed
     if (node.cutscene && node.autoNext && pages.length <= 1 && !(node.choices && node.choices.length)) {
