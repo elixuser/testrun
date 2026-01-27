@@ -17,7 +17,7 @@ html,body,#app{height:100%;margin:0;background:var(--page-bg);color:var(--text);
   position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;
 }
 #bg{
-  position:absolute;inset:0;background:#0b0b0f center/cover no-repeat;filter:brightness(.65) blur(0.0px);transition:background-image .35s ease;
+  position:absolute;inset:0;background:#0b0b0f center/cover no-repeat;filter:brightness(.65) blur(0.0px);transition:background-image .45s ease;
 }
 
 /* Overlay UI (centered, responsive) */
