@@ -365,7 +365,7 @@ typeText(pages[pageIndex], showPostTextUI);
       const delay = Number(node.autoDelay ?? 1200);
       autoAdvanceTimer = setTimeout(() => goTo(node.autoNext), delay);
     }
-  });
+  };
 
   renderHotspots(node);
 }
