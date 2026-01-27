@@ -316,6 +316,51 @@ function goTo(nodeId) {
   renderHotspots(node);
 }
 
+function showPostTextUI(){
+  const node = gameData.nodes[currentNode];
+
+  // If there are more pages, show ▼
+  if (pageIndex < pages.length - 1) {
+    setContinueVisible(true);
+    choicesEl.innerHTML = ""; // keep choices hidden until final page
+    return;
+  }
+
+  // Final page: if choices exist, show them
+  if (node.choices && node.choices.length) {
+    setContinueVisible(false);
+    renderChoices(node.choices);
+    return;
+  }
+
+  // No choices: if default next exists, show ▼
+  if (node.next) {
+    setContinueVisible(true);
+    return;
+  }
+
+  // End node
+  setContinueVisible(false);
+}
+
+function advance(){
+  const node = gameData.nodes[currentNode];
+
+  // next page
+  if (pageIndex < pages.length - 1) {
+    pageIndex++;
+    typeText(pages[pageIndex], showPostTextUI);
+    return;
+  }
+
+  // if choices exist, do nothing (player must pick)
+  if (node.choices && node.choices.length) return;
+
+  // otherwise go to default next
+  if (node.next) goTo(node.next);
+}
+
+
 // ---------- save/load ----------
 function saveGame() {
   const save = { current: currentNode, flags };
@@ -360,6 +405,28 @@ document.addEventListener("keydown", e => {
     if (btn) btn.click();
   }
 });
+
+textboxEl.addEventListener("click", () => {
+  // If currently typing: complete instantly
+  if (typing) {
+    // finish current page immediately
+    clearTimers(); // stops typing interval + glitch timers
+    typing = false;
+
+    // re-render the current page fully
+    const { html } = formatText(pages[pageIndex] || "");
+    textEl.innerHTML = html;
+    startGlitchEffects();
+
+    // show continue if appropriate
+    showPostTextUI();
+    return;
+  }
+
+  // If not typing: advance to next page or next node
+  advance();
+});
+
 
 // ---------- load story ----------
 async function loadStory() {
