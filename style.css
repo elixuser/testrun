@@ -21,17 +21,60 @@ html,body,#app{height:100%;margin:0;background:var(--page-bg);color:var(--text);
 }
 
 /* Overlay UI (centered, responsive) */
+/* Put the whole UI at the bottom like VN/Danganronpa */
 #overlay{
-  position:relative;
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
   z-index:10;
-  max-width:var(--max-width);
-  width:95%;
-  margin:24px auto;
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:18px;
   display:flex;
   gap:16px;
   align-items:flex-end;
   justify-content:center;
   pointer-events:auto;
+}
+
+/* Keep UI centered with max width */
+#overlay > *{
+  max-width:1100px;
+}
+
+/* Dialogue column should be wide */
+#right-column{
+  flex:1;
+  min-width:320px;
+  max-width:1100px;
+}
+
+/* Optional: make textbox feel more like VN */
+#textbox{
+  position:relative;
+  min-height:160px;
+}
+
+/* Continue indicator (▼) */
+#continue-indicator{
+  position:absolute;
+  right:14px;
+  bottom:10px;
+  opacity:0.0;
+  transform:translateY(0);
+  transition:opacity .15s ease;
+  user-select:none;
+  pointer-events:none;
+}
+#continue-indicator.show{
+  opacity:0.85;
+  animation: bounce 0.9s infinite;
+}
+@keyframes bounce{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-4px); }
 }
 
 /* Left column portrait */
