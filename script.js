@@ -169,7 +169,7 @@ function typeText(raw, done) {
       if (done) done();
     }
   }, textSpeed);
-}
+
 
 // ---------- choices ----------
 function choiceVisible(c) {
