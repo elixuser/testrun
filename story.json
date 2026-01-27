@@ -7,7 +7,7 @@
       "background": "backgrounds/mountains.jpeg",
       "portrait": "",
       "name": "",
-      "text": "(Cutscene) You cling to icy rock—climbing a snowy mountain.\nA blinding flash.",
+      "text": "You cling to icy rock—climbing a snowy mountain.\nA blinding flash.",
       "autoNext": "cs_planets_walk",
       "autoDelay": 900
     },
@@ -18,7 +18,7 @@
       "background": "backgrounds/planets.jpeg",
       "portrait": "",
       "name": "",
-      "text": "(Cutscene) You walk through a scenery where multiple planets hang in the sky.\n\nYou (out of breath): \"Where is it?\"\n\nYou follow a wisp of light.\n\nStranger: \"You should hurry up.\"",
+      "text": " You walk through a scenery where multiple planets hang in the sky.\n\nYou (out of breath): \"Where is it?\"\n\nYou follow a wisp of light.\n\nStranger: \"You should hurry up.\"",
       "choices": [
         { "text": "Stay silent", "next": "cs_stranger_silent" },
         { "text": "Who are you?", "next": "cs_stranger_ask" }
