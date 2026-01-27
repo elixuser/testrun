@@ -1,7 +1,7 @@
 // Interactive VN engine — cutscenes + hotspots + glitch text
 const STORY_FILE = "story.json";
 const ASSETS_DIR = "assets"; // <-- correct folder name
-const textSpeed = 18; // ms per char
+const textSpeed = 25; // ms per char
 
 // DOM
 const bgEl = document.getElementById("bg");
