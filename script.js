@@ -144,15 +144,16 @@ function startGlitchEffects() {
 }
 
 // ---------- typewriter ----------
-function typeText(raw, done) {
+function typeText(raw, done){
   clearTimers();
   typing = true;
+  setContinueVisible(false);
 
   const { plain, html } = formatText(raw);
-  textEl.textContent = "";
-  choicesEl.innerHTML = "";
 
+  textEl.textContent = "";
   let i = 0;
+
   typingInterval = setInterval(() => {
     textEl.textContent += plain.charAt(i++);
     if (i >= plain.length) {
@@ -162,9 +163,12 @@ function typeText(raw, done) {
 
       textEl.innerHTML = html;
       startGlitchEffects();
+
       if (done) done();
     }
   }, textSpeed);
+}
+
 
   textboxEl.onclick = () => {
     if (!typing) return;
