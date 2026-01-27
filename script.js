@@ -4,6 +4,14 @@ const STORY_FILE = "story.json";
 const ASSETS_DIR = "assets";
 const textSpeed = 35; // ms per char
 
+// === Glitch tuning ===
+// How long each glitch runs after the text is fully displayed (ms)
+const GLITCH_DURATION_MS = 750;
+// How fast it scrambles during the glitch (ms)
+const GLITCH_TICK_MS = 70;
+// Chance a character scrambles each tick (0..1). Higher = more scramble.
+const GLITCH_SCRAMBLE_PROB = 0.45;
+
 // DOM
 const bgEl = document.getElementById("bg");
 const hotspotsEl = document.getElementById("hotspots");
@@ -37,7 +45,10 @@ let typing = false;
 
 let typingInterval = null;
 let autoAdvanceTimer = null;
-let glitchTimers = [];
+
+// Track timers so we can stop them on scene change
+let glitchIntervals = [];
+let glitchTimeouts = [];
 
 // ---------- utilities ----------
 function assetPath(filename) {
@@ -72,14 +83,19 @@ function formatText(raw) {
 }
 
 function clearTimers() {
+  // typing
   if (typingInterval) clearInterval(typingInterval);
   typingInterval = null;
 
+  // auto-advance cutscene
   if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
   autoAdvanceTimer = null;
 
-  glitchTimers.forEach(t => clearInterval(t));
-  glitchTimers = [];
+  // glitch
+  glitchIntervals.forEach(id => clearInterval(id));
+  glitchIntervals = [];
+  glitchTimeouts.forEach(id => clearTimeout(id));
+  glitchTimeouts = [];
 }
 
 function setContinueVisible(on) {
@@ -119,29 +135,38 @@ function applyFlags(obj) {
   Object.keys(obj).forEach(k => (flags[k] = obj[k]));
 }
 
-// ---------- glitch effect ----------
-function startGlitchEffects() {
+// ---------- glitch effect (brief + self-stopping) ----------
+function startGlitchEffectsBrief() {
   const glitchEls = textEl.querySelectorAll(".glitch");
+  if (!glitchEls.length) return;
+
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-+=~?";
+  const scramble = (s) => {
+    const arr = s.split("");
+    return arr.map(ch => {
+      if (ch === " " || Math.random() > GLITCH_SCRAMBLE_PROB) return ch;
+      return chars[Math.floor(Math.random() * chars.length)];
+    }).join("");
+  };
+
   glitchEls.forEach(el => {
     const base = el.getAttribute("data-base") || el.textContent || "";
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-+=~?";
+    el.textContent = base;
 
-    const scramble = (s) => {
-      const arr = s.split("");
-      return arr.map(ch => {
-        if (ch === " " || Math.random() < 0.55) return ch;
-        return chars[Math.floor(Math.random() * chars.length)];
-      }).join("");
-    };
+    // scramble briefly
+    const intervalId = setInterval(() => {
+      el.textContent = scramble(base);
+    }, GLITCH_TICK_MS);
+    glitchIntervals.push(intervalId);
 
-    let tick = 0;
-    const timer = setInterval(() => {
-      tick++;
-      if (tick % 9 === 0) el.innerHTML = base;
-      else el.innerHTML = scramble(base);
-    }, 70);
-
-    glitchTimers.push(timer);
+    // stop after duration, restore base
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+      el.textContent = base;
+      // remove intervalId from list (optional hygiene)
+      glitchIntervals = glitchIntervals.filter(x => x !== intervalId);
+    }, GLITCH_DURATION_MS);
+    glitchTimeouts.push(timeoutId);
   });
 }
 
@@ -163,8 +188,11 @@ function typeText(raw, done) {
       typingInterval = null;
       typing = false;
 
+      // render with glitch spans
       textEl.innerHTML = html;
-      startGlitchEffects();
+
+      // brief glitch ONLY once after full render
+      startGlitchEffectsBrief();
 
       if (done) done();
     }
@@ -321,20 +349,19 @@ function advance() {
   if (node.next) goTo(node.next);
 }
 
-// One click handler only
+// Click handler (finish typing OR advance)
 textboxEl.addEventListener("click", () => {
-  // If typing → finish instantly
   if (typing) {
+    // Finish instantly: render full page and run brief glitch once
     clearTimers();
     typing = false;
 
     const { html } = formatText(pages[pageIndex] || "");
     textEl.innerHTML = html;
-    startGlitchEffects();
+    startGlitchEffectsBrief();
     showPostTextUI();
     return;
   }
-
   advance();
 });
 
@@ -354,7 +381,6 @@ function goTo(nodeId) {
   setPortrait(node.portrait);
   nameEl.textContent = node.name || "";
 
-  // Build pages and show first page
   pages = buildPages(node.text || "");
   pageIndex = 0;
 
@@ -430,110 +456,13 @@ async function loadStory() {
           id: "error",
           name: "Error",
           background: "",
-          text: `Could not load story.json.\n\nCheck:\n- story.json is in the same folder as index.html\n- You are running via GitHub Pages or a local server (not file://)\n\nConsole:\n${String(err)}`,
+          text: `Could not load story.json.\n\n${String(err)}`,
           choices: []
         }
       }
     };
   }
 }
-
-// =======================
-// Hotspot Calibration Mode (press H)
-// =======================
-let hsDebugEnabled = false;
-let hsDrag = null;
-
-const hsDebugBox = document.createElement("div");
-hsDebugBox.id = "hs-debug";
-hsDebugBox.innerHTML = `
-  <strong>Hotspot Debug (H to toggle)</strong>
-  <div>Move mouse: <span id="hs-debug-pos">x: -, y: -</span></div>
-  <div>Drag to box: <span id="hs-debug-box">x: -, y: -, w: -, h: -</span></div>
-  <div style="opacity:.85;margin-top:6px;">Tip: Open Console to copy JSON</div>
-`;
-document.body.appendChild(hsDebugBox);
-
-const hsRect = document.createElement("div");
-hsRect.id = "hs-debug-rect";
-hotspotsEl.appendChild(hsRect);
-
-function getScenePercent(e) {
-  const scene = document.getElementById("scene");
-  const r = scene.getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width) * 100;
-  const y = ((e.clientY - r.top) / r.height) * 100;
-  return {
-    x: Math.max(0, Math.min(100, x)),
-    y: Math.max(0, Math.min(100, y))
-  };
-}
-
-function setDebugVisible(on) {
-  hsDebugEnabled = on;
-  hsDebugBox.style.display = on ? "block" : "none";
-  hsRect.style.display = "none";
-  hsDrag = null;
-}
-
-document.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "h") setDebugVisible(!hsDebugEnabled);
-});
-
-document.addEventListener("mousemove", (e) => {
-  if (!hsDebugEnabled) return;
-  const { x, y } = getScenePercent(e);
-  document.getElementById("hs-debug-pos").textContent = `x: ${x.toFixed(2)}%, y: ${y.toFixed(2)}%`;
-
-  if (hsDrag) {
-    const left = Math.min(hsDrag.startX, x);
-    const top = Math.min(hsDrag.startY, y);
-    const w = Math.abs(x - hsDrag.startX);
-    const h = Math.abs(y - hsDrag.startY);
-
-    hsRect.style.display = "block";
-    hsRect.style.left = left + "%";
-    hsRect.style.top = top + "%";
-    hsRect.style.width = w + "%";
-    hsRect.style.height = h + "%";
-
-    document.getElementById("hs-debug-box").textContent =
-      `x: ${left.toFixed(2)}%, y: ${top.toFixed(2)}%, w: ${w.toFixed(2)}%, h: ${h.toFixed(2)}%`;
-  }
-});
-
-document.addEventListener("mousedown", (e) => {
-  if (!hsDebugEnabled) return;
-  if (hsModal && !hsModal.classList.contains("hidden")) return;
-  const target = e.target;
-  if (target.closest("#controls") || target.closest("#choices") || target.closest("#hotspot-modal")) return;
-
-  const { x, y } = getScenePercent(e);
-  hsDrag = { startX: x, startY: y };
-});
-
-document.addEventListener("mouseup", (e) => {
-  if (!hsDebugEnabled || !hsDrag) return;
-  const { x, y } = getScenePercent(e);
-
-  const left = Math.min(hsDrag.startX, x);
-  const top = Math.min(hsDrag.startY, y);
-  const w = Math.abs(x - hsDrag.startX);
-  const h = Math.abs(y - hsDrag.startY);
-
-  hsDrag = null;
-  hsRect.style.display = "none";
-
-  const hotspotJson = {
-    x: Number(left.toFixed(2)),
-    y: Number(top.toFixed(2)),
-    w: Number(w.toFixed(2)),
-    h: Number(h.toFixed(2))
-  };
-
-  console.log("HOTSPOT:", hotspotJson);
-  console.log("Paste into story.json:", `"x": ${hotspotJson.x}, "y": ${hotspotJson.y}, "w": ${hotspotJson.w}, "h": ${hotspotJson.h}`);
-});
 
 // Start
 (async () => {
