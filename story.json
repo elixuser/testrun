@@ -1,173 +1,342 @@
 {
-  "start": "wakeup",
+  "start": "cs_mountain_flash",
   "nodes": {
-    "wakeup": {
-      "id": "wakeup",
+    "cs_mountain_flash": {
+      "id": "cs_mountain_flash",
+      "cutscene": true,
+      "background": "backgrounds/mountains.jpeg",
+      "portrait": "",
+      "name": "",
+      "text": "(Cutscene) You cling to icy rock—climbing a snowy mountain.\nA blinding flash.",
+      "autoNext": "cs_planets_walk",
+      "autoDelay": 900
+    },
+
+    "cs_planets_walk": {
+      "id": "cs_planets_walk",
+      "cutscene": true,
+      "background": "backgrounds/planets.jpeg",
+      "portrait": "",
+      "name": "",
+      "text": "(Cutscene) You walk through a scenery where multiple planets hang in the sky.\n\nYou (out of breath): \"Where is it?\"\n\nYou follow a wisp of light.\n\nStranger: \"You should hurry up.\"",
+      "choices": [
+        { "text": "Stay silent", "next": "cs_stranger_silent" },
+        { "text": "Who are you?", "next": "cs_stranger_ask" }
+      ]
+    },
+
+    "cs_stranger_silent": {
+      "id": "cs_stranger_silent",
+      "cutscene": true,
+      "background": "backgrounds/planets.jpeg",
+      "portrait": "",
+      "name": "",
+      "text": "You say nothing.\n\nThe stranger’s presence fades.\n\nStranger: \"You don’t have much time left before [[glitch:th3 c0ll@pse]]... just remember [[glitch:th3 l1ght]]\"",
+      "autoNext": "bedroom_wakeup",
+      "autoDelay": 1100
+    },
+
+    "cs_stranger_ask": {
+      "id": "cs_stranger_ask",
+      "cutscene": true,
+      "background": "backgrounds/planets.jpeg",
+      "portrait": "",
+      "name": "",
+      "text": "You: \"Who are you?\"\n\nStranger: \"No time. You should hurry up... just remember [[glitch:th3 l1ght]]\"",
+      "autoNext": "bedroom_wakeup",
+      "autoDelay": 1100
+    },
+
+    "bedroom_wakeup": {
+      "id": "bedroom_wakeup",
+      "background": "backgrounds/bedroom.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "You wake up in a strange classroom. The room is quiet.",
+      "text": "You wake up.\n\nYou stare at your hand.\nIt flickers—glitches.\n\n\"...I must still be asleep.\"",
       "hotspots": [
         {
-          "id": "desk",
-          "label": "Desk",
-          "x": 42,
-          "y": 62,
-          "w": 24,
-          "h": 16,
+          "id": "window",
+          "label": "Window",
+          "x": 12,
+          "y": 14,
+          "w": 72,
+          "h": 62,
           "action": {
             "type": "dialogue",
-            "text": "There's a folded note on the desk.",
+            "text": "Several planets hang in the sky.\n\n\"Is it just me... or does the sky look slightly different today?\"",
             "choices": [
-              { "text": "Read the note", "next": "read_note" },
-              { "text": "Ignore it", "next": "look_around" }
+              { "text": "Back", "setFlag": { "checkedWindow": true } }
             ]
           }
         },
         {
-          "id": "door",
-          "label": "Door",
-          "x": 82,
-          "y": 38,
-          "w": 10,
-          "h": 40,
-          "action": { "type": "goto", "next": "locked_door" }
+          "id": "laptop",
+          "label": "Laptop",
+          "x": 70,
+          "y": 58,
+          "w": 30,
+          "h": 34,
+          "action": {
+            "type": "dialogue",
+            "text": "Your laptop is on... but nothing connects.\n\n\"No signal? Weird...\"\n\n\"I really need a new device... or maybe the Wi-Fi’s just dead.\"",
+            "choices": [
+              { "text": "Back", "setFlag": { "checkedLaptop": true } }
+            ]
+          }
         }
       ],
       "choices": [
-        { "text": "Look around", "next": "look_around" }
+        { "text": "Try to remember the dream", "next": "bedroom_reflection" },
+        { "text": "Get up anyway", "next": "bedroom_reflection" }
       ]
     },
 
-    "read_note": {
-      "id": "read_note",
+    "bedroom_reflection": {
+      "id": "bedroom_reflection",
+      "background": "backgrounds/bedroom.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "The note reads: 'Trust no one.'",
-      "setFlag": { "paranoid": true },
+      "text": "\"I feel like I woke up from a really long dream... but I can’t remember it at all.\"\n\n\"Like there’s something I need to find... but what?\"\n\n\"Ugh... I feel nauseous... I’m tired of feeling like this.\"",
       "choices": [
-        { "text": "Stand up", "next": "hall" },
-        { "text": "Ignore note", "next": "sleep" }
+        { "text": "ALARM RINGS AGAIN", "next": "alarm_late" }
       ]
     },
 
-    "look_around": {
-      "id": "look_around",
+    "alarm_late": {
+      "id": "alarm_late",
+      "background": "backgrounds/bedroom.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/smile.jpg",
-      "text": "You see posters and a locked door.",
-      "choices": [
-        { "text": "Try the door", "next": "locked_door" },
-        { "text": "Read the note", "next": "read_note" }
-      ]
+      "text": "ALARM RINGS AGAIN.\n\n\"Shoot—I'm gonna be late for work!\"",
+      "autoNext": "train_ride_1",
+      "autoDelay": 900
     },
 
-    "locked_door": {
-      "id": "locked_door",
+    "train_ride_1": {
+      "id": "train_ride_1",
+      "background": "backgrounds/trainwithpeople.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/worried.jpg",
-      "text": "The door is locked.",
+      "text": "Rumble. Rumble.\n\n\"It’s so packed today... I guess everyone’s late as well.\"\n\n\"My boss is so gonna kill me... and I’m working overtime again...\"",
       "choices": [
-        { "text": "Turn around", "next": "mysterious_person" }
+        { "text": "Keep thinking", "next": "train_ride_2" }
       ]
     },
 
-    "mysterious_person": {
-      "id": "mysterious_person",
-      "name": "???:",
-      "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "'Let's play a game,' a voice whispers.",
-      "choices": [
-        { "text": "Agree", "next": "ending_good" },
-        { "text": "Refuse", "next": "refuse_game" }
-      ]
-    },
-
-    "refuse_game": {
-      "id": "refuse_game",
+    "train_ride_2": {
+      "id": "train_ride_2",
+      "background": "backgrounds/trainwithpeople.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/worried.jpg",
-      "text": "You refuse.",
+      "text": "\"I really wonder how I ended up working a 9-5... becoming a slave to a paycheck...\"\n\n\"But I need it to survive and pay my rent...\"\n\n\"I guess there really is no escape from capitalism...\"",
       "choices": [
-        { "text": "Back", "next": "wakeup" }
+        { "text": "Look out the window", "next": "train_window_thought" },
+        { "text": "Close your eyes", "next": "train_sleep" }
       ]
     },
 
-    "sleep": {
-      "id": "sleep",
+    "train_window_thought": {
+      "id": "train_window_thought",
+      "background": "backgrounds/trainwithpeople.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/classroom.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "You sleep again. (Bad ending)",
+      "text": "You look out the window.\n\n\"It’s odd... every time I look outside there’s a loud silence screaming at me...\"\n\n\"Telling me I should be doing more with myself...\"\n\n\"But it’s not like I can do anything... can I?\"",
       "choices": [
-        { "text": "Restart", "next": "wakeup" }
+        { "text": "Take a quick nap", "next": "train_sleep" }
       ]
     },
 
-    "hall": {
-      "id": "hall",
+    "train_sleep": {
+      "id": "train_sleep",
+      "cutscene": true,
+      "background": "backgrounds/trainwithpeople.jpeg",
+      "portrait": "",
+      "name": "",
+      "text": "\"I’m feeling sleepy again... a quick nap never hurt anyone...\"\n\n\"I’ll wake up at my stop. I promise.\"",
+      "autoNext": "train_wake_shaking",
+      "autoDelay": 1100
+    },
+
+    "train_wake_shaking": {
+      "id": "train_wake_shaking",
+      "background": "backgrounds/trainwithpeople.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "A long hallway stretches ahead.",
-      "choices": [
-        {
-          "text": "Open red door",
-          "next": "red_room",
-          "requiredFlag": "paranoid",
-          "requiredValue": true
-        },
-        { "text": "Open red door (force)", "next": "red_room_force" },
-        { "text": "Go back", "next": "wakeup" }
-      ]
+      "text": "You wake up to the train shaking.\n\n\"What the hell is going on?\"",
+      "autoNext": "train_realise_empty",
+      "autoDelay": 900
     },
 
-    "red_room": {
-      "id": "red_room",
+    "train_realise_empty": {
+      "id": "train_realise_empty",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/red_room.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "You found a secret lever.",
+      "text": "You look around.\n\nEveryone on the train has disappeared.\nThe lights flicker on and off.\n\nThe hairs on your neck stand up.\n\nMaybe you're still dreaming.\nYou pinch yourself.\n\nNothing happens—except red marks all over your arms.\n\nYou freeze.\n\n(...): \"That’s not going to do anything so you should give up.\"",
       "choices": [
-        { "text": "Pull lever", "next": "secret_end" }
+        { "text": "\"Wha-whats going on? Who are you?!\"", "next": "voice_mutter" }
       ]
     },
 
-    "red_room_force": {
-      "id": "red_room_force",
+    "voice_mutter": {
+      "id": "voice_mutter",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"...I swear to the 12 primordial gods... they must’ve given you to me as some kind of punishment...\"",
+      "choices": [
+        { "text": "\"Excuse you?!\"", "next": "voice_excuse" },
+        { "text": "\"Show yourself!\"", "next": "voice_show" },
+        { "text": "\"Where’s that voice coming from?\"", "next": "voice_where" }
+      ]
+    },
+
+    "voice_excuse": {
+      "id": "voice_excuse",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"Oh! And you have an attitude! Do you want to get help or not?\"",
+      "choices": [
+        { "text": "Stay silent", "next": "child_appears_plain" },
+        { "text": "\"What kind of sick joke is this?! I'm going to be late for work!\"", "next": "child_work" }
+      ]
+    },
+
+    "voice_show": {
+      "id": "voice_show",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"This is a first—being ordered around by a human... Do you even realise the situation you’re in?\"",
+      "choices": [
+        { "text": "\"If you want me to understand, show yourself and explain.\"", "next": "child_explain" },
+        { "text": "\"What do you mean by a human?\"", "next": "child_explain" }
+      ]
+    },
+
+    "voice_where": {
+      "id": "voice_where",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"I’m right here. Relax and look.\"",
+      "choices": [
+        { "text": "Look", "next": "child_boo" }
+      ]
+    },
+
+    "child_boo": {
+      "id": "child_boo",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "A small child appears.\n\n\"Boo!\"",
+      "choices": [
+        { "text": "\"AHH! What the hell! ...Oh god I'm actually going to be sick\"", "next": "child_sick" },
+        { "text": "\"Why is there a kid here? Where did you come from?!\"", "next": "child_kid" }
+      ]
+    },
+
+    "child_appears_plain": {
+      "id": "child_appears_plain",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "A small child steps into view.\n\n\"...Yeah. Surprise.\"",
+      "choices": [
+        { "text": "\"Why is there a kid here? Where did you come from?!\"", "next": "child_kid" },
+        { "text": "\"...What's that supposed to mean?..and sent here? by who?..and where did everyone go?\"", "next": "child_where_everyone" }
+      ]
+    },
+
+    "child_work": {
+      "id": "child_work",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"Work? No wonder you got sent here...\"\n\n\"To think of all souls—YOURS would end up like this...\"",
+      "choices": [
+        { "text": "\"...What's that supposed to mean?..and sent here? by who?..and where did everyone go?\"", "next": "child_where_everyone" },
+        { "text": "\"Show me what’s happening.\"", "next": "child_reveal_prompt" }
+      ]
+    },
+
+    "child_explain": {
+      "id": "child_explain",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"Jeez... so much for having a surprise appearance...\"\n\n\"To explain... have you noticed something different about yourself lately?\"\n\n\"The nauseating pit in your gut..?\"\n\n\"Feeling both the worlds inside and outside of you slipping through the palms of the fabric of what you know as reality?\"",
+      "choices": [
+        { "text": "\"...What's that supposed to mean?..and sent here? by who?..and where did everyone go?\"", "next": "child_where_everyone" },
+        { "text": "\"Why is there a kid here?\"", "next": "child_kid" }
+      ]
+    },
+
+    "child_where_everyone": {
+      "id": "child_where_everyone",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"Look through the window... does this really seem like the same train you were on this morning??\"",
+      "choices": [
+        { "text": "Look outside", "next": "train_space_reveal" }
+      ]
+    },
+
+    "child_kid": {
+      "id": "child_kid",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"You worry about the wrong things.. Take a look outside..\"",
+      "choices": [
+        { "text": "Look outside", "next": "train_space_reveal" }
+      ]
+    },
+
+    "child_sick": {
+      "id": "child_sick",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"Please don’t. Just the talk of it makes me gag....\"\n\n\"Now... I assume you have some clue why you're here.. I mean take a look outside.\"",
+      "choices": [
+        { "text": "Look outside", "next": "train_space_reveal" }
+      ]
+    },
+
+    "child_reveal_prompt": {
+      "id": "child_reveal_prompt",
+      "background": "backgrounds/trainwithnopeople.jpeg",
+      "portrait": "",
+      "name": "(...)",
+      "text": "\"Good. Then look.\"",
+      "choices": [
+        { "text": "Look outside", "next": "train_space_reveal" }
+      ]
+    },
+
+    "train_space_reveal": {
+      "id": "train_space_reveal",
+      "background": "backgrounds/trainspace.jpeg",
+      "portrait": "",
       "name": "You",
-      "background": "backgrounds/red_room.jpg",
-      "portrait": "portraits/worried.jpg",
-      "text": "A trap triggers. (Bad ending)",
+      "text": "You look out the window.\n\nOnly stars.\nA spacelike void.\n\nThis is not the morning commute.\n\nYour reflection flickers.\n\n\"...This can’t be real.\"",
       "choices": [
-        { "text": "Restart", "next": "wakeup" }
+        { "text": "Continue", "next": "end_demo" }
       ]
     },
 
-    "secret_end": {
-      "id": "secret_end",
+    "end_demo": {
+      "id": "end_demo",
+      "background": "backgrounds/trainspace.jpeg",
+      "portrait": "",
       "name": "Narrator",
-      "background": "backgrounds/red_room.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "You discovered a secret. (Good ending)",
+      "text": "To be continued...",
       "choices": [
-        { "text": "Play again", "next": "wakeup" }
-      ]
-    },
-
-    "ending_good": {
-      "id": "ending_good",
-      "name": "Narrator",
-      "background": "backgrounds/hallway.jpg",
-      "portrait": "portraits/neutral.jpg",
-      "text": "The game ends for now.",
-      "choices": [
-        { "text": "Play again", "next": "wakeup" }
+        { "text": "Restart", "next": "cs_mountain_flash" }
       ]
     }
   }
