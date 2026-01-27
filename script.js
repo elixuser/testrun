@@ -145,18 +145,17 @@ function startGlitchEffects() {
   });
 }
 
-// ---------- typewriter (no click handler inside) ----------
 // ---------- typewriter ----------
-function typeText(raw, done){
+function typeText(raw, done) {
   clearTimers();
   typing = true;
   setContinueVisible(false);
 
   const { plain, html } = formatText(raw);
-
   textEl.textContent = "";
-  let i = 0;
+  choicesEl.innerHTML = "";
 
+  let i = 0;
   typingInterval = setInterval(() => {
     textEl.textContent += plain.charAt(i++);
     if (i >= plain.length) {
@@ -171,8 +170,6 @@ function typeText(raw, done){
     }
   }, textSpeed);
 }
-
-
 
 // ---------- choices ----------
 function choiceVisible(c) {
@@ -307,22 +304,24 @@ function showPostTextUI() {
   setContinueVisible(false);
 }
 
-function advance(){
+function advance() {
   const node = gameData.nodes[currentNode];
 
+  // Next page
   if (pageIndex < pages.length - 1) {
     pageIndex++;
     typeText(pages[pageIndex], showPostTextUI);
     return;
   }
 
+  // Choices exist → player must pick
   if (node.choices && node.choices.length) return;
 
+  // Default next
   if (node.next) goTo(node.next);
 }
 
-
-// One click handler only (do NOT set textboxEl.onclick elsewhere)
+// One click handler only
 textboxEl.addEventListener("click", () => {
   // If typing → finish instantly
   if (typing) {
@@ -355,17 +354,19 @@ function goTo(nodeId) {
   setPortrait(node.portrait);
   nameEl.textContent = node.name || "";
 
- pages = buildPages(node.text || "");
-pageIndex = 0;
-typeText(pages[pageIndex], showPostTextUI);
-;
+  // Build pages and show first page
+  pages = buildPages(node.text || "");
+  pageIndex = 0;
 
-    // Only auto-advance in cutscenes when there are NO choices and no paging needed
+  typeText(pages[pageIndex], () => {
+    showPostTextUI();
+
+    // Auto-advance only if: cutscene + single page + no choices
     if (node.cutscene && node.autoNext && pages.length <= 1 && !(node.choices && node.choices.length)) {
       const delay = Number(node.autoDelay ?? 1200);
       autoAdvanceTimer = setTimeout(() => goTo(node.autoNext), delay);
     }
-  };
+  });
 
   renderHotspots(node);
 }
@@ -422,7 +423,6 @@ async function loadStory() {
     gameData = await r.json();
   } catch (err) {
     console.error(err);
-    // Show something on screen instead of blank
     gameData = {
       start: "error",
       nodes: {
@@ -430,7 +430,7 @@ async function loadStory() {
           id: "error",
           name: "Error",
           background: "",
-          text: `Could not load story.json.\n\nOpen DevTools → Console.\n\n${String(err)}`,
+          text: `Could not load story.json.\n\nCheck:\n- story.json is in the same folder as index.html\n- You are running via GitHub Pages or a local server (not file://)\n\nConsole:\n${String(err)}`,
           choices: []
         }
       }
