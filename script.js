@@ -80,6 +80,19 @@ function clearTimers() {
   glitchTimers = [];
 }
 
+function setContinueVisible(on){
+  if (!continueEl) return;
+  continueEl.classList.toggle("show", !!on);
+}
+
+// Split text into pages like VN dialogue.
+// Use "\n\n" to mean “next click continues” (easy for writing)
+function buildPages(text){
+  const raw = String(text || "").trim();
+  if (!raw) return [""];
+  return raw.split(/\n\s*\n/g); // blank line = new page
+}
+
 function setBackground(img) {
   if (!img) {
     bgEl.style.backgroundImage = "none";
