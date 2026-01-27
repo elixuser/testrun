@@ -349,7 +349,11 @@ function advance(){
   // next page
   if (pageIndex < pages.length - 1) {
     pageIndex++;
-    typeText(pages[pageIndex], showPostTextUI);
+    pages = buildPages(node.text || "");
+pageIndex = 0;
+
+typeText(pages[pageIndex], showPostTextUI);
+
     return;
   }
 
