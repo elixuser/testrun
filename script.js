@@ -22,6 +22,11 @@ const hsText = document.getElementById("hs-text");
 const hsChoices = document.getElementById("hs-choices");
 const hsClose = document.getElementById("hs-close");
 
+const continueEl = document.getElementById("continue-indicator");
+
+let pages = [];
+let pageIndex = 0;
+
 // State
 let gameData = null;
 let currentNode = null;
