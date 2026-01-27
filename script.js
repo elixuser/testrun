@@ -307,22 +307,20 @@ function showPostTextUI() {
   setContinueVisible(false);
 }
 
-function advance() {
+function advance(){
   const node = gameData.nodes[currentNode];
 
-  // Next page
   if (pageIndex < pages.length - 1) {
     pageIndex++;
     typeText(pages[pageIndex], showPostTextUI);
     return;
   }
 
-  // Choices exist → player must pick
   if (node.choices && node.choices.length) return;
 
-  // Default next
   if (node.next) goTo(node.next);
 }
+
 
 // One click handler only (do NOT set textboxEl.onclick elsewhere)
 textboxEl.addEventListener("click", () => {
