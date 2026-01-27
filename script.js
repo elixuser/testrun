@@ -5,7 +5,7 @@ const ASSETS_DIR = "assets";
 const textSpeed = 35; // ms per char
 
 // === Glitch tuning (HARD STOP after 3 seconds) ===
-const GLITCH_DURATION_MS = 3000; // <- 3 seconds
+const GLITCH_DURATION_MS = 3000;
 const GLITCH_TICK_MS = 70;
 const GLITCH_SCRAMBLE_PROB = 0.45;
 
@@ -159,7 +159,6 @@ function startGlitchEffects3s() {
     const id = setInterval(() => {
       const elapsed = performance.now() - start;
 
-      // HARD STOP at 3 seconds
       if (elapsed >= GLITCH_DURATION_MS) {
         clearInterval(id);
         el.textContent = base;
@@ -210,6 +209,16 @@ function choiceVisible(c) {
   return true;
 }
 
+function getVisibleChoices(node) {
+  return (node.choices || []).filter(choiceVisible);
+}
+
+function runChoice(choice) {
+  if (!choice) return;
+  if (choice.setFlag) applyFlags(choice.setFlag);
+  if (choice.next) goTo(choice.next);
+}
+
 function renderChoices(choices = []) {
   choicesEl.innerHTML = "";
   (choices || []).forEach(c => {
@@ -218,10 +227,7 @@ function renderChoices(choices = []) {
     const btn = document.createElement("button");
     btn.className = "choice-btn";
     btn.textContent = c.text || "Choice";
-    btn.onclick = () => {
-      if (c.setFlag) applyFlags(c.setFlag);
-      if (c.next) goTo(c.next);
-    };
+    btn.onclick = () => runChoice(c);
 
     choicesEl.appendChild(btn);
   });
@@ -307,23 +313,43 @@ function setCutsceneMode(isCutscene) {
   document.body.classList.toggle("cutscene", !!isCutscene);
 }
 
+// Auto-next scheduling (works even if player skips typing)
+function maybeScheduleAutoNext(node) {
+  if (!node || !node.autoNext) return;
+
+  const visibleChoices = getVisibleChoices(node);
+  const hasChoices = visibleChoices.length > 0;
+
+  // Only auto-advance if it’s meant to be cinematic (or you explicitly set autoNext)
+  // and there are no choices blocking progress.
+  if (hasChoices) return;
+
+  const delay = Number(node.autoDelay ?? 1200);
+  autoAdvanceTimer = setTimeout(() => goTo(node.autoNext), delay);
+}
+
 // ---------- click-to-continue UI ----------
 function showPostTextUI() {
   const node = gameData.nodes[currentNode];
+  const visibleChoices = getVisibleChoices(node);
 
+  // More pages? Show ▼
   if (pageIndex < pages.length - 1) {
     setContinueVisible(true);
     choicesEl.innerHTML = "";
     return;
   }
 
-  if (node.choices && node.choices.length) {
-    setContinueVisible(false);
+  // Final page:
+  // If choices exist -> show them, but ALSO allow textbox click to auto-pick if only 1.
+  if (visibleChoices.length) {
     renderChoices(node.choices);
+    setContinueVisible(visibleChoices.length === 1); // show ▼ if a single "Continue"-like option
     return;
   }
 
-  if (node.next) {
+  // No choices: allow next/autoNext
+  if (node.next || node.autoNext) {
     setContinueVisible(true);
     return;
   }
@@ -333,20 +359,43 @@ function showPostTextUI() {
 
 function advance() {
   const node = gameData.nodes[currentNode];
+  const visibleChoices = getVisibleChoices(node);
 
+  // Next page
   if (pageIndex < pages.length - 1) {
     pageIndex++;
-    typeText(pages[pageIndex], showPostTextUI);
+    typeText(pages[pageIndex], () => {
+      showPostTextUI();
+      maybeScheduleAutoNext(node);
+    });
     return;
   }
 
-  if (node.choices && node.choices.length) return;
+  // If choices exist:
+  // - If exactly one visible choice, auto-run it on textbox click (fixes your "Continue" nodes)
+  // - If multiple choices, player must click one.
+  if (visibleChoices.length) {
+    if (visibleChoices.length === 1) runChoice(visibleChoices[0]);
+    return;
+  }
 
-  if (node.next) goTo(node.next);
+  // Default next
+  if (node.next) {
+    goTo(node.next);
+    return;
+  }
+
+  // Cutscene/autoNext fallback (click to continue even without node.next)
+  if (node.autoNext) {
+    goTo(node.autoNext);
+    return;
+  }
 }
 
 // Click handler: finish typing OR advance
 textboxEl.addEventListener("click", () => {
+  const node = gameData?.nodes?.[currentNode];
+
   if (typing) {
     // Finish instantly
     clearTimers();
@@ -355,10 +404,11 @@ textboxEl.addEventListener("click", () => {
     const { html } = formatText(pages[pageIndex] || "");
     textEl.innerHTML = html;
 
-    // Brief 3s glitch (hard stop)
     startGlitchEffects3s();
-
     showPostTextUI();
+
+    // If it was a cutscene autoNext, reschedule it after skip
+    maybeScheduleAutoNext(node);
     return;
   }
 
@@ -386,12 +436,7 @@ function goTo(nodeId) {
 
   typeText(pages[pageIndex], () => {
     showPostTextUI();
-
-    // Auto-advance only if: cutscene + single page + no choices
-    if (node.cutscene && node.autoNext && pages.length <= 1 && !(node.choices && node.choices.length)) {
-      const delay = Number(node.autoDelay ?? 1200);
-      autoAdvanceTimer = setTimeout(() => goTo(node.autoNext), delay);
-    }
+    maybeScheduleAutoNext(node);
   });
 
   renderHotspots(node);
