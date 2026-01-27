@@ -4,12 +4,9 @@ const STORY_FILE = "story.json";
 const ASSETS_DIR = "assets";
 const textSpeed = 35; // ms per char
 
-// === Glitch tuning ===
-// How long each glitch runs after the text is fully displayed (ms)
-const GLITCH_DURATION_MS = 750;
-// How fast it scrambles during the glitch (ms)
+// === Glitch tuning (HARD STOP after 3 seconds) ===
+const GLITCH_DURATION_MS = 3000; // <- 3 seconds
 const GLITCH_TICK_MS = 70;
-// Chance a character scrambles each tick (0..1). Higher = more scramble.
 const GLITCH_SCRAMBLE_PROB = 0.45;
 
 // DOM
@@ -46,9 +43,9 @@ let typing = false;
 let typingInterval = null;
 let autoAdvanceTimer = null;
 
-// Track timers so we can stop them on scene change
+// Glitch interval tracking
 let glitchIntervals = [];
-let glitchTimeouts = [];
+let glitchState = new WeakMap(); // element -> intervalId
 
 // ---------- utilities ----------
 function assetPath(filename) {
@@ -87,15 +84,14 @@ function clearTimers() {
   if (typingInterval) clearInterval(typingInterval);
   typingInterval = null;
 
-  // auto-advance cutscene
+  // cutscene auto-next
   if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
   autoAdvanceTimer = null;
 
-  // glitch
+  // glitch intervals
   glitchIntervals.forEach(id => clearInterval(id));
   glitchIntervals = [];
-  glitchTimeouts.forEach(id => clearTimeout(id));
-  glitchTimeouts = [];
+  glitchState = new WeakMap();
 }
 
 function setContinueVisible(on) {
@@ -135,12 +131,13 @@ function applyFlags(obj) {
   Object.keys(obj).forEach(k => (flags[k] = obj[k]));
 }
 
-// ---------- glitch effect (brief + self-stopping) ----------
-function startGlitchEffectsBrief() {
+// ---------- glitch effect (HARD STOP after 3 seconds) ----------
+function startGlitchEffects3s() {
   const glitchEls = textEl.querySelectorAll(".glitch");
   if (!glitchEls.length) return;
 
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-+=~?";
+
   const scramble = (s) => {
     const arr = s.split("");
     return arr.map(ch => {
@@ -153,20 +150,28 @@ function startGlitchEffectsBrief() {
     const base = el.getAttribute("data-base") || el.textContent || "";
     el.textContent = base;
 
-    // scramble briefly
-    const intervalId = setInterval(() => {
+    // If this element already had a glitch interval, stop it
+    const prev = glitchState.get(el);
+    if (prev) clearInterval(prev);
+
+    const start = performance.now();
+
+    const id = setInterval(() => {
+      const elapsed = performance.now() - start;
+
+      // HARD STOP at 3 seconds
+      if (elapsed >= GLITCH_DURATION_MS) {
+        clearInterval(id);
+        el.textContent = base;
+        glitchState.delete(el);
+        return;
+      }
+
       el.textContent = scramble(base);
     }, GLITCH_TICK_MS);
-    glitchIntervals.push(intervalId);
 
-    // stop after duration, restore base
-    const timeoutId = setTimeout(() => {
-      clearInterval(intervalId);
-      el.textContent = base;
-      // remove intervalId from list (optional hygiene)
-      glitchIntervals = glitchIntervals.filter(x => x !== intervalId);
-    }, GLITCH_DURATION_MS);
-    glitchTimeouts.push(timeoutId);
+    glitchState.set(el, id);
+    glitchIntervals.push(id);
   });
 }
 
@@ -188,11 +193,8 @@ function typeText(raw, done) {
       typingInterval = null;
       typing = false;
 
-      // render with glitch spans
       textEl.innerHTML = html;
-
-      // brief glitch ONLY once after full render
-      startGlitchEffectsBrief();
+      startGlitchEffects3s();
 
       if (done) done();
     }
@@ -309,21 +311,18 @@ function setCutsceneMode(isCutscene) {
 function showPostTextUI() {
   const node = gameData.nodes[currentNode];
 
-  // More pages? Show ▼
   if (pageIndex < pages.length - 1) {
     setContinueVisible(true);
     choicesEl.innerHTML = "";
     return;
   }
 
-  // Final page: show choices if any
   if (node.choices && node.choices.length) {
     setContinueVisible(false);
     renderChoices(node.choices);
     return;
   }
 
-  // No choices: show ▼ only if there's a default next
   if (node.next) {
     setContinueVisible(true);
     return;
@@ -335,33 +334,34 @@ function showPostTextUI() {
 function advance() {
   const node = gameData.nodes[currentNode];
 
-  // Next page
   if (pageIndex < pages.length - 1) {
     pageIndex++;
     typeText(pages[pageIndex], showPostTextUI);
     return;
   }
 
-  // Choices exist → player must pick
   if (node.choices && node.choices.length) return;
 
-  // Default next
   if (node.next) goTo(node.next);
 }
 
-// Click handler (finish typing OR advance)
+// Click handler: finish typing OR advance
 textboxEl.addEventListener("click", () => {
   if (typing) {
-    // Finish instantly: render full page and run brief glitch once
+    // Finish instantly
     clearTimers();
     typing = false;
 
     const { html } = formatText(pages[pageIndex] || "");
     textEl.innerHTML = html;
-    startGlitchEffectsBrief();
+
+    // Brief 3s glitch (hard stop)
+    startGlitchEffects3s();
+
     showPostTextUI();
     return;
   }
+
   advance();
 });
 
