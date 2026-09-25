@@ -1,1210 +1,646 @@
-```javascript
-/* =========================================
-   FIN & FRIENDS
-   RETRO FISH CARE GAME
-========================================= */
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
 
-/* =========================================
-   SAVE SYSTEM
-========================================= */
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-const SAVE_KEY =
-  "fin-and-friends-save-v1";
+    <title>FIN & FRIENDS</title>
 
+    <link rel="stylesheet" href="style.css">
+</head>
 
-/* =========================================
-   DEFAULT FISH
-========================================= */
 
-const defaultState = {
+<body>
 
-  name: "Bubbles",
+<div class="game">
 
-  day: 1,
+    <!-- =====================================
+         TOP GAME HEADER
+    ====================================== -->
 
-  minutes: 8 * 60,
+    <header class="header">
 
-  health: 82,
+        <div class="logo">
 
-  hunger: 68,
+            <div class="logo-small">
+                PIXEL AQUARIUM
+            </div>
 
-  affection: 55,
+            <div class="logo-big">
+                FIN
+            </div>
 
-  energy: 76,
+            <div class="logo-big second">
+                & FRIENDS
+            </div>
 
-  cleanliness: 72,
+        </div>
 
-  lastSaved: Date.now()
 
-};
+        <div class="day-box">
 
+            <div class="day-label">
+                DAY
+            </div>
 
-let state = loadState();
+            <div
+                id="day"
+                class="day-number"
+            >
+                1
+            </div>
 
-let actionLock = false;
+            <div
+                id="timeLabel"
+                class="clock"
+            >
+                08:00
+            </div>
 
+        </div>
 
-/* =========================================
-   HELPER
-========================================= */
+    </header>
 
-function $(id) {
-  return document.getElementById(id);
-}
 
+    <!-- =====================================
+         MAIN GAME
+    ====================================== -->
 
-function clamp(
-  number,
-  min = 0,
-  max = 100
-) {
+    <main class="game-screen">
 
-  return Math.max(
-    min,
-    Math.min(max, number)
-  );
 
-}
+        <!-- =================================
+             AQUARIUM
+        ================================== -->
 
+        <section
+            class="aquarium"
+            id="aquarium"
+        >
 
-/* =========================================
-   LOAD GAME
-========================================= */
+            <!-- water pixel decoration -->
 
-function loadState() {
+            <div class="water-pixels"></div>
 
-  try {
 
-    const raw =
-      localStorage.getItem(SAVE_KEY);
+            <!-- bubbles -->
 
+            <div class="bubble bubble1"></div>
+            <div class="bubble bubble2"></div>
+            <div class="bubble bubble3"></div>
+            <div class="bubble bubble4"></div>
+            <div class="bubble bubble5"></div>
 
-    if (!raw) {
 
-      return {
-        ...defaultState
-      };
+            <!-- BACKGROUND DECOR -->
 
-    }
+            <div class="castle">
 
+                <div class="castle-top"></div>
 
-    const saved = {
+                <div class="castle-body">
 
-      ...defaultState,
+                    <div class="castle-window"></div>
+                    <div class="castle-window"></div>
 
-      ...JSON.parse(raw)
+                </div>
 
-    };
+            </div>
 
 
-    /*
-      Work out how long the player
-      has been away.
-    */
+            <!-- PLANTS -->
 
-    const elapsedMinutes =
-      Math.floor(
-        (Date.now() - saved.lastSaved)
-        / 60000
-      );
+            <div class="plant plant1">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
+            <div class="plant plant2">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
-    if (elapsedMinutes > 0) {
 
-      simulateTime(
-        saved,
-        Math.min(
-          elapsedMinutes,
-          240
-        )
-      );
+            <!-- SAND -->
 
-      saved.lastSaved =
-        Date.now();
+            <div class="sand"></div>
 
-    }
 
+            <!-- =================================
+                 FISH
+            ================================== -->
 
-    return saved;
+            <div
+                id="fish"
+                class="fish-container"
+            >
 
-  }
+                <div class="fish-shadow"></div>
 
-  catch {
 
-    return {
-      ...defaultState
-    };
+                <div class="fish">
 
-  }
+                    <div class="fish-tail"></div>
 
-}
 
+                    <div class="fish-body">
 
-/* =========================================
-   SAVE GAME
-========================================= */
+                        <div class="fish-fin-top"></div>
 
-function save() {
+                        <div class="fish-fin-bottom"></div>
 
-  state.lastSaved =
-    Date.now();
 
-  localStorage.setItem(
-    SAVE_KEY,
-    JSON.stringify(state)
-  );
+                        <div class="fish-eye">
+                            <span></span>
+                        </div>
 
-}
 
+                        <div class="fish-cheek"></div>
 
-/* =========================================
-   TIME SIMULATION
-========================================= */
 
-function simulateTime(
-  fish,
-  minutes
-) {
+                        <div class="fish-scale scale1"></div>
+                        <div class="fish-scale scale2"></div>
+                        <div class="fish-scale scale3"></div>
 
-  const chunks =
-    Math.max(
-      1,
-      Math.floor(minutes / 10)
-    );
 
+                        <div
+                            id="fishMouth"
+                            class="fish-mouth"
+                        ></div>
 
-  for (
-    let i = 0;
-    i < chunks;
-    i++
-  ) {
+                    </div>
 
-    /*
-      Advance clock.
-    */
+                </div>
 
-    fish.minutes += 10;
+            </div>
 
 
-    if (
-      fish.minutes >=
-      24 * 60
-    ) {
+            <!-- =================================
+                 FOOD
+            ================================== -->
 
-      fish.minutes -=
-        24 * 60;
+            <div
+                id="foodTray"
+                class="food-tray hidden"
+            >
 
-      fish.day++;
+                <div class="food-title">
+                    FOOD!
+                </div>
 
-    }
+                <div class="food-subtitle">
+                    GIVE TO FISH
+                </div>
 
 
-    /*
-      Fish slowly gets hungry.
-    */
+                <div
+                    id="foodPieces"
+                    class="food-pieces"
+                ></div>
 
-    fish.hunger =
-      clamp(
-        fish.hunger - 1.6
-      );
+            </div>
 
 
-    /*
-      Energy decreases.
-    */
+            <!-- =================================
+                 FEEDING MESSAGE
+            ================================== -->
 
-    fish.energy =
-      clamp(
-        fish.energy - .65
-      );
+            <div
+                id="foodMessage"
+                class="food-message hidden"
+            >
+                CLICK A FOOD
+            </div>
 
 
-    /*
-      Aquarium slowly gets dirty.
-    */
+            <!-- =================================
+                 SPEECH BOX
+            ================================== -->
 
-    fish.cleanliness =
-      clamp(
-        fish.cleanliness - .75
-      );
+            <div
+                id="speech"
+                class="speech"
+            >
+                HELLO!
+            </div>
 
 
-    /*
-      Hunger and dirt affect health.
-    */
+            <!-- =================================
+                 STATUS BAR
+            ================================== -->
 
-    if (
-      fish.hunger < 30
-    ) {
+            <div class="status-bar">
 
-      fish.health =
-        clamp(
-          fish.health - 1.1
-        );
+                <div class="status-face">
+                    <span id="moodIcon">
+                        ♥
+                    </span>
+                </div>
 
-    }
+                <div class="status-text">
 
+                    <strong id="moodText">
+                        HAPPY
+                    </strong>
 
-    if (
-      fish.cleanliness < 25
-    ) {
+                    <span id="statusText">
+                        READY TO PLAY!
+                    </span>
 
-      fish.health =
-        clamp(
-          fish.health - .8
-        );
+                </div>
 
-    }
+            </div>
 
 
-    /*
-      Healthy fish recover slightly.
-    */
+        </section>
 
-    if (
-      fish.hunger > 70 &&
-      fish.cleanliness > 55
-    ) {
 
-      fish.health =
-        clamp(
-          fish.health + .25
-        );
+        <!-- =====================================
+             CONTROL PANEL
+        ====================================== -->
 
-    }
+        <aside class="panel">
 
 
-    /*
-      Sad fish loses affection.
-    */
+            <!-- FISH NAME -->
 
-    if (
-      fish.hunger < 35 ||
-      fish.health < 35
-    ) {
+            <div class="fish-name-box">
 
-      fish.affection =
-        clamp(
-          fish.affection - .3
-        );
+                <div>
 
-    }
+                    <div class="small-label">
+                        MY FISH
+                    </div>
 
-  }
+                    <div
+                        id="fishName"
+                        class="fish-name"
+                    >
+                        BUBBLES
+                    </div>
 
-}
+                </div>
 
 
-/* =========================================
-   MOOD
-========================================= */
+                <button
+                    id="renameBtn"
+                    class="tiny-button"
+                >
+                    ✎
+                </button>
 
-function mood() {
+            </div>
 
-  const average =
 
-    (
-      state.health +
-      state.hunger +
-      state.affection +
-      state.energy
-    ) / 4;
+            <!-- =================================
+                 STATS
+            ================================== -->
 
+            <div class="stats">
 
-  if (
-    state.health < 25
-  ) {
 
-    return [
-      "☹",
-      "Unwell",
-      "I don't feel very good…"
-    ];
+                <!-- HEALTH -->
 
-  }
+                <div class="stat">
 
+                    <div class="stat-header">
 
-  if (
-    state.hunger < 20
-  ) {
+                        <span>
+                            ♥ HEALTH
+                        </span>
 
-    return [
-      "○",
-      "Very hungry",
-      "My tummy is rumbling!"
-    ];
+                        <strong
+                            id="healthValue"
+                        >
+                            82
+                        </strong>
 
-  }
+                    </div>
 
+                    <div class="pixel-bar">
 
-  if (
-    state.cleanliness < 25
-  ) {
+                        <div
+                            id="healthBar"
+                            class="bar health"
+                        ></div>
 
-    return [
-      "~",
-      "Grumpy",
-      "Could we tidy the tank?"
-    ];
+                    </div>
 
-  }
+                </div>
 
 
-  if (
-    average >= 78
-  ) {
+                <!-- HUNGER -->
 
-    return [
-      "♥",
-      "Delighted",
-      "Everything is wonderful!"
-    ];
+                <div class="stat">
 
-  }
+                    <div class="stat-header">
 
+                        <span>
+                            ● HUNGER
+                        </span>
 
-  if (
-    average >= 58
-  ) {
+                        <strong
+                            id="hungerValue"
+                        >
+                            68
+                        </strong>
 
-    return [
-      "♡",
-      "Happy",
-      "Ready for a little adventure?"
-    ];
+                    </div>
 
-  }
+                    <div class="pixel-bar">
 
+                        <div
+                            id="hungerBar"
+                            class="bar hunger"
+                        ></div>
 
-  if (
-    average >= 40
-  ) {
+                    </div>
 
-    return [
-      "•",
-      "Okay",
-      "A little care would be lovely."
-    ];
+                </div>
 
-  }
 
+                <!-- AFFECTION -->
 
-  return [
-    "…",
-    "Lonely",
-    "Can we spend some time together?"
-  ];
+                <div class="stat">
 
-}
+                    <div class="stat-header">
 
+                        <span>
+                            ♥ LOVE
+                        </span>
 
-/* =========================================
-   RENDER EVERYTHING
-========================================= */
+                        <strong
+                            id="affectionValue"
+                        >
+                            55
+                        </strong>
 
-function render() {
+                    </div>
 
-  /*
-    Name
-  */
+                    <div class="pixel-bar">
 
-  $("fishName").textContent =
-    state.name;
+                        <div
+                            id="affectionBar"
+                            class="bar affection"
+                        ></div>
 
+                    </div>
 
-  /*
-    Day
-  */
+                </div>
 
-  $("day").textContent =
-    state.day;
 
+                <!-- ENERGY -->
 
-  /*
-    Time
-  */
+                <div class="stat">
 
-  const hours =
-    Math.floor(
-      state.minutes / 60
-    );
+                    <div class="stat-header">
 
+                        <span>
+                            ★ ENERGY
+                        </span>
 
-  const mins =
-    state.minutes % 60;
+                        <strong
+                            id="energyValue"
+                        >
+                            76
+                        </strong>
 
+                    </div>
 
-  $("timeLabel").textContent =
+                    <div class="pixel-bar">
 
-    `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+                        <div
+                            id="energyBar"
+                            class="bar energy"
+                        ></div>
 
+                    </div>
 
-  /*
-    Stat bars
-  */
+                </div>
 
-  const stats = [
-    "health",
-    "hunger",
-    "affection",
-    "energy"
-  ];
 
+            </div>
 
-  for (
-    const key of stats
-  ) {
 
-    $(key + "Value").textContent =
-      Math.round(state[key]);
+            <!-- =================================
+                 DIVIDER
+            ================================== -->
 
+            <div class="pixel-divider">
+                ★ ★ ★ ★ ★
+            </div>
 
-    $(key + "Bar").style.width =
-      state[key] + "%";
 
-  }
+            <!-- =================================
+                 CONTROLS
+            ================================== -->
 
+            <div class="controls">
 
-  /*
-    Mood
-  */
 
-  const [
-    icon,
-    moodName,
-    status
-  ] = mood();
+                <button
+                    id="feedBtn"
+                    class="game-button feed-button"
+                >
 
+                    <span class="button-icon">
+                        ●
+                    </span>
 
-  $("moodIcon").textContent =
-    icon;
+                    <span>
+                        FEED
+                    </span>
 
+                    <small>
+                        FOOD
+                    </small>
 
-  $("moodText").textContent =
-    moodName;
+                </button>
 
 
-  $("statusText").textContent =
-    status;
+                <button
+                    id="playBtn"
+                    class="game-button play-button"
+                >
 
+                    <span class="button-icon">
+                        ★
+                    </span>
 
-  /*
-    Move fish depending
-    on its mood/statistics.
-  */
+                    <span>
+                        PLAY
+                    </span>
 
-  updateFishPosition();
+                    <small>
+                        FUN
+                    </small>
 
-}
+                </button>
 
 
-/* =========================================
-   FISH MOVEMENT
-========================================= */
+                <button
+                    id="cleanBtn"
+                    class="game-button clean-button"
+                >
 
-function updateFishPosition() {
+                    <span class="button-icon">
+                        ✧
+                    </span>
 
-  /*
-    More affection = fish swims
-    slightly further across the tank.
-  */
+                    <span>
+                        CLEAN
+                    </span>
 
-  const x =
-    30 +
-    (state.affection / 100) * 40;
+                    <small>
+                        TANK
+                    </small>
 
+                </button>
 
-  /*
-    Lower energy makes the fish
-    sit lower.
-  */
 
-  const y =
-    39 +
-    (
-      (100 - state.energy)
-      / 100
-    ) * 15;
+                <button
+                    id="petBtn"
+                    class="game-button pet-button"
+                >
 
+                    <span class="button-icon">
+                        ♥
+                    </span>
 
-  $("fishWrap").style.left =
-    x + "%";
+                    <span>
+                        PET
+                    </span>
 
+                    <small>
+                        LOVE
+                    </small>
 
-  $("fishWrap").style.top =
-    y + "%";
+                </button>
 
-}
 
+            </div>
 
-/* =========================================
-   FISH SPEECH
-========================================= */
 
-function speak(text) {
+            <!-- =================================
+                 LITTLE GAME STATUS
+            ================================== -->
 
-  $("speech").textContent =
-    text;
+            <div class="mission-box">
 
-}
+                <div class="mission-title">
+                    TODAY'S CARE
+                </div>
 
+                <div class="mission">
 
-/* =========================================
-   TOAST MESSAGE
-========================================= */
+                    <span>
+                        FOOD
+                    </span>
 
-function toast(text) {
+                    <span id="foodCount">
+                        0 / 3
+                    </span>
 
-  const element =
-    $("toast");
+                </div>
 
+                <div class="mission">
 
-  element.textContent =
-    text;
+                    <span>
+                        LOVE
+                    </span>
 
+                    <span id="loveCount">
+                        0 / 3
+                    </span>
 
-  element.classList.add(
-    "show"
-  );
+                </div>
 
+            </div>
 
-  clearTimeout(
-    toast.timer
-  );
 
+        </aside>
 
-  toast.timer =
-    setTimeout(
-      () => {
+    </main>
 
-        element.classList.remove(
-          "show"
-        );
 
-      },
-      1800
-    );
+    <!-- =====================================
+         FOOTER
+    ====================================== -->
 
-}
+    <footer>
 
+        <span>
+            © FIN & FRIENDS
+        </span>
 
-/* =========================================
-   ANIMATIONS
-========================================= */
+        <button id="resetBtn">
+            RESET GAME
+        </button>
 
-function animate(kind) {
+    </footer>
 
-  const tank =
-    $("tank");
 
+</div>
 
-  tank.classList.remove(
-    "pop-heart",
-    "pop-food"
-  );
 
+<!-- =========================================
+     NAME MODAL
+========================================== -->
 
-  /*
-    Force browser to restart
-    animation.
-  */
+<div
+    id="nameModal"
+    class="modal hidden"
+>
 
-  void tank.offsetWidth;
+    <div class="modal-box">
 
+        <div class="modal-title">
+            NAME YOUR FISH
+        </div>
 
-  tank.classList.add(
-    kind
-  );
+        <input
+            id="nameInput"
+            maxlength="12"
+            value="BUBBLES"
+        >
 
+        <div class="modal-buttons">
 
-  setTimeout(
-    () => {
+            <button id="cancelName">
+                CANCEL
+            </button>
 
-      tank.classList.remove(
-        kind
-      );
+            <button id="saveName">
+                OK!
+            </button>
 
-    },
-    1000
-  );
+        </div>
 
-}
+    </div>
 
+</div>
 
-/* =========================================
-   CARE ACTIONS
-========================================= */
 
-function doAction(type) {
+<!-- =========================================
+     TOAST
+========================================== -->
 
-  /*
-    Prevent button spam.
-  */
+<div
+    id="toast"
+    class="toast"
+>
+</div>
 
-  if (actionLock) {
-    return;
-  }
 
+<script src="game.js"></script>
 
-  actionLock = true;
-
-
-  /* =====================================
-     FEED
-  ===================================== */
-
-  if (
-    type === "feed"
-  ) {
-
-    if (
-      state.hunger >= 95
-    ) {
-
-      speak(
-        "I'm full! Maybe later? ♡"
-      );
-
-
-      toast(
-        "Bubbles is already full."
-      );
-
-    }
-
-    else {
-
-      state.hunger =
-        clamp(
-          state.hunger + 24
-        );
-
-
-      state.health =
-        clamp(
-          state.health + 3
-        );
-
-
-      state.energy =
-        clamp(
-          state.energy + 2
-        );
-
-
-      state.affection =
-        clamp(
-          state.affection + 2
-        );
-
-
-      const messages = [
-
-        "Yum yum! ☆",
-
-        "Best snack ever!",
-
-        "Nom nom nom!"
-
-      ];
-
-
-      speak(
-        messages[
-          Math.floor(
-            Math.random()
-            * messages.length
-          )
-        ]
-      );
-
-
-      animate(
-        "pop-food"
-      );
-
-
-      toast(
-        "+HUNGER  +HEALTH  +AFFECTION"
-      );
-
-    }
-
-  }
-
-
-  /* =====================================
-     PLAY
-  ===================================== */
-
-  if (
-    type === "play"
-  ) {
-
-    if (
-      state.energy < 18
-    ) {
-
-      speak(
-        "I'm sleepy… let's rest first."
-      );
-
-
-      toast(
-        "Bubbles needs more energy."
-      );
-
-    }
-
-    else {
-
-      state.affection =
-        clamp(
-          state.affection + 10
-        );
-
-
-      state.energy =
-        clamp(
-          state.energy - 13
-        );
-
-
-      state.hunger =
-        clamp(
-          state.hunger - 5
-        );
-
-
-      const messages = [
-
-        "Let's play! ★",
-
-        "Wheee!",
-
-        "That was fun! ♡"
-
-      ];
-
-
-      speak(
-        messages[
-          Math.floor(
-            Math.random()
-            * messages.length
-          )
-        ]
-      );
-
-
-      animate(
-        "pop-heart"
-      );
-
-
-      toast(
-        "+AFFECTION  -ENERGY"
-      );
-
-    }
-
-  }
-
-
-  /* =====================================
-     CLEAN
-  ===================================== */
-
-  if (
-    type === "clean"
-  ) {
-
-    state.cleanliness =
-      clamp(
-        state.cleanliness + 35
-      );
-
-
-    state.health =
-      clamp(
-        state.health + 7
-      );
-
-
-    state.affection =
-      clamp(
-        state.affection + 3
-      );
-
-
-    speak(
-      "Sparkly! I can see my fins again ✧"
-    );
-
-
-    animate(
-      "pop-heart"
-    );
-
-
-    toast(
-      "Tank cleaned! +HEALTH"
-    );
-
-  }
-
-
-  /* =====================================
-     PET
-  ===================================== */
-
-  if (
-    type === "pet"
-  ) {
-
-    state.affection =
-      clamp(
-        state.affection + 7
-      );
-
-
-    state.energy =
-      clamp(
-        state.energy + 2
-      );
-
-
-    const messages = [
-
-      "Heehee… that tickles!",
-
-      "♡♡♡",
-
-      "You are my favourite human!"
-
-    ];
-
-
-    speak(
-      messages[
-        Math.floor(
-          Math.random()
-          * messages.length
-        )
-      ]
-    );
-
-
-    animate(
-      "pop-heart"
-    );
-
-
-    toast(
-      "+AFFECTION"
-    );
-
-  }
-
-
-  /*
-    Save and update screen.
-  */
-
-  save();
-
-  render();
-
-
-  setTimeout(
-    () => {
-
-      actionLock = false;
-
-    },
-    350
-  );
-
-}
-
-
-/* =========================================
-   NAME MODAL
-========================================= */
-
-function openNameModal() {
-
-  $("nameInput").value =
-    state.name;
-
-
-  $("nameModal")
-    .classList
-    .remove("hidden");
-
-
-  setTimeout(
-    () => {
-
-      $("nameInput").focus();
-
-      $("nameInput").select();
-
-    },
-    30
-  );
-
-}
-
-
-function closeNameModal() {
-
-  $("nameModal")
-    .classList
-    .add("hidden");
-
-}
-
-
-/* =========================================
-   BUTTON EVENTS
-========================================= */
-
-$("feedBtn")
-  .addEventListener(
-    "click",
-    () => doAction("feed")
-  );
-
-
-$("playBtn")
-  .addEventListener(
-    "click",
-    () => doAction("play")
-  );
-
-
-$("cleanBtn")
-  .addEventListener(
-    "click",
-    () => doAction("clean")
-  );
-
-
-$("petBtn")
-  .addEventListener(
-    "click",
-    () => doAction("pet")
-  );
-
-
-$("renameBtn")
-  .addEventListener(
-    "click",
-    openNameModal
-  );
-
-
-$("cancelName")
-  .addEventListener(
-    "click",
-    closeNameModal
-  );
-
-
-/* =========================================
-   SAVE NEW NAME
-========================================= */
-
-$("saveName")
-  .addEventListener(
-    "click",
-    () => {
-
-      const value =
-        $("nameInput")
-          .value
-          .trim()
-          .replace(
-            /\s+/g,
-            " "
-          );
-
-
-      if (!value) {
-        return;
-      }
-
-
-      state.name =
-        value.slice(
-          0,
-          14
-        );
-
-
-      save();
-
-      render();
-
-      closeNameModal();
-
-
-      speak(
-        `Nice to meet you, ${state.name}! ♡`
-      );
-
-    }
-  );
-
-
-/* =========================================
-   KEYBOARD SUPPORT
-========================================= */
-
-$("nameInput")
-  .addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.key === "Enter"
-      ) {
-
-        $("saveName").click();
-
-      }
-
-
-      if (
-        event.key === "Escape"
-      ) {
-
-        closeNameModal();
-
-      }
-
-    }
-  );
-
-
-/* =========================================
-   RESET GAME
-========================================= */
-
-$("resetBtn")
-  .addEventListener(
-    "click",
-    () => {
-
-      const confirmed =
-        confirm(
-          "Reset your fish and start a new aquarium?"
-        );
-
-
-      if (!confirmed) {
-        return;
-      }
-
-
-      state = {
-        ...defaultState
-      };
-
-
-      save();
-
-      render();
-
-
-      speak(
-        "A fresh new adventure! ♡"
-      );
-
-
-      toast(
-        "Save reset."
-      );
-
-    }
-  );
-
-
-/* =========================================
-   AUTOMATIC TIME
-========================================= */
-
-/*
-  Every real-world minute,
-  the fish experiences 10 in-game
-  minutes.
-*/
-
-setInterval(
-  () => {
-
-    simulateTime(
-      state,
-      10
-    );
-
-
-    save();
-
-    render();
-
-  },
-  60000
-);
-
-
-/* =========================================
-   RANDOM IDLE SPEECH
-========================================= */
-
-setInterval(
-  () => {
-
-    const lines = [
-
-      "The water feels nice today. ♡",
-
-      "Have you seen my favourite plant?",
-
-      "Bloop bloop!",
-
-      "I wonder what is outside the tank…",
-
-      "I love my little aquarium."
-
-    ];
-
-
-    if (
-      Math.random() < .35
-    ) {
-
-      speak(
-        lines[
-          Math.floor(
-            Math.random()
-            * lines.length
-          )
-        ]
-      );
-
-    }
-
-  },
-  15000
-);
-
-
-/* =========================================
-   START GAME
-========================================= */
-
-render();
-```
+</body>
+</html>
