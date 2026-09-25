@@ -14,633 +14,622 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
-<div class="game">
+    <div class="game">
 
-    <!-- =====================================
-         TOP GAME HEADER
-    ====================================== -->
+        <!-- =========================================
+             HEADER
+        ========================================== -->
 
-    <header class="header">
+        <header class="header">
 
-        <div class="logo">
+            <div class="logo">
 
-            <div class="logo-small">
-                PIXEL AQUARIUM
-            </div>
+                <div class="logo-small">
+                    PIXEL AQUARIUM
+                </div>
 
-            <div class="logo-big">
-                FIN
-            </div>
+                <div class="logo-big">
+                    FIN
+                </div>
 
-            <div class="logo-big second">
-                & FRIENDS
-            </div>
-
-        </div>
-
-
-        <div class="day-box">
-
-            <div class="day-label">
-                DAY
-            </div>
-
-            <div
-                id="day"
-                class="day-number"
-            >
-                1
-            </div>
-
-            <div
-                id="timeLabel"
-                class="clock"
-            >
-                08:00
-            </div>
-
-        </div>
-
-    </header>
-
-
-    <!-- =====================================
-         MAIN GAME
-    ====================================== -->
-
-    <main class="game-screen">
-
-
-        <!-- =================================
-             AQUARIUM
-        ================================== -->
-
-        <section
-            class="aquarium"
-            id="aquarium"
-        >
-
-            <!-- water pixel decoration -->
-
-            <div class="water-pixels"></div>
-
-
-            <!-- bubbles -->
-
-            <div class="bubble bubble1"></div>
-            <div class="bubble bubble2"></div>
-            <div class="bubble bubble3"></div>
-            <div class="bubble bubble4"></div>
-            <div class="bubble bubble5"></div>
-
-
-            <!-- BACKGROUND DECOR -->
-
-            <div class="castle">
-
-                <div class="castle-top"></div>
-
-                <div class="castle-body">
-
-                    <div class="castle-window"></div>
-                    <div class="castle-window"></div>
-
+                <div class="logo-big second">
+                    &amp; FRIENDS
                 </div>
 
             </div>
 
+            <div class="day-box">
 
-            <!-- PLANTS -->
+                <div class="day-label">
+                    DAY
+                </div>
 
-            <div class="plant plant1">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
+                <div
+                    id="day"
+                    class="day-number"
+                >
+                    1
+                </div>
+
+                <div
+                    id="timeLabel"
+                    class="clock"
+                >
+                    08:00
+                </div>
+
             </div>
 
-            <div class="plant plant2">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+        </header>
 
 
-            <!-- SAND -->
+        <!-- =========================================
+             MAIN GAME
+        ========================================== -->
 
-            <div class="sand"></div>
+        <main class="game-screen">
 
 
-            <!-- =================================
-                 FISH
-            ================================== -->
+            <!-- =====================================
+                 AQUARIUM
+            ====================================== -->
 
-            <div
-                id="fish"
-                class="fish-container"
+            <section
+                id="aquarium"
+                class="aquarium"
             >
 
-                <div class="fish-shadow"></div>
+                <div class="water-pixels"></div>
 
 
-                <div class="fish">
+                <!-- BUBBLES -->
 
-                    <div class="fish-tail"></div>
-
-
-                    <div class="fish-body">
-
-                        <div class="fish-fin-top"></div>
-
-                        <div class="fish-fin-bottom"></div>
+                <div class="bubble bubble1"></div>
+                <div class="bubble bubble2"></div>
+                <div class="bubble bubble3"></div>
+                <div class="bubble bubble4"></div>
+                <div class="bubble bubble5"></div>
 
 
-                        <div class="fish-eye">
-                            <span></span>
-                        </div>
+                <!-- CASTLE -->
 
+                <div class="castle">
 
-                        <div class="fish-cheek"></div>
+                    <div class="castle-top"></div>
 
+                    <div class="castle-body">
 
-                        <div class="fish-scale scale1"></div>
-                        <div class="fish-scale scale2"></div>
-                        <div class="fish-scale scale3"></div>
+                        <div class="castle-window"></div>
 
-
-                        <div
-                            id="fishMouth"
-                            class="fish-mouth"
-                        ></div>
+                        <div class="castle-window"></div>
 
                     </div>
 
                 </div>
 
-            </div>
 
+                <!-- PLANTS -->
 
-            <!-- =================================
-                 FOOD
-            ================================== -->
+                <div class="plant plant1">
 
-            <div
-                id="foodTray"
-                class="food-tray hidden"
-            >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
 
-                <div class="food-title">
-                    FOOD!
                 </div>
 
-                <div class="food-subtitle">
-                    GIVE TO FISH
+
+                <div class="plant plant2">
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
                 </div>
 
+
+                <!-- SAND -->
+
+                <div class="sand"></div>
+
+
+                <!-- =================================
+                     FISH
+                ================================== -->
 
                 <div
-                    id="foodPieces"
-                    class="food-pieces"
-                ></div>
+                    id="fish"
+                    class="fish-container"
+                >
 
-            </div>
+                    <div class="fish-shadow"></div>
 
+                    <div class="fish">
 
-            <!-- =================================
-                 FEEDING MESSAGE
-            ================================== -->
+                        <div class="fish-tail"></div>
 
-            <div
-                id="foodMessage"
-                class="food-message hidden"
-            >
-                CLICK A FOOD
-            </div>
+                        <div class="fish-body">
 
+                            <div class="fish-fin-top"></div>
 
-            <!-- =================================
-                 SPEECH BOX
-            ================================== -->
+                            <div class="fish-fin-bottom"></div>
 
-            <div
-                id="speech"
-                class="speech"
-            >
-                HELLO!
-            </div>
+                            <div class="fish-eye">
+                                <span></span>
+                            </div>
 
+                            <div class="fish-cheek"></div>
 
-            <!-- =================================
-                 STATUS BAR
-            ================================== -->
+                            <div class="fish-scale scale1"></div>
+                            <div class="fish-scale scale2"></div>
+                            <div class="fish-scale scale3"></div>
 
-            <div class="status-bar">
+                            <div
+                                id="fishMouth"
+                                class="fish-mouth"
+                            ></div>
 
-                <div class="status-face">
-                    <span id="moodIcon">
-                        ♥
-                    </span>
-                </div>
+                        </div>
 
-                <div class="status-text">
-
-                    <strong id="moodText">
-                        HAPPY
-                    </strong>
-
-                    <span id="statusText">
-                        READY TO PLAY!
-                    </span>
+                    </div>
 
                 </div>
 
-            </div>
 
+                <!-- =================================
+                     FOOD TRAY
+                ================================== -->
 
-        </section>
+                <div
+                    id="foodTray"
+                    class="food-tray hidden"
+                >
 
+                    <div class="food-title">
+                        FOOD!
+                    </div>
 
-        <!-- =====================================
-             CONTROL PANEL
-        ====================================== -->
-
-        <aside class="panel">
-
-
-            <!-- FISH NAME -->
-
-            <div class="fish-name-box">
-
-                <div>
-
-                    <div class="small-label">
-                        MY FISH
+                    <div class="food-subtitle">
+                        CLICK A SNACK
                     </div>
 
                     <div
-                        id="fishName"
-                        class="fish-name"
+                        id="foodPieces"
+                        class="food-pieces"
+                    ></div>
+
+                </div>
+
+
+                <!-- FOOD MESSAGE -->
+
+                <div
+                    id="foodMessage"
+                    class="food-message hidden"
+                >
+                    CHOOSE FOOD
+                </div>
+
+
+                <!-- SPEECH -->
+
+                <div
+                    id="speech"
+                    class="speech"
+                >
+                    HELLO!
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="status-bar">
+
+                    <div
+                        id="moodIcon"
+                        class="status-face"
                     >
-                        BUBBLES
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="renameBtn"
-                    class="tiny-button"
-                >
-                    ✎
-                </button>
-
-            </div>
-
-
-            <!-- =================================
-                 STATS
-            ================================== -->
-
-            <div class="stats">
-
-
-                <!-- HEALTH -->
-
-                <div class="stat">
-
-                    <div class="stat-header">
-
-                        <span>
-                            ♥ HEALTH
-                        </span>
-
-                        <strong
-                            id="healthValue"
-                        >
-                            82
-                        </strong>
-
-                    </div>
-
-                    <div class="pixel-bar">
-
-                        <div
-                            id="healthBar"
-                            class="bar health"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- HUNGER -->
-
-                <div class="stat">
-
-                    <div class="stat-header">
-
-                        <span>
-                            ● HUNGER
-                        </span>
-
-                        <strong
-                            id="hungerValue"
-                        >
-                            68
-                        </strong>
-
-                    </div>
-
-                    <div class="pixel-bar">
-
-                        <div
-                            id="hungerBar"
-                            class="bar hunger"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- AFFECTION -->
-
-                <div class="stat">
-
-                    <div class="stat-header">
-
-                        <span>
-                            ♥ LOVE
-                        </span>
-
-                        <strong
-                            id="affectionValue"
-                        >
-                            55
-                        </strong>
-
-                    </div>
-
-                    <div class="pixel-bar">
-
-                        <div
-                            id="affectionBar"
-                            class="bar affection"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ENERGY -->
-
-                <div class="stat">
-
-                    <div class="stat-header">
-
-                        <span>
-                            ★ ENERGY
-                        </span>
-
-                        <strong
-                            id="energyValue"
-                        >
-                            76
-                        </strong>
-
-                    </div>
-
-                    <div class="pixel-bar">
-
-                        <div
-                            id="energyBar"
-                            class="bar energy"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-
-            <!-- =================================
-                 DIVIDER
-            ================================== -->
-
-            <div class="pixel-divider">
-                ★ ★ ★ ★ ★
-            </div>
-
-
-            <!-- =================================
-                 CONTROLS
-            ================================== -->
-
-            <div class="controls">
-
-
-                <button
-                    id="feedBtn"
-                    class="game-button feed-button"
-                >
-
-                    <span class="button-icon">
-                        ●
-                    </span>
-
-                    <span>
-                        FEED
-                    </span>
-
-                    <small>
-                        FOOD
-                    </small>
-
-                </button>
-
-
-                <button
-                    id="playBtn"
-                    class="game-button play-button"
-                >
-
-                    <span class="button-icon">
-                        ★
-                    </span>
-
-                    <span>
-                        PLAY
-                    </span>
-
-                    <small>
-                        FUN
-                    </small>
-
-                </button>
-
-
-                <button
-                    id="cleanBtn"
-                    class="game-button clean-button"
-                >
-
-                    <span class="button-icon">
-                        ✧
-                    </span>
-
-                    <span>
-                        CLEAN
-                    </span>
-
-                    <small>
-                        TANK
-                    </small>
-
-                </button>
-
-
-                <button
-                    id="petBtn"
-                    class="game-button pet-button"
-                >
-
-                    <span class="button-icon">
                         ♥
-                    </span>
+                    </div>
 
-                    <span>
-                        PET
-                    </span>
+                    <div class="status-text">
 
-                    <small>
-                        LOVE
-                    </small>
+                        <strong id="moodText">
+                            HAPPY
+                        </strong>
 
+                        <span id="statusText">
+                            READY TO PLAY!
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================
+                 SIDE PANEL
+            ====================================== -->
+
+            <aside class="panel">
+
+
+                <!-- NAME -->
+
+                <div class="fish-name-box">
+
+                    <div>
+
+                        <div class="small-label">
+                            MY FISH
+                        </div>
+
+                        <div
+                            id="fishName"
+                            class="fish-name"
+                        >
+                            BUBBLES
+                        </div>
+
+                    </div>
+
+                    <button
+                        id="renameBtn"
+                        class="tiny-button"
+                        type="button"
+                    >
+                        ✎
+                    </button>
+
+                </div>
+
+
+                <!-- =================================
+                     STATS
+                ================================== -->
+
+                <div class="stats">
+
+
+                    <!-- HEALTH -->
+
+                    <div class="stat">
+
+                        <div class="stat-header">
+
+                            <span>
+                                ♥ HEALTH
+                            </span>
+
+                            <strong id="healthValue">
+                                82
+                            </strong>
+
+                        </div>
+
+                        <div class="pixel-bar">
+
+                            <div
+                                id="healthBar"
+                                class="bar health"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- HUNGER -->
+
+                    <div class="stat">
+
+                        <div class="stat-header">
+
+                            <span>
+                                ● HUNGER
+                            </span>
+
+                            <strong id="hungerValue">
+                                68
+                            </strong>
+
+                        </div>
+
+                        <div class="pixel-bar">
+
+                            <div
+                                id="hungerBar"
+                                class="bar hunger"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- AFFECTION -->
+
+                    <div class="stat">
+
+                        <div class="stat-header">
+
+                            <span>
+                                ♥ LOVE
+                            </span>
+
+                            <strong id="affectionValue">
+                                55
+                            </strong>
+
+                        </div>
+
+                        <div class="pixel-bar">
+
+                            <div
+                                id="affectionBar"
+                                class="bar affection"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ENERGY -->
+
+                    <div class="stat">
+
+                        <div class="stat-header">
+
+                            <span>
+                                ★ ENERGY
+                            </span>
+
+                            <strong id="energyValue">
+                                76
+                            </strong>
+
+                        </div>
+
+                        <div class="pixel-bar">
+
+                            <div
+                                id="energyBar"
+                                class="bar energy"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="pixel-divider">
+                    ★ ★ ★ ★ ★
+                </div>
+
+
+                <!-- =================================
+                     BUTTONS
+                ================================== -->
+
+                <div class="controls">
+
+
+                    <button
+                        id="feedBtn"
+                        type="button"
+                        class="game-button feed-button"
+                    >
+
+                        <span class="button-icon">
+                            ●
+                        </span>
+
+                        <span>
+                            FEED
+                        </span>
+
+                        <small>
+                            FOOD
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        id="playBtn"
+                        type="button"
+                        class="game-button play-button"
+                    >
+
+                        <span class="button-icon">
+                            ★
+                        </span>
+
+                        <span>
+                            PLAY
+                        </span>
+
+                        <small>
+                            FUN
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        id="cleanBtn"
+                        type="button"
+                        class="game-button clean-button"
+                    >
+
+                        <span class="button-icon">
+                            ✧
+                        </span>
+
+                        <span>
+                            CLEAN
+                        </span>
+
+                        <small>
+                            TANK
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        id="petBtn"
+                        type="button"
+                        class="game-button pet-button"
+                    >
+
+                        <span class="button-icon">
+                            ♥
+                        </span>
+
+                        <span>
+                            PET
+                        </span>
+
+                        <small>
+                            LOVE
+                        </small>
+
+                    </button>
+
+                </div>
+
+
+                <!-- =================================
+                     DAILY MISSIONS
+                ================================== -->
+
+                <div class="mission-box">
+
+                    <div class="mission-title">
+                        TODAY'S CARE
+                    </div>
+
+                    <div class="mission">
+
+                        <span>
+                            FOOD
+                        </span>
+
+                        <span id="foodCount">
+                            0 / 3
+                        </span>
+
+                    </div>
+
+                    <div class="mission">
+
+                        <span>
+                            LOVE
+                        </span>
+
+                        <span id="loveCount">
+                            0 / 3
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </aside>
+
+        </main>
+
+
+        <!-- FOOTER -->
+
+        <footer>
+
+            <span>
+                © FIN &amp; FRIENDS
+            </span>
+
+            <button
+                id="resetBtn"
+                type="button"
+            >
+                RESET GAME
+            </button>
+
+        </footer>
+
+    </div>
+
+
+    <!-- =========================================
+         NAME MODAL
+    ========================================== -->
+
+    <div
+        id="nameModal"
+        class="modal hidden"
+    >
+
+        <div class="modal-box">
+
+            <div class="modal-title">
+                NAME YOUR FISH
+            </div>
+
+            <input
+                id="nameInput"
+                type="text"
+                maxlength="12"
+                value="BUBBLES"
+            >
+
+            <div class="modal-buttons">
+
+                <button
+                    id="cancelName"
+                    type="button"
+                >
+                    CANCEL
                 </button>
 
+                <button
+                    id="saveName"
+                    type="button"
+                >
+                    OK!
+                </button>
 
             </div>
-
-
-            <!-- =================================
-                 LITTLE GAME STATUS
-            ================================== -->
-
-            <div class="mission-box">
-
-                <div class="mission-title">
-                    TODAY'S CARE
-                </div>
-
-                <div class="mission">
-
-                    <span>
-                        FOOD
-                    </span>
-
-                    <span id="foodCount">
-                        0 / 3
-                    </span>
-
-                </div>
-
-                <div class="mission">
-
-                    <span>
-                        LOVE
-                    </span>
-
-                    <span id="loveCount">
-                        0 / 3
-                    </span>
-
-                </div>
-
-            </div>
-
-
-        </aside>
-
-    </main>
-
-
-    <!-- =====================================
-         FOOTER
-    ====================================== -->
-
-    <footer>
-
-        <span>
-            © FIN & FRIENDS
-        </span>
-
-        <button id="resetBtn">
-            RESET GAME
-        </button>
-
-    </footer>
-
-
-</div>
-
-
-<!-- =========================================
-     NAME MODAL
-========================================== -->
-
-<div
-    id="nameModal"
-    class="modal hidden"
->
-
-    <div class="modal-box">
-
-        <div class="modal-title">
-            NAME YOUR FISH
-        </div>
-
-        <input
-            id="nameInput"
-            maxlength="12"
-            value="BUBBLES"
-        >
-
-        <div class="modal-buttons">
-
-            <button id="cancelName">
-                CANCEL
-            </button>
-
-            <button id="saveName">
-                OK!
-            </button>
 
         </div>
 
     </div>
 
-</div>
+
+    <!-- TOAST -->
+
+    <div
+        id="toast"
+        class="toast"
+    ></div>
 
 
-<!-- =========================================
-     TOAST
-========================================== -->
+    <!-- IMPORTANT:
+         JavaScript is loaded AFTER all HTML elements exist.
+    -->
 
-<div
-    id="toast"
-    class="toast"
->
-</div>
-
-
-<script src="game.js"></script>
+    <script src="game.js"></script>
 
 </body>
+
 </html>
