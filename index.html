@@ -1,53 +1,412 @@
-<!doctype html>
+```html
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Interactive VN - Template</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Fin & Friends — Pixel Aquarium</title>
+
+  <meta
+    name="description"
+    content="A cute retro pixel-art fish care game."
+  >
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div id="app">
-    <div id="scene">
-      <div id="bg"></div>
-      <div id="hotspots"></div>
-    </div>
 
-    <div id="overlay">
-      <div id="left-column">
-        <div id="portrait" aria-hidden="true"></div>
+  <main class="game-shell">
+
+    <!-- HEADER -->
+    <header class="topbar">
+
+      <div>
+        <p class="eyebrow">PIXEL AQUARIUM</p>
+        <h1>FIN &amp; FRIENDS</h1>
       </div>
 
-      <div id="right-column">
-        <div id="namebox" role="status" aria-live="polite"></div>
-       <div id="textbox" tabindex="0">
-  <p id="text"></p>
-  <div id="continue-indicator">▼</div>
-</div>
+      <div class="clock-card">
+        <span>DAY</span>
+        <strong id="day">1</strong>
+        <small id="timeLabel">08:00</small>
+      </div>
+
+    </header>
 
 
-        <div id="choices" aria-live="polite"></div>
+    <!-- MAIN GAME -->
+    <section class="screen">
 
-        <div id="controls">
-          <button id="saveBtn">Save</button>
-          <button id="loadBtn">Load</button>
-          <button id="restartBtn">Restart</button>
+      <!-- AQUARIUM -->
+      <div class="tank" id="tank">
+
+        <div class="water-glow"></div>
+        <div class="sunbeam"></div>
+
+        <!-- BUBBLES -->
+        <div class="bubble b1"></div>
+        <div class="bubble b2"></div>
+        <div class="bubble b3"></div>
+        <div class="bubble b4"></div>
+
+        <!-- PLANTS -->
+        <div class="plant plant-left">
+          <i></i>
+          <i></i>
+          <i></i>
+          <i></i>
         </div>
+
+        <div class="plant plant-right">
+          <i></i>
+          <i></i>
+          <i></i>
+        </div>
+
+        <!-- FLOOR -->
+        <div class="sand"></div>
+
+        <div class="pebble p1"></div>
+        <div class="pebble p2"></div>
+        <div class="pebble p3"></div>
+
+
+        <!-- FISH -->
+        <div
+          class="fish-wrap"
+          id="fishWrap"
+          aria-label="Your fish"
+        >
+
+          <div class="fish-shadow"></div>
+
+          <div class="fish">
+
+            <div class="tail"></div>
+
+            <div class="body">
+
+              <div class="fin top-fin"></div>
+              <div class="fin bottom-fin"></div>
+
+              <div class="eye"></div>
+
+              <div class="cheek"></div>
+
+              <div class="scale s1"></div>
+              <div class="scale s2"></div>
+              <div class="scale s3"></div>
+
+              <div class="mouth"></div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="heart-pop"
+            id="heartPop"
+          >
+            ♥
+          </div>
+
+          <div
+            class="food-pop"
+            id="foodPop"
+          >
+            ✦
+          </div>
+
+        </div>
+
+
+        <!-- SPEECH -->
+        <div
+          class="speech"
+          id="speech"
+        >
+          Hello, little human! ♡
+        </div>
+
+
+        <!-- STATUS -->
+        <div class="status-strip">
+
+          <span id="moodIcon">♡</span>
+
+          <strong id="moodText">
+            Happy
+          </strong>
+
+          <span class="status-dot"></span>
+
+          <span id="statusText">
+            Ready for a snack?
+          </span>
+
+        </div>
+
       </div>
+
+
+      <!-- RIGHT PANEL -->
+      <aside class="stats-panel">
+
+        <!-- NAME -->
+        <div class="name-row">
+
+          <div>
+
+            <span class="tiny-label">
+              YOUR FISH
+            </span>
+
+            <h2 id="fishName">
+              Bubbles
+            </h2>
+
+          </div>
+
+          <button
+            class="icon-btn"
+            id="renameBtn"
+            title="Rename fish"
+          >
+            ✎
+          </button>
+
+        </div>
+
+
+        <!-- HEALTH -->
+        <div class="stat">
+
+          <div class="stat-head">
+            <span>HEALTH</span>
+            <b id="healthValue">82</b>
+          </div>
+
+          <div class="bar">
+            <i
+              class="health"
+              id="healthBar"
+            ></i>
+          </div>
+
+        </div>
+
+
+        <!-- HUNGER -->
+        <div class="stat">
+
+          <div class="stat-head">
+            <span>HUNGER</span>
+            <b id="hungerValue">68</b>
+          </div>
+
+          <div class="bar">
+            <i
+              class="hunger"
+              id="hungerBar"
+            ></i>
+          </div>
+
+        </div>
+
+
+        <!-- AFFECTION -->
+        <div class="stat">
+
+          <div class="stat-head">
+            <span>AFFECTION</span>
+            <b id="affectionValue">55</b>
+          </div>
+
+          <div class="bar">
+            <i
+              class="affection"
+              id="affectionBar"
+            ></i>
+          </div>
+
+        </div>
+
+
+        <!-- ENERGY -->
+        <div class="stat">
+
+          <div class="stat-head">
+            <span>ENERGY</span>
+            <b id="energyValue">76</b>
+          </div>
+
+          <div class="bar">
+            <i
+              class="energy"
+              id="energyBar"
+            ></i>
+          </div>
+
+        </div>
+
+
+        <div class="divider"></div>
+
+
+        <!-- CARE BUTTONS -->
+        <div class="care-grid">
+
+          <button
+            class="care-btn feed"
+            id="feedBtn"
+          >
+
+            <span class="emoji">●</span>
+
+            <span>FEED</span>
+
+            <small>
+              snack time
+            </small>
+
+          </button>
+
+
+          <button
+            class="care-btn play"
+            id="playBtn"
+          >
+
+            <span class="emoji">★</span>
+
+            <span>PLAY</span>
+
+            <small>
+              have fun
+            </small>
+
+          </button>
+
+
+          <button
+            class="care-btn clean"
+            id="cleanBtn"
+          >
+
+            <span class="emoji">✧</span>
+
+            <span>CLEAN</span>
+
+            <small>
+              fresh tank
+            </small>
+
+          </button>
+
+
+          <button
+            class="care-btn pet"
+            id="petBtn"
+          >
+
+            <span class="emoji">♥</span>
+
+            <span>PET</span>
+
+            <small>
+              show love
+            </small>
+
+          </button>
+
+        </div>
+
+
+        <!-- TIP -->
+        <div class="hint">
+
+          <span>TIP</span>
+
+          Keep all four bars healthy.
+          Your fish needs regular care!
+
+        </div>
+
+      </aside>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+      <span>
+        ♡ A tiny aquarium made with pixels
+      </span>
+
+      <button id="resetBtn">
+        RESET SAVE
+      </button>
+
+    </footer>
+
+  </main>
+
+
+  <!-- NAME MODAL -->
+  <div
+    class="modal hidden"
+    id="nameModal"
+  >
+
+    <div class="modal-card">
+
+      <span class="tiny-label">
+        NEW NAME
+      </span>
+
+      <h2>
+        Name your fish
+      </h2>
+
+      <input
+        id="nameInput"
+        maxlength="14"
+        value="Bubbles"
+        autocomplete="off"
+      >
+
+      <div class="modal-actions">
+
+        <button id="cancelName">
+          CANCEL
+        </button>
+
+        <button
+          class="primary"
+          id="saveName"
+        >
+          SAVE
+        </button>
+
+      </div>
+
     </div>
+
   </div>
 
-  <!-- Hotspot Modal -->
-  <div id="hotspot-modal" class="hidden" role="dialog" aria-modal="true">
-    <div class="modal-inner">
-      <div id="hs-name" class="hs-name"></div>
-      <div id="hs-text" class="hs-text"></div>
-      <div id="hs-choices" class="hs-choices"></div>
-      <button id="hs-close">Close</button>
-    </div>
-  </div>
 
-  <script src="script.js"></script>
+  <!-- TOAST -->
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+  <script src="game.js"></script>
+
 </body>
 </html>
-
+```
