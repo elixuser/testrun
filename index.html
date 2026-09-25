@@ -1,412 +1,646 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-  <title>Fin & Friends — Pixel Aquarium</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-  <meta
-    name="description"
-    content="A cute retro pixel-art fish care game."
-  >
+    <title>FIN & FRIENDS</title>
 
-  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 
 <body>
 
-  <main class="game-shell">
+<div class="game">
 
-    <!-- HEADER -->
-    <header class="topbar">
+    <!-- =====================================
+         TOP GAME HEADER
+    ====================================== -->
 
-      <div>
-        <p class="eyebrow">PIXEL AQUARIUM</p>
-        <h1>FIN &amp; FRIENDS</h1>
-      </div>
+    <header class="header">
 
-      <div class="clock-card">
-        <span>DAY</span>
-        <strong id="day">1</strong>
-        <small id="timeLabel">08:00</small>
-      </div>
+        <div class="logo">
+
+            <div class="logo-small">
+                PIXEL AQUARIUM
+            </div>
+
+            <div class="logo-big">
+                FIN
+            </div>
+
+            <div class="logo-big second">
+                & FRIENDS
+            </div>
+
+        </div>
+
+
+        <div class="day-box">
+
+            <div class="day-label">
+                DAY
+            </div>
+
+            <div
+                id="day"
+                class="day-number"
+            >
+                1
+            </div>
+
+            <div
+                id="timeLabel"
+                class="clock"
+            >
+                08:00
+            </div>
+
+        </div>
 
     </header>
 
 
-    <!-- MAIN GAME -->
-    <section class="screen">
+    <!-- =====================================
+         MAIN GAME
+    ====================================== -->
 
-      <!-- AQUARIUM -->
-      <div class="tank" id="tank">
-
-        <div class="water-glow"></div>
-        <div class="sunbeam"></div>
-
-        <!-- BUBBLES -->
-        <div class="bubble b1"></div>
-        <div class="bubble b2"></div>
-        <div class="bubble b3"></div>
-        <div class="bubble b4"></div>
-
-        <!-- PLANTS -->
-        <div class="plant plant-left">
-          <i></i>
-          <i></i>
-          <i></i>
-          <i></i>
-        </div>
-
-        <div class="plant plant-right">
-          <i></i>
-          <i></i>
-          <i></i>
-        </div>
-
-        <!-- FLOOR -->
-        <div class="sand"></div>
-
-        <div class="pebble p1"></div>
-        <div class="pebble p2"></div>
-        <div class="pebble p3"></div>
+    <main class="game-screen">
 
 
-        <!-- FISH -->
-        <div
-          class="fish-wrap"
-          id="fishWrap"
-          aria-label="Your fish"
+        <!-- =================================
+             AQUARIUM
+        ================================== -->
+
+        <section
+            class="aquarium"
+            id="aquarium"
         >
 
-          <div class="fish-shadow"></div>
+            <!-- water pixel decoration -->
 
-          <div class="fish">
+            <div class="water-pixels"></div>
 
-            <div class="tail"></div>
 
-            <div class="body">
+            <!-- bubbles -->
 
-              <div class="fin top-fin"></div>
-              <div class="fin bottom-fin"></div>
+            <div class="bubble bubble1"></div>
+            <div class="bubble bubble2"></div>
+            <div class="bubble bubble3"></div>
+            <div class="bubble bubble4"></div>
+            <div class="bubble bubble5"></div>
 
-              <div class="eye"></div>
 
-              <div class="cheek"></div>
+            <!-- BACKGROUND DECOR -->
 
-              <div class="scale s1"></div>
-              <div class="scale s2"></div>
-              <div class="scale s3"></div>
+            <div class="castle">
 
-              <div class="mouth"></div>
+                <div class="castle-top"></div>
+
+                <div class="castle-body">
+
+                    <div class="castle-window"></div>
+                    <div class="castle-window"></div>
+
+                </div>
 
             </div>
 
-          </div>
 
-          <div
-            class="heart-pop"
-            id="heartPop"
-          >
-            ♥
-          </div>
+            <!-- PLANTS -->
 
-          <div
-            class="food-pop"
-            id="foodPop"
-          >
-            ✦
-          </div>
+            <div class="plant plant1">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
-        </div>
+            <div class="plant plant2">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
 
-        <!-- SPEECH -->
-        <div
-          class="speech"
-          id="speech"
-        >
-          Hello, little human! ♡
-        </div>
+            <!-- SAND -->
 
+            <div class="sand"></div>
 
-        <!-- STATUS -->
-        <div class="status-strip">
 
-          <span id="moodIcon">♡</span>
+            <!-- =================================
+                 FISH
+            ================================== -->
 
-          <strong id="moodText">
-            Happy
-          </strong>
+            <div
+                id="fish"
+                class="fish-container"
+            >
 
-          <span class="status-dot"></span>
+                <div class="fish-shadow"></div>
 
-          <span id="statusText">
-            Ready for a snack?
-          </span>
 
-        </div>
+                <div class="fish">
 
-      </div>
+                    <div class="fish-tail"></div>
 
 
-      <!-- RIGHT PANEL -->
-      <aside class="stats-panel">
+                    <div class="fish-body">
 
-        <!-- NAME -->
-        <div class="name-row">
+                        <div class="fish-fin-top"></div>
 
-          <div>
+                        <div class="fish-fin-bottom"></div>
 
-            <span class="tiny-label">
-              YOUR FISH
-            </span>
 
-            <h2 id="fishName">
-              Bubbles
-            </h2>
+                        <div class="fish-eye">
+                            <span></span>
+                        </div>
 
-          </div>
 
-          <button
-            class="icon-btn"
-            id="renameBtn"
-            title="Rename fish"
-          >
-            ✎
-          </button>
+                        <div class="fish-cheek"></div>
 
-        </div>
 
+                        <div class="fish-scale scale1"></div>
+                        <div class="fish-scale scale2"></div>
+                        <div class="fish-scale scale3"></div>
 
-        <!-- HEALTH -->
-        <div class="stat">
 
-          <div class="stat-head">
-            <span>HEALTH</span>
-            <b id="healthValue">82</b>
-          </div>
+                        <div
+                            id="fishMouth"
+                            class="fish-mouth"
+                        ></div>
 
-          <div class="bar">
-            <i
-              class="health"
-              id="healthBar"
-            ></i>
-          </div>
+                    </div>
 
-        </div>
+                </div>
 
+            </div>
 
-        <!-- HUNGER -->
-        <div class="stat">
 
-          <div class="stat-head">
-            <span>HUNGER</span>
-            <b id="hungerValue">68</b>
-          </div>
+            <!-- =================================
+                 FOOD
+            ================================== -->
 
-          <div class="bar">
-            <i
-              class="hunger"
-              id="hungerBar"
-            ></i>
-          </div>
+            <div
+                id="foodTray"
+                class="food-tray hidden"
+            >
 
-        </div>
+                <div class="food-title">
+                    FOOD!
+                </div>
 
+                <div class="food-subtitle">
+                    GIVE TO FISH
+                </div>
 
-        <!-- AFFECTION -->
-        <div class="stat">
 
-          <div class="stat-head">
-            <span>AFFECTION</span>
-            <b id="affectionValue">55</b>
-          </div>
+                <div
+                    id="foodPieces"
+                    class="food-pieces"
+                ></div>
 
-          <div class="bar">
-            <i
-              class="affection"
-              id="affectionBar"
-            ></i>
-          </div>
+            </div>
 
-        </div>
 
+            <!-- =================================
+                 FEEDING MESSAGE
+            ================================== -->
 
-        <!-- ENERGY -->
-        <div class="stat">
+            <div
+                id="foodMessage"
+                class="food-message hidden"
+            >
+                CLICK A FOOD
+            </div>
 
-          <div class="stat-head">
-            <span>ENERGY</span>
-            <b id="energyValue">76</b>
-          </div>
 
-          <div class="bar">
-            <i
-              class="energy"
-              id="energyBar"
-            ></i>
-          </div>
+            <!-- =================================
+                 SPEECH BOX
+            ================================== -->
 
-        </div>
+            <div
+                id="speech"
+                class="speech"
+            >
+                HELLO!
+            </div>
 
 
-        <div class="divider"></div>
+            <!-- =================================
+                 STATUS BAR
+            ================================== -->
 
+            <div class="status-bar">
 
-        <!-- CARE BUTTONS -->
-        <div class="care-grid">
+                <div class="status-face">
+                    <span id="moodIcon">
+                        ♥
+                    </span>
+                </div>
 
-          <button
-            class="care-btn feed"
-            id="feedBtn"
-          >
+                <div class="status-text">
 
-            <span class="emoji">●</span>
+                    <strong id="moodText">
+                        HAPPY
+                    </strong>
 
-            <span>FEED</span>
+                    <span id="statusText">
+                        READY TO PLAY!
+                    </span>
 
-            <small>
-              snack time
-            </small>
+                </div>
 
-          </button>
+            </div>
 
 
-          <button
-            class="care-btn play"
-            id="playBtn"
-          >
+        </section>
 
-            <span class="emoji">★</span>
 
-            <span>PLAY</span>
+        <!-- =====================================
+             CONTROL PANEL
+        ====================================== -->
 
-            <small>
-              have fun
-            </small>
+        <aside class="panel">
 
-          </button>
 
+            <!-- FISH NAME -->
 
-          <button
-            class="care-btn clean"
-            id="cleanBtn"
-          >
+            <div class="fish-name-box">
 
-            <span class="emoji">✧</span>
+                <div>
 
-            <span>CLEAN</span>
+                    <div class="small-label">
+                        MY FISH
+                    </div>
 
-            <small>
-              fresh tank
-            </small>
+                    <div
+                        id="fishName"
+                        class="fish-name"
+                    >
+                        BUBBLES
+                    </div>
 
-          </button>
+                </div>
 
 
-          <button
-            class="care-btn pet"
-            id="petBtn"
-          >
+                <button
+                    id="renameBtn"
+                    class="tiny-button"
+                >
+                    ✎
+                </button>
 
-            <span class="emoji">♥</span>
+            </div>
 
-            <span>PET</span>
 
-            <small>
-              show love
-            </small>
+            <!-- =================================
+                 STATS
+            ================================== -->
 
-          </button>
+            <div class="stats">
 
-        </div>
 
+                <!-- HEALTH -->
 
-        <!-- TIP -->
-        <div class="hint">
+                <div class="stat">
 
-          <span>TIP</span>
+                    <div class="stat-header">
 
-          Keep all four bars healthy.
-          Your fish needs regular care!
+                        <span>
+                            ♥ HEALTH
+                        </span>
 
-        </div>
+                        <strong
+                            id="healthValue"
+                        >
+                            82
+                        </strong>
 
-      </aside>
+                    </div>
 
-    </section>
+                    <div class="pixel-bar">
 
+                        <div
+                            id="healthBar"
+                            class="bar health"
+                        ></div>
 
-    <!-- FOOTER -->
+                    </div>
+
+                </div>
+
+
+                <!-- HUNGER -->
+
+                <div class="stat">
+
+                    <div class="stat-header">
+
+                        <span>
+                            ● HUNGER
+                        </span>
+
+                        <strong
+                            id="hungerValue"
+                        >
+                            68
+                        </strong>
+
+                    </div>
+
+                    <div class="pixel-bar">
+
+                        <div
+                            id="hungerBar"
+                            class="bar hunger"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AFFECTION -->
+
+                <div class="stat">
+
+                    <div class="stat-header">
+
+                        <span>
+                            ♥ LOVE
+                        </span>
+
+                        <strong
+                            id="affectionValue"
+                        >
+                            55
+                        </strong>
+
+                    </div>
+
+                    <div class="pixel-bar">
+
+                        <div
+                            id="affectionBar"
+                            class="bar affection"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ENERGY -->
+
+                <div class="stat">
+
+                    <div class="stat-header">
+
+                        <span>
+                            ★ ENERGY
+                        </span>
+
+                        <strong
+                            id="energyValue"
+                        >
+                            76
+                        </strong>
+
+                    </div>
+
+                    <div class="pixel-bar">
+
+                        <div
+                            id="energyBar"
+                            class="bar energy"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 DIVIDER
+            ================================== -->
+
+            <div class="pixel-divider">
+                ★ ★ ★ ★ ★
+            </div>
+
+
+            <!-- =================================
+                 CONTROLS
+            ================================== -->
+
+            <div class="controls">
+
+
+                <button
+                    id="feedBtn"
+                    class="game-button feed-button"
+                >
+
+                    <span class="button-icon">
+                        ●
+                    </span>
+
+                    <span>
+                        FEED
+                    </span>
+
+                    <small>
+                        FOOD
+                    </small>
+
+                </button>
+
+
+                <button
+                    id="playBtn"
+                    class="game-button play-button"
+                >
+
+                    <span class="button-icon">
+                        ★
+                    </span>
+
+                    <span>
+                        PLAY
+                    </span>
+
+                    <small>
+                        FUN
+                    </small>
+
+                </button>
+
+
+                <button
+                    id="cleanBtn"
+                    class="game-button clean-button"
+                >
+
+                    <span class="button-icon">
+                        ✧
+                    </span>
+
+                    <span>
+                        CLEAN
+                    </span>
+
+                    <small>
+                        TANK
+                    </small>
+
+                </button>
+
+
+                <button
+                    id="petBtn"
+                    class="game-button pet-button"
+                >
+
+                    <span class="button-icon">
+                        ♥
+                    </span>
+
+                    <span>
+                        PET
+                    </span>
+
+                    <small>
+                        LOVE
+                    </small>
+
+                </button>
+
+
+            </div>
+
+
+            <!-- =================================
+                 LITTLE GAME STATUS
+            ================================== -->
+
+            <div class="mission-box">
+
+                <div class="mission-title">
+                    TODAY'S CARE
+                </div>
+
+                <div class="mission">
+
+                    <span>
+                        FOOD
+                    </span>
+
+                    <span id="foodCount">
+                        0 / 3
+                    </span>
+
+                </div>
+
+                <div class="mission">
+
+                    <span>
+                        LOVE
+                    </span>
+
+                    <span id="loveCount">
+                        0 / 3
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </aside>
+
+    </main>
+
+
+    <!-- =====================================
+         FOOTER
+    ====================================== -->
+
     <footer>
 
-      <span>
-        ♡ A tiny aquarium made with pixels
-      </span>
+        <span>
+            © FIN & FRIENDS
+        </span>
 
-      <button id="resetBtn">
-        RESET SAVE
-      </button>
+        <button id="resetBtn">
+            RESET GAME
+        </button>
 
     </footer>
 
-  </main>
+
+</div>
 
 
-  <!-- NAME MODAL -->
-  <div
-    class="modal hidden"
+<!-- =========================================
+     NAME MODAL
+========================================== -->
+
+<div
     id="nameModal"
-  >
+    class="modal hidden"
+>
 
-    <div class="modal-card">
+    <div class="modal-box">
 
-      <span class="tiny-label">
-        NEW NAME
-      </span>
+        <div class="modal-title">
+            NAME YOUR FISH
+        </div>
 
-      <h2>
-        Name your fish
-      </h2>
-
-      <input
-        id="nameInput"
-        maxlength="14"
-        value="Bubbles"
-        autocomplete="off"
-      >
-
-      <div class="modal-actions">
-
-        <button id="cancelName">
-          CANCEL
-        </button>
-
-        <button
-          class="primary"
-          id="saveName"
+        <input
+            id="nameInput"
+            maxlength="12"
+            value="BUBBLES"
         >
-          SAVE
-        </button>
 
-      </div>
+        <div class="modal-buttons">
+
+            <button id="cancelName">
+                CANCEL
+            </button>
+
+            <button id="saveName">
+                OK!
+            </button>
+
+        </div>
 
     </div>
 
-  </div>
+</div>
 
 
-  <!-- TOAST -->
-  <div
-    class="toast"
+<!-- =========================================
+     TOAST
+========================================== -->
+
+<div
     id="toast"
-  ></div>
+    class="toast"
+>
+</div>
 
 
-  <script src="game.js"></script>
+<script src="game.js"></script>
 
 </body>
 </html>
-```
