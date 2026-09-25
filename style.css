@@ -1,11 +1,6 @@
 /* =====================================================
    FIN & FRIENDS
-   90s PIXEL GAME STYLE
-===================================================== */
-
-
-/* =====================================================
-   COLOURS
+   RETRO AQUARIUM
 ===================================================== */
 
 :root {
@@ -34,8 +29,6 @@
 
     --cream: #fff4dc;
 
-    --blue: #82c9ec;
-
 }
 
 
@@ -60,8 +53,17 @@ body {
 
 body {
 
-    background:
+    padding: 25px 12px;
 
+    color: var(--dark);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-weight: bold;
+
+    background:
         repeating-linear-gradient(
             0deg,
             #d5e9ee 0px,
@@ -70,24 +72,13 @@ body {
             #cbe1e8 8px
         );
 
-    color: var(--dark);
-
-    font-family:
-
-        "Courier New",
-        monospace;
-
-    font-weight: bold;
-
-    padding: 25px 12px;
-
     image-rendering: pixelated;
 
 }
 
 
 /* =====================================================
-   MAIN GAME
+   GAME
 ===================================================== */
 
 .game {
@@ -95,8 +86,7 @@ body {
     width:
         min(1100px, 100%);
 
-    margin:
-        0 auto;
+    margin: 0 auto;
 
 }
 
@@ -109,11 +99,9 @@ body {
 
     display: flex;
 
-    justify-content:
-        space-between;
+    align-items: flex-end;
 
-    align-items:
-        flex-end;
+    justify-content: space-between;
 
     margin-bottom: 18px;
 
@@ -126,26 +114,21 @@ body {
 
     letter-spacing: 2px;
 
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 
 }
 
 
 .logo-big {
 
-    font-family:
-        "Courier New",
-        monospace;
-
     font-size:
-        clamp(36px, 7vw, 70px);
+        clamp(40px, 7vw, 70px);
 
     line-height: .75;
 
     letter-spacing: -5px;
 
     text-shadow:
-
         4px 0 var(--dark),
         -2px 0 var(--dark),
         0 4px var(--pink);
@@ -158,7 +141,6 @@ body {
     color: var(--pink);
 
     text-shadow:
-
         4px 0 var(--dark),
         -2px 0 var(--dark),
         0 4px var(--dark);
@@ -167,26 +149,22 @@ body {
 
 
 /* =====================================================
-   DAY BOX
+   DAY
 ===================================================== */
 
 .day-box {
 
     width: 115px;
 
-    background:
-        var(--cyan);
-
-    border:
-        4px solid var(--dark);
-
-    box-shadow:
-
-        6px 6px 0 var(--dark);
+    padding: 9px;
 
     text-align: center;
 
-    padding: 9px;
+    background: var(--cyan);
+
+    border: 4px solid var(--dark);
+
+    box-shadow: 6px 6px 0 var(--dark);
 
 }
 
@@ -200,25 +178,22 @@ body {
 
 .day-number {
 
+    margin: 6px 0;
+
     font-size: 28px;
 
     line-height: 1;
-
-    margin:
-        6px 0;
 
 }
 
 
 .clock {
 
-    background:
-        var(--cream);
-
-    border:
-        2px solid var(--dark);
-
     padding: 4px;
+
+    background: var(--cream);
+
+    border: 2px solid var(--dark);
 
     font-size: 9px;
 
@@ -237,14 +212,11 @@ body {
         minmax(0, 1.5fr)
         minmax(300px, .7fr);
 
-    border:
-        5px solid var(--dark);
+    background: var(--cream);
 
-    box-shadow:
-        10px 10px 0 var(--dark);
+    border: 5px solid var(--dark);
 
-    background:
-        var(--cream);
+    box-shadow: 10px 10px 0 var(--dark);
 
 }
 
@@ -261,22 +233,20 @@ body {
 
     overflow: hidden;
 
-    border-right:
-        5px solid var(--dark);
-
     background:
-
         linear-gradient(
             180deg,
             #8bdde8,
             #69bfd4
         );
 
+    border-right: 5px solid var(--dark);
+
 }
 
 
 /* =====================================================
-   WATER PIXEL PATTERN
+   WATER
 ===================================================== */
 
 .water-pixels {
@@ -300,8 +270,7 @@ body {
             rgba(255,255,255,.35) 50%
         );
 
-    background-size:
-        18px 18px;
+    background-size: 18px 18px;
 
 }
 
@@ -318,13 +287,7 @@ body {
 
     height: 9px;
 
-    border:
-        3px solid
-        rgba(255,255,255,.75);
-
-    box-shadow:
-        2px 2px 0
-        rgba(67,128,153,.25);
+    border: 3px solid rgba(255,255,255,.75);
 
     animation:
         bubbleUp 5s linear infinite;
@@ -333,71 +296,44 @@ body {
 
 
 .bubble1 {
-
     left: 15%;
-
     bottom: 20%;
-
 }
 
 
 .bubble2 {
-
     left: 30%;
-
     bottom: 5%;
-
-    animation-delay:
-        1s;
-
+    animation-delay: 1s;
 }
 
 
 .bubble3 {
-
     right: 25%;
-
     bottom: 30%;
-
-    animation-delay:
-        2.5s;
-
+    animation-delay: 2.5s;
 }
 
 
 .bubble4 {
-
     right: 10%;
-
     bottom: 15%;
-
-    animation-delay:
-        3s;
-
+    animation-delay: 3s;
 }
 
 
 .bubble5 {
-
     left: 52%;
-
     bottom: 35%;
-
-    animation-delay:
-        1.7s;
-
+    animation-delay: 1.7s;
 }
 
 
 @keyframes bubbleUp {
 
     from {
-
-        transform:
-            translateY(40px);
-
+        transform: translateY(40px);
         opacity: 0;
-
     }
 
     20% {
@@ -405,12 +341,8 @@ body {
     }
 
     to {
-
-        transform:
-            translateY(-400px);
-
+        transform: translateY(-400px);
         opacity: 0;
-
     }
 
 }
@@ -424,12 +356,11 @@ body {
 
     position: absolute;
 
-    bottom: 85px;
-
     left: 50%;
 
-    transform:
-        translateX(-50%);
+    bottom: 85px;
+
+    transform: translateX(-50%);
 
     opacity: .55;
 
@@ -442,28 +373,24 @@ body {
 
     height: 18px;
 
-    background:
-        var(--pink);
+    background: var(--pink);
 
-    border:
-        4px solid var(--dark);
+    border: 4px solid var(--dark);
 
 }
 
 
 .castle-body {
 
+    position: relative;
+
     width: 115px;
 
     height: 65px;
 
-    background:
-        #e5b8d9;
+    background: #e5b8d9;
 
-    border:
-        4px solid var(--dark);
-
-    position: relative;
+    border: 4px solid var(--dark);
 
 }
 
@@ -472,17 +399,15 @@ body {
 
     position: absolute;
 
+    top: 15px;
+
     width: 17px;
 
     height: 24px;
 
-    background:
-        var(--cyan);
+    background: var(--cyan);
 
-    border:
-        3px solid var(--dark);
-
-    top: 15px;
+    border: 3px solid var(--dark);
 
 }
 
@@ -520,10 +445,10 @@ body {
 
 
 .plant2 {
+
     right: 3%;
 
-    transform:
-        scaleX(-1);
+    transform: scaleX(-1);
 
 }
 
@@ -536,15 +461,11 @@ body {
 
     width: 16px;
 
-    background:
-        #48a978;
+    background: #48a978;
 
-    border:
-        3px solid
-        var(--dark);
+    border: 3px solid var(--dark);
 
-    transform-origin:
-        bottom;
+    transform-origin: bottom;
 
 }
 
@@ -555,8 +476,7 @@ body {
 
     height: 105px;
 
-    transform:
-        rotate(-20deg);
+    transform: rotate(-20deg);
 
 }
 
@@ -576,8 +496,7 @@ body {
 
     height: 120px;
 
-    transform:
-        rotate(20deg);
+    transform: rotate(20deg);
 
 }
 
@@ -599,16 +518,15 @@ body {
 
     position: absolute;
 
+    right: 0;
+
     bottom: 0;
 
     left: 0;
 
-    right: 0;
-
     height: 95px;
 
     background:
-
         repeating-linear-gradient(
             0deg,
             #f1d493 0px,
@@ -617,9 +535,7 @@ body {
             #e8c982 12px
         );
 
-    border-top:
-        5px solid
-        var(--dark);
+    border-top: 5px solid var(--dark);
 
 }
 
@@ -632,22 +548,19 @@ body {
 
     position: absolute;
 
-    left: 50%;
+    z-index: 5;
 
-    top: 48%;
+    top: 45%;
+
+    left: 45%;
 
     width: 230px;
 
     height: 150px;
 
-    transform:
-        translate(-50%, -50%);
-
     transition:
-        left .7s,
-        top .7s;
-
-    z-index: 5;
+        left .6s ease,
+        top .6s ease;
 
 }
 
@@ -670,57 +583,47 @@ body {
 
     position: absolute;
 
-    left: 35px;
-
     top: 20px;
+
+    left: 35px;
 
     width: 155px;
 
     height: 95px;
 
-    background:
-        #ff9b48;
+    background: #ff9b48;
 
-    border:
-        6px solid
-        var(--dark);
+    border: 6px solid var(--dark);
 
-    border-radius:
-        48% 52% 50% 50%;
+    border-radius: 48% 52% 50% 50%;
 
     box-shadow:
-
-        inset -10px -8px 0
-        #e9793c;
+        inset -10px -8px 0 #e9793c;
 
 }
 
 
 /* =====================================================
-   FISH TAIL
+   TAIL
 ===================================================== */
 
 .fish-tail {
 
     position: absolute;
 
-    left: 0;
-
     top: 43px;
+
+    left: 0;
 
     width: 62px;
 
     height: 67px;
 
-    background:
-        #ff813d;
+    background: #ff813d;
 
-    border:
-        6px solid
-        var(--dark);
+    border: 6px solid var(--dark);
 
     clip-path:
-
         polygon(
             100% 50%,
             0 0,
@@ -732,7 +635,7 @@ body {
 
 
 /* =====================================================
-   FISH FINS
+   FINS
 ===================================================== */
 
 .fish-fin-top,
@@ -744,12 +647,9 @@ body {
 
     height: 32px;
 
-    background:
-        #ffbd61;
+    background: #ffbd61;
 
-    border:
-        5px solid
-        var(--dark);
+    border: 5px solid var(--dark);
 
 }
 
@@ -760,8 +660,7 @@ body {
 
     left: 75px;
 
-    transform:
-        rotate(-15deg);
+    transform: rotate(-15deg);
 
 }
 
@@ -772,8 +671,7 @@ body {
 
     left: 75px;
 
-    transform:
-        rotate(18deg);
+    transform: rotate(18deg);
 
 }
 
@@ -786,20 +684,17 @@ body {
 
     position: absolute;
 
-    right: 25px;
-
     top: 27px;
+
+    right: 25px;
 
     width: 17px;
 
     height: 17px;
 
-    background:
-        white;
+    background: white;
 
-    border:
-        4px solid
-        var(--dark);
+    border: 4px solid var(--dark);
 
 }
 
@@ -808,16 +703,15 @@ body {
 
     position: absolute;
 
+    right: 1px;
+
+    bottom: 1px;
+
     width: 8px;
 
     height: 8px;
 
-    background:
-        var(--dark);
-
-    right: 1px;
-
-    bottom: 1px;
+    background: var(--dark);
 
 }
 
@@ -830,16 +724,15 @@ body {
 
     position: absolute;
 
-    right: 21px;
-
     top: 54px;
+
+    right: 21px;
 
     width: 18px;
 
     height: 9px;
 
-    background:
-        #f25e6e;
+    background: #f25e6e;
 
 }
 
@@ -856,36 +749,34 @@ body {
 
     height: 14px;
 
-    border:
-        3px solid
-        rgba(130,55,45,.35);
+    border: 3px solid rgba(130,55,45,.35);
 
 }
 
 
 .scale1 {
 
-    left: 43px;
-
     top: 48px;
+
+    left: 43px;
 
 }
 
 
 .scale2 {
 
-    left: 67px;
-
     top: 32px;
+
+    left: 67px;
 
 }
 
 
 .scale3 {
 
-    left: 67px;
-
     top: 66px;
+
+    left: 67px;
 
 }
 
@@ -898,36 +789,36 @@ body {
 
     position: absolute;
 
-    right: 6px;
-
     top: 52px;
+
+    right: 6px;
 
     width: 15px;
 
     height: 9px;
 
-    border-bottom:
-        5px solid
-        var(--dark);
+    border-bottom: 5px solid var(--dark);
 
 }
 
 
-/* FISH EATING */
+/*
+    When the fish eats, JavaScript adds
+    .fish-eating to #fish.
 
-.fish-eating
-.fish-mouth {
+    #fish .fish-mouth therefore becomes
+    a round open mouth.
+*/
+
+#fish.fish-eating .fish-mouth {
 
     width: 18px;
 
     height: 18px;
 
-    border:
-        4px solid
-        var(--dark);
+    border: 4px solid var(--dark);
 
-    background:
-        #6b2948;
+    background: #6b2948;
 
 }
 
@@ -936,24 +827,18 @@ body {
 
     0%,
     100% {
-
-        transform:
-            translateY(0);
-
+        transform: translateY(0);
     }
 
     50% {
-
-        transform:
-            translateY(-9px);
-
+        transform: translateY(-9px);
     }
 
 }
 
 
 /* =====================================================
-   FISH SHADOW
+   SHADOW
 ===================================================== */
 
 .fish-shadow {
@@ -968,8 +853,7 @@ body {
 
     height: 13px;
 
-    background:
-        rgba(36,28,56,.18);
+    background: rgba(36,28,56,.18);
 
     border-radius: 50%;
 
@@ -984,34 +868,27 @@ body {
 
     position: absolute;
 
+    z-index: 15;
+
     top: 8%;
 
     left: 50%;
 
-    transform:
-        translateX(-50%);
-
-    background:
-        var(--cream);
-
-    border:
-        4px solid
-        var(--dark);
-
-    box-shadow:
-        5px 5px 0
-        var(--dark);
-
-    padding:
-        12px 18px;
-
-    font-size: 11px;
-
     min-width: 130px;
+
+    padding: 12px 18px;
+
+    transform: translateX(-50%);
 
     text-align: center;
 
-    z-index: 15;
+    background: var(--cream);
+
+    border: 4px solid var(--dark);
+
+    box-shadow: 5px 5px 0 var(--dark);
+
+    font-size: 11px;
 
 }
 
@@ -1030,20 +907,15 @@ body {
 
     height: 12px;
 
-    background:
-        var(--cream);
+    background: var(--cream);
 
-    border-right:
-        4px solid
-        var(--dark);
+    border-right: 4px solid var(--dark);
 
-    border-bottom:
-        4px solid
-        var(--dark);
+    border-bottom: 4px solid var(--dark);
 
     transform:
-        rotate(45deg)
-        translateX(-50%);
+        translateX(-50%)
+        rotate(45deg);
 
 }
 
@@ -1056,11 +928,13 @@ body {
 
     position: absolute;
 
+    z-index: 20;
+
+    right: 14px;
+
     bottom: 14px;
 
     left: 14px;
-
-    right: 14px;
 
     height: 60px;
 
@@ -1068,14 +942,9 @@ body {
 
     align-items: center;
 
-    background:
-        var(--cream);
+    background: var(--cream);
 
-    border:
-        4px solid
-        var(--dark);
-
-    z-index: 20;
+    border: 4px solid var(--dark);
 
 }
 
@@ -1090,12 +959,9 @@ body {
 
     place-items: center;
 
-    background:
-        var(--pink);
+    background: var(--pink);
 
-    border-right:
-        4px solid
-        var(--dark);
+    border-right: 4px solid var(--dark);
 
     font-size: 25px;
 
@@ -1104,14 +970,13 @@ body {
 
 .status-text {
 
-    padding:
-        6px 12px;
-
     display: flex;
 
     flex-direction: column;
 
     gap: 7px;
+
+    padding: 6px 12px;
 
     font-size: 9px;
 
@@ -1135,28 +1000,23 @@ body {
 
     position: absolute;
 
+    z-index: 50;
+
+    top: 95px;
+
     left: 20px;
 
-    top: 90px;
+    width: 155px;
 
-    width: 150px;
-
-    min-height: 110px;
-
-    background:
-        var(--pink);
-
-    border:
-        5px solid
-        var(--dark);
-
-    box-shadow:
-        6px 6px 0
-        var(--dark);
+    min-height: 115px;
 
     padding: 10px;
 
-    z-index: 25;
+    background: var(--pink);
+
+    border: 5px solid var(--dark);
+
+    box-shadow: 6px 6px 0 var(--dark);
 
 }
 
@@ -1170,9 +1030,9 @@ body {
 
 .food-subtitle {
 
-    font-size: 7px;
-
     margin-top: 4px;
+
+    font-size: 7px;
 
 }
 
@@ -1181,39 +1041,38 @@ body {
 
     display: flex;
 
-    gap: 14px;
+    align-items: center;
 
-    margin-top: 14px;
+    gap: 18px;
+
+    min-height: 45px;
+
+    margin-top: 10px;
 
 }
 
 
 /* =====================================================
-   FOOD
+   FOOD PIECE
 ===================================================== */
 
 .food {
 
-    width: 24px;
+    width: 25px;
 
-    height: 24px;
+    height: 25px;
 
-    background:
-        var(--yellow);
+    flex: 0 0 auto;
 
-    border:
-        4px solid
-        var(--dark);
+    background: var(--yellow);
 
-    transform:
-        rotate(45deg);
+    border: 4px solid var(--dark);
 
     cursor: pointer;
 
-    position: relative;
+    transform: rotate(45deg);
 
-    transition:
-        transform .15s;
+    position: relative;
 
 }
 
@@ -1224,16 +1083,15 @@ body {
 
     position: absolute;
 
+    top: 4px;
+
+    left: 4px;
+
     width: 5px;
 
     height: 5px;
 
-    background:
-        var(--orange);
-
-    left: 5px;
-
-    top: 5px;
+    background: var(--orange);
 
 }
 
@@ -1242,23 +1100,16 @@ body {
 
     transform:
         rotate(45deg)
-        scale(1.2);
+        scale(1.25);
 
 }
 
 
-.food.flying {
+.food:active {
 
-    position: fixed;
-
-    z-index: 100;
-
-    pointer-events: none;
-
-    transition:
-        left .55s ease,
-        top .55s ease,
-        transform .55s ease;
+    transform:
+        rotate(45deg)
+        scale(.9);
 
 }
 
@@ -1271,44 +1122,38 @@ body {
 
     position: absolute;
 
+    z-index: 51;
+
+    top: 225px;
+
     left: 20px;
 
-    top: 215px;
+    padding: 8px 12px;
 
-    background:
-        var(--yellow);
+    background: var(--yellow);
 
-    border:
-        4px solid
-        var(--dark);
-
-    padding:
-        8px 12px;
+    border: 4px solid var(--dark);
 
     font-size: 8px;
-
-    z-index: 30;
 
 }
 
 
 /* =====================================================
-   CONTROL PANEL
+   PANEL
 ===================================================== */
 
 .panel {
 
-    padding:
-        22px;
+    padding: 22px;
 
-    background:
-        #f7dfef;
+    background: #f7dfef;
 
 }
 
 
 /* =====================================================
-   FISH NAME
+   NAME
 ===================================================== */
 
 .fish-name-box {
@@ -1317,37 +1162,31 @@ body {
 
     align-items: center;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
 
-    padding-bottom:
-        18px;
+    padding-bottom: 18px;
 
-    border-bottom:
-        4px solid
-        var(--dark);
+    border-bottom: 4px solid var(--dark);
 
 }
 
 
 .small-label {
 
-    font-size: 8px;
-
     margin-bottom: 5px;
+
+    font-size: 8px;
 
 }
 
 
 .fish-name {
 
+    color: var(--pink-dark);
+
     font-size: 20px;
 
-    color:
-        var(--pink-dark);
-
-    text-shadow:
-        2px 2px 0 var(--dark);
+    text-shadow: 2px 2px 0 var(--dark);
 
 }
 
@@ -1358,16 +1197,11 @@ body {
 
     height: 40px;
 
-    background:
-        var(--cyan);
+    background: var(--cyan);
 
-    border:
-        4px solid
-        var(--dark);
+    border: 4px solid var(--dark);
 
-    box-shadow:
-        4px 4px 0
-        var(--dark);
+    box-shadow: 4px 4px 0 var(--dark);
 
     cursor: pointer;
 
@@ -1376,8 +1210,7 @@ body {
 
 .tiny-button:active {
 
-    transform:
-        translate(4px,4px);
+    transform: translate(4px,4px);
 
     box-shadow: none;
 
@@ -1397,8 +1230,7 @@ body {
 
 .stat {
 
-    margin-bottom:
-        15px;
+    margin-bottom: 15px;
 
 }
 
@@ -1407,13 +1239,11 @@ body {
 
     display: flex;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
+
+    margin-bottom: 6px;
 
     font-size: 8px;
-
-    margin-bottom:
-        6px;
 
 }
 
@@ -1422,14 +1252,11 @@ body {
 
     height: 21px;
 
-    background:
-        #c8b5c7;
-
-    border:
-        4px solid
-        var(--dark);
-
     padding: 2px;
+
+    background: #c8b5c7;
+
+    border: 4px solid var(--dark);
 
 }
 
@@ -1441,7 +1268,7 @@ body {
     width: 50%;
 
     transition:
-        width .4s steps(8);
+        width .35s steps(8);
 
 }
 
@@ -1472,17 +1299,15 @@ body {
 
 .pixel-divider {
 
-    text-align: center;
+    margin: 15px 0;
 
-    font-size: 11px;
+    color: var(--pink-dark);
+
+    text-align: center;
 
     letter-spacing: 4px;
 
-    color:
-        var(--pink-dark);
-
-    margin:
-        15px 0;
+    font-size: 11px;
 
 }
 
@@ -1495,8 +1320,7 @@ body {
 
     display: grid;
 
-    grid-template-columns:
-        1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 
     gap: 10px;
 
@@ -1504,58 +1328,52 @@ body {
 
 
 /* =====================================================
-   GAME BUTTONS
+   GAME BUTTON
 ===================================================== */
 
 .game-button {
 
-    min-height:
-        92px;
-
-    border:
-        4px solid
-        var(--dark);
-
-    box-shadow:
-        5px 5px 0
-        var(--dark);
-
-    cursor: pointer;
+    min-height: 92px;
 
     display: flex;
 
-    flex-direction:
-        column;
+    flex-direction: column;
 
-    align-items:
-        center;
+    align-items: center;
 
-    justify-content:
-        center;
+    justify-content: center;
 
     gap: 5px;
 
-    font-weight:
-        bold;
+    padding: 8px;
+
+    border: 4px solid var(--dark);
+
+    box-shadow: 5px 5px 0 var(--dark);
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-weight: bold;
+
+    user-select: none;
 
 }
 
 
 .game-button:hover {
 
-    filter:
-        brightness(1.08);
+    filter: brightness(1.08);
 
 }
 
 
 .game-button:active {
 
-    transform:
-        translate(5px,5px);
+    transform: translate(5px,5px);
 
-    box-shadow:
-        none;
+    box-shadow: none;
 
 }
 
@@ -1584,69 +1402,49 @@ body {
 
 
 .feed-button {
-
-    background:
-        var(--yellow);
-
+    background: var(--yellow);
 }
 
 
 .play-button {
-
-    background:
-        var(--green);
-
+    background: var(--green);
 }
 
 
 .clean-button {
-
-    background:
-        var(--cyan);
-
+    background: var(--cyan);
 }
 
 
 .pet-button {
-
-    background:
-        var(--pink);
-
+    background: var(--pink);
 }
 
 
 /* =====================================================
-   MISSION BOX
+   MISSIONS
 ===================================================== */
 
 .mission-box {
 
-    margin-top:
-        17px;
+    margin-top: 17px;
 
-    border:
-        4px solid
-        var(--dark);
+    padding: 10px;
 
-    background:
-        var(--cream);
+    background: var(--cream);
 
-    padding:
-        10px;
+    border: 4px solid var(--dark);
 
 }
 
 
 .mission-title {
 
+    padding-bottom: 7px;
+
+    border-bottom: 2px dashed var(--dark);
+
     font-size: 8px;
-
-    padding-bottom:
-        7px;
-
-    border-bottom:
-        2px dashed
-        var(--dark);
 
 }
 
@@ -1655,13 +1453,11 @@ body {
 
     display: flex;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
+
+    margin-top: 9px;
 
     font-size: 7px;
-
-    margin-top:
-        9px;
 
 }
 
@@ -1674,8 +1470,7 @@ footer {
 
     display: flex;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
 
     margin-top: 17px;
 
@@ -1686,17 +1481,19 @@ footer {
 
 footer button {
 
+    padding: 0;
+
     background: transparent;
 
     border: 0;
 
-    text-decoration:
-        underline;
+    text-decoration: underline;
 
     cursor: pointer;
 
-    font-weight:
-        bold;
+    font-family: inherit;
+
+    font-weight: bold;
 
 }
 
@@ -1709,23 +1506,15 @@ footer button {
 
     position: fixed;
 
+    z-index: 200;
+
     inset: 0;
 
     display: grid;
 
     place-items: center;
 
-    background:
-        rgba(36,28,56,.7);
-
-    z-index: 200;
-
-}
-
-
-.hidden {
-
-    display: none !important;
+    background: rgba(36,28,56,.7);
 
 }
 
@@ -1735,29 +1524,22 @@ footer button {
     width:
         min(400px, 90%);
 
-    background:
-        var(--cyan);
+    padding: 25px;
 
-    border:
-        5px solid
-        var(--dark);
+    background: var(--cyan);
 
-    box-shadow:
-        8px 8px 0
-        var(--dark);
+    border: 5px solid var(--dark);
 
-    padding:
-        25px;
+    box-shadow: 8px 8px 0 var(--dark);
 
 }
 
 
 .modal-title {
 
-    font-size: 17px;
+    margin-bottom: 18px;
 
-    margin-bottom:
-        18px;
+    font-size: 17px;
 
 }
 
@@ -1768,19 +1550,17 @@ footer button {
 
     padding: 12px;
 
-    background:
-        var(--cream);
+    background: var(--cream);
 
-    border:
-        4px solid
-        var(--dark);
+    border: 4px solid var(--dark);
 
     outline: none;
 
+    font-family: inherit;
+
     font-size: 14px;
 
-    font-weight:
-        bold;
+    font-weight: bold;
 
 }
 
@@ -1789,42 +1569,37 @@ footer button {
 
     display: flex;
 
-    justify-content:
-        flex-end;
+    justify-content: flex-end;
 
     gap: 10px;
 
-    margin-top:
-        18px;
+    margin-top: 18px;
 
 }
 
 
 .modal-buttons button {
 
-    padding:
-        10px 14px;
+    padding: 10px 14px;
 
-    background:
-        var(--pink);
+    background: var(--pink);
 
-    border:
-        4px solid
-        var(--dark);
+    border: 4px solid var(--dark);
 
-    box-shadow:
-        4px 4px 0
-        var(--dark);
+    box-shadow: 4px 4px 0 var(--dark);
 
     cursor: pointer;
+
+    font-family: inherit;
+
+    font-weight: bold;
 
 }
 
 
 .modal-buttons button:active {
 
-    transform:
-        translate(4px,4px);
+    transform: translate(4px,4px);
 
     box-shadow: none;
 
@@ -1839,32 +1614,27 @@ footer button {
 
     position: fixed;
 
+    z-index: 500;
+
     bottom: 25px;
 
     left: 50%;
 
+    padding: 12px 18px;
+
+    color: var(--cream);
+
+    background: var(--dark);
+
+    border: 4px solid var(--yellow);
+
     transform:
         translate(-50%, 100px);
 
-    background:
-        var(--dark);
-
-    color:
-        var(--cream);
-
-    border:
-        4px solid
-        var(--yellow);
-
-    padding:
-        12px 18px;
-
-    font-size: 9px;
-
-    z-index: 500;
-
     transition:
         transform .25s;
+
+    font-size: 9px;
 
 }
 
@@ -1878,17 +1648,25 @@ footer button {
 
 
 /* =====================================================
+   IMPORTANT UTILITY
+===================================================== */
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+/* =====================================================
    MOBILE
 ===================================================== */
 
-@media (
-    max-width: 850px
-) {
+@media (max-width: 850px) {
 
     .game-screen {
 
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
 
     }
 
@@ -1897,31 +1675,25 @@ footer button {
 
         border-right: 0;
 
-        border-bottom:
-            5px solid
-            var(--dark);
+        border-bottom: 5px solid var(--dark);
 
     }
 
 }
 
 
-@media (
-    max-width: 500px
-) {
+@media (max-width: 500px) {
 
     body {
 
-        padding:
-            12px 7px;
+        padding: 12px 7px;
 
     }
 
 
     .header {
 
-        align-items:
-            center;
+        align-items: center;
 
     }
 
@@ -1942,8 +1714,7 @@ footer button {
 
     .aquarium {
 
-        min-height:
-            520px;
+        min-height: 520px;
 
     }
 
@@ -1951,7 +1722,7 @@ footer button {
     .fish-container {
 
         transform:
-            translate(-50%, -50%)
+            translate(-10%, -10%)
             scale(.75);
 
     }
@@ -1959,15 +1730,7 @@ footer button {
 
     .panel {
 
-        padding:
-            15px;
-
-    }
-
-
-    .speech {
-
-        font-size: 8px;
+        padding: 15px;
 
     }
 
