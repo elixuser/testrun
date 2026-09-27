@@ -1,721 +1,2622 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+<title>Goldie - Pixel Aquarium</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<style>
 
-    <title>FIN & FRIENDS</title>
+/* =========================================================
+   GLOBAL
+========================================================= */
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    image-rendering: pixelated;
+}
 
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Courier New", monospace;
+    background: #173b48;
+}
+
+body {
+    cursor: none;
+    user-select: none;
+}
+
+/* =========================================================
+   AQUARIUM
+========================================================= */
+
+#aquarium {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            180deg,
+            #315b66 0%,
+            #426f77 35%,
+            #39666d 65%,
+            #244d55 100%
+        );
+}
+
+/* Dark glass edges */
+
+#aquarium::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    border:
+        10px solid rgba(20, 43, 48, 0.55);
+
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* Pixel water bands */
+
+.water-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    opacity: 0.16;
+    background: #a4d2cb;
+}
+
+.water-line.one {
+    top: 18%;
+}
+
+.water-line.two {
+    top: 44%;
+}
+
+.water-line.three {
+    top: 69%;
+}
+
+/* =========================================================
+   BACKGROUND LIGHT
+========================================================= */
+
+.light-ray {
+    position: absolute;
+    top: -15%;
+    width: 80px;
+    height: 140%;
+    opacity: 0.055;
+    background: #d9f3df;
+    transform: rotate(10deg);
+    pointer-events: none;
+}
+
+.ray-one {
+    left: 12%;
+}
+
+.ray-two {
+    left: 38%;
+    transform: rotate(-7deg);
+}
+
+.ray-three {
+    right: 17%;
+    transform: rotate(12deg);
+}
+
+/* =========================================================
+   BUBBLES
+========================================================= */
+
+.bubble {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+
+    border:
+        2px solid rgba(190, 232, 220, 0.55);
+
+    background: rgba(160, 214, 205, 0.08);
+
+    animation: bubbleRise linear infinite;
+    pointer-events: none;
+}
+
+@keyframes bubbleRise {
+
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-110vh);
+        opacity: 0;
+    }
+
+}
+
+/* =========================================================
+   PIXEL PLANTS
+========================================================= */
+
+.plant {
+    position: absolute;
+    bottom: 65px;
+    width: 18px;
+    height: 150px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0 20%,
+            #294f43 20% 45%,
+            transparent 45% 55%,
+            #35664c 55% 80%,
+            transparent 80%
+        );
+
+    transform-origin: bottom;
+    opacity: 0.85;
+}
+
+.plant::before,
+.plant::after {
+    content: "";
+    position: absolute;
+    bottom: 30px;
+    width: 35px;
+    height: 12px;
+    background: #3d7453;
+}
+
+.plant::before {
+    left: -24px;
+    transform: rotate(-22deg);
+}
+
+.plant::after {
+    right: -24px;
+    transform: rotate(22deg);
+}
+
+.plant.one {
+    left: 6%;
+    height: 180px;
+}
+
+.plant.two {
+    left: 11%;
+    height: 120px;
+}
+
+.plant.three {
+    right: 8%;
+    height: 190px;
+}
+
+.plant.four {
+    right: 15%;
+    height: 135px;
+}
+
+/* =========================================================
+   ROCKS
+========================================================= */
+
+.rock {
+    position: absolute;
+    bottom: 47px;
+    width: 65px;
+    height: 28px;
+
+    background: #3c5553;
+
+    border:
+        4px solid #263e40;
+
+    box-shadow:
+        inset 8px 5px 0 #59706a,
+        inset -7px -5px 0 #2c4143;
+}
+
+.rock.one {
+    left: 20%;
+}
+
+.rock.two {
+    left: 31%;
+    width: 90px;
+}
+
+.rock.three {
+    right: 22%;
+}
+
+.rock.four {
+    right: 7%;
+    width: 80px;
+}
+
+/* =========================================================
+   GRAVEL
+========================================================= */
+
+#gravel {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 65px;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #263e3e 0 10px,
+            #334f47 10px 20px,
+            #405b4c 20px 31px,
+            #2c4742 31px 42px
+        );
+
+    border-top: 7px solid #20383b;
+}
+
+/* =========================================================
+   TOP HUD
+========================================================= */
+
+#hud {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(1100px, calc(100% - 30px));
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    z-index: 50;
+}
+
+/* Status panel */
+
+#status-panel {
+    flex: 1;
+
+    min-width: 280px;
+
+    background: #172f34;
+
+    border:
+        4px solid #0c2025;
+
+    box-shadow:
+        5px 5px 0 rgba(10, 25, 28, 0.5);
+
+    padding: 10px;
+}
+
+/* Name */
+
+#fish-name {
+    color: #f4d77b;
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+}
+
+/* Stats */
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 4px 0;
+}
+
+.stat-label {
+    width: 75px;
+    color: #a9cbc2;
+    font-size: 11px;
+}
+
+.bar {
+    flex: 1;
+    height: 12px;
+
+    background: #10272b;
+
+    border:
+        3px solid #0b1b1e;
+
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s;
+}
+
+.health-fill {
+    background: #c85b55;
+}
+
+.hunger-fill {
+    background: #d8a34c;
+}
+
+.happiness-fill {
+    background: #d979a3;
+}
+
+.affection-fill {
+    background: #d9788d;
+}
+
+.clean-fill {
+    background: #6eb8ae;
+}
+
+.energy-fill {
+    background: #83a5cf;
+}
+
+/* =========================================================
+   TIME
+========================================================= */
+
+#time-panel {
+    min-width: 130px;
+
+    background: #172f34;
+
+    border:
+        4px solid #0c2025;
+
+    box-shadow:
+        5px 5px 0 rgba(10, 25, 28, 0.5);
+
+    padding: 10px;
+
+    color: #d9eee2;
+    text-align: center;
+}
+
+#fish-time {
+    font-size: 22px;
+    color: #f3dc91;
+}
+
+#day-counter {
+    font-size: 10px;
+    color: #9bbcb4;
+    margin-top: 3px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+#controls {
+    display: flex;
+    gap: 6px;
+}
+
+.pixel-button {
+    min-width: 75px;
+
+    padding: 11px 8px;
+
+    background: #80b9b2;
+
+    color: #112d31;
+
+    border:
+        4px solid #0d2529;
+
+    box-shadow:
+        4px 4px 0 #0d2529;
+
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 11px;
+
+    cursor: none;
+
+    transition:
+        transform 0.08s,
+        box-shadow 0.08s,
+        background 0.1s;
+}
+
+.pixel-button:hover {
+    background: #9fd1c7;
+}
+
+.pixel-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+.pixel-button.food {
+    background: #e6b85c;
+}
+
+.pixel-button.clean {
+    background: #79b7c1;
+}
+
+.pixel-button.play {
+    background: #c982a4;
+}
+
+/* =========================================================
+   FISH
+========================================================= */
+
+#fish-container {
+    position: absolute;
+
+    width: 210px;
+    height: 170px;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 20;
+
+    transition:
+        left 1.2s ease-in-out,
+        top 1.2s ease-in-out;
+}
+
+#fish-canvas {
+    width: 210px;
+    height: 170px;
+
+    image-rendering: pixelated;
+
+    cursor: none;
+}
+
+#fish-shadow {
+    position: absolute;
+
+    left: 55px;
+    bottom: 15px;
+
+    width: 100px;
+    height: 12px;
+
+    background: rgba(12, 31, 34, 0.25);
+}
+
+/* =========================================================
+   PET HEARTS
+========================================================= */
+
+.heart {
+    position: absolute;
+
+    color: #ef9a9e;
+
+    font-size: 22px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-weight: bold;
+
+    pointer-events: none;
+
+    z-index: 40;
+
+    animation:
+        heartFloat 1.3s steps(8) forwards;
+}
+
+@keyframes heartFloat {
+
+    0% {
+        opacity: 1;
+        transform:
+            translate(0, 0)
+            scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(var(--x), -80px)
+            scale(1.35);
+    }
+
+}
+
+/* =========================================================
+   FOOD
+========================================================= */
+
+.food-item {
+    position: absolute;
+
+    width: 24px;
+    height: 24px;
+
+    z-index: 25;
+
+    cursor: none;
+
+    animation:
+        foodDrop 0.4s steps(4);
+}
+
+.food-flake {
+    position: absolute;
+
+    width: 14px;
+    height: 10px;
+
+    background: #d8a54d;
+
+    border:
+        3px solid #6e4b2c;
+
+    transform: rotate(12deg);
+}
+
+.food-label {
+    position: absolute;
+
+    top: 25px;
+    left: -18px;
+
+    width: 60px;
+
+    color: #e5d69b;
+
+    font-size: 8px;
+
+    text-align: center;
+
+    opacity: 0.8;
+}
+
+@keyframes foodDrop {
+
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+}
+
+/* =========================================================
+   SLEEP
+========================================================= */
+
+#sleep-zone {
+    position: absolute;
+
+    left: 50%;
+    bottom: 85px;
+
+    transform: translateX(-50%);
+
+    width: 300px;
+    height: 120px;
+
+    display: none;
+
+    z-index: 18;
+}
+
+/* Pillow */
+
+#pillow {
+    position: absolute;
+
+    left: 75px;
+    bottom: 12px;
+
+    width: 65px;
+    height: 35px;
+
+    background: #d6c9bd;
+
+    border:
+        4px solid #554d4a;
+
+    box-shadow:
+        inset 5px 5px 0 #ece0d1;
+}
+
+/* Blanket */
+
+#blanket {
+    position: absolute;
+
+    left: 120px;
+    bottom: 0;
+
+    width: 125px;
+    height: 75px;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            #687f9b 0 12px,
+            #8195ac 12px 24px
+        );
+
+    border:
+        5px solid #364a5b;
+
+    border-radius: 35px 35px 12px 12px;
+
+    box-shadow:
+        inset 7px 0 0 #526d88;
+}
+
+#sleep-text {
+    position: absolute;
+
+    left: 0;
+    top: 15px;
+
+    color: #d5e4df;
+
+    font-size: 13px;
+
+    animation:
+        sleepy 1.5s steps(2) infinite;
+}
+
+@keyframes sleepy {
+
+    50% {
+        opacity: 0.35;
+    }
+
+}
+
+/* =========================================================
+   FOOD PANEL
+========================================================= */
+
+#food-panel {
+    position: absolute;
+
+    top: 105px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: none;
+
+    background: #182f35;
+
+    border:
+        4px solid #0b1d21;
+
+    padding: 8px;
+
+    z-index: 60;
+
+    box-shadow:
+        5px 5px 0 rgba(8, 25, 29, 0.5);
+}
+
+.food-choice {
+    background: #c99952;
+
+    border:
+        3px solid #533c28;
+
+    padding: 8px 12px;
+
+    font-family: inherit;
+    font-size: 10px;
+
+    cursor: none;
+}
+
+.food-choice:hover {
+    background: #e2b869;
+}
+
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+#message {
+    position: absolute;
+
+    left: 50%;
+    bottom: 30px;
+
+    transform: translateX(-50%);
+
+    padding: 9px 15px;
+
+    background: #162f34;
+
+    border:
+        3px solid #0a1d21;
+
+    color: #d8e9df;
+
+    font-size: 11px;
+
+    z-index: 70;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity 0.2s;
+}
+
+#message.show {
+    opacity: 1;
+}
+
+/* =========================================================
+   CUSTOM HAND CURSOR
+========================================================= */
+
+#hand-cursor {
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 28px;
+    height: 28px;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    font-size: 25px;
+
+    transform:
+        translate(-5px, -3px);
+
+    filter:
+        drop-shadow(2px 2px 0 #172b2f);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    #hud {
+        top: 8px;
+        width: calc(100% - 16px);
+        flex-wrap: wrap;
+    }
+
+    #status-panel {
+        min-width: 0;
+        width: calc(100% - 140px);
+    }
+
+    #time-panel {
+        min-width: 125px;
+    }
+
+    #controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pixel-button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    #fish-container {
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+}
+
+</style>
 </head>
-
 
 <body>
 
+<!-- =======================================================
+     AQUARIUM
+======================================================= -->
 
-    <!-- =================================================
-         CUSTOM PIXEL HAND CURSOR
-    ================================================== -->
+<div id="aquarium">
 
-    <div
-        id="handCursor"
-        class="hand-cursor"
-        aria-hidden="true"
-    >
-        ☝
-    </div>
+    <!-- Water lighting -->
 
+    <div class="light-ray ray-one"></div>
+    <div class="light-ray ray-two"></div>
+    <div class="light-ray ray-three"></div>
 
-    <!-- =================================================
-         WHOLE SCREEN AQUARIUM
-    ================================================== -->
+    <!-- Water lines -->
 
-    <main
-        id="aquarium"
-        class="aquarium"
-    >
+    <div class="water-line one"></div>
+    <div class="water-line two"></div>
+    <div class="water-line three"></div>
 
+    <!-- Plants -->
 
-        <!-- =================================================
-             WATER BACKGROUND
-        ================================================== -->
+    <div class="plant one"></div>
+    <div class="plant two"></div>
+    <div class="plant three"></div>
+    <div class="plant four"></div>
 
-        <div class="water-background"></div>
+    <!-- Rocks -->
 
-        <div class="water-pixels"></div>
+    <div class="rock one"></div>
+    <div class="rock two"></div>
+    <div class="rock three"></div>
+    <div class="rock four"></div>
 
+    <!-- Gravel -->
 
-        <!-- =================================================
-             TOP HUD
-        ================================================== -->
+    <div id="gravel"></div>
 
-        <header class="top-hud">
+    <!-- Bubbles generated by JS -->
 
+    <div id="bubble-container"></div>
 
-            <!-- LOGO -->
+    <!-- ===================================================
+         TOP HUD
+    =================================================== -->
 
-            <div class="logo">
+    <div id="hud">
 
-                <div class="logo-small">
-                    PIXEL AQUARIUM
-                </div>
+        <div id="status-panel">
 
-                <div class="logo-big">
-                    FIN
-                </div>
-
+            <div id="fish-name">
+                GOL-DIE ♥
             </div>
 
-
-            <!-- FISH NAME -->
-
-            <div class="name-display">
-
-                <span>
-                    MY FISH
-                </span>
-
-                <strong id="fishName">
-                    BUBBLES
-                </strong>
-
-            </div>
-
-
-            <!-- TIME -->
-
-            <div class="time-display">
-
-                <div class="time-label">
-                    DAY
-                </div>
-
-                <strong id="day">
-                    1
-                </strong>
-
-                <div
-                    id="timeLabel"
-                    class="clock"
-                >
-                    08:00
-                </div>
-
-            </div>
-
-
-            <!-- STATUS -->
-
-            <div class="mood-display">
-
-                <div
-                    id="moodIcon"
-                    class="mood-icon"
-                >
-                    ♥
-                </div>
-
-                <div>
-
-                    <strong id="moodText">
-                        HAPPY
-                    </strong>
-
-                    <span id="statusText">
-                        READY TO PLAY!
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- CONTROLS -->
-
-            <div class="top-controls">
-
-
-                <button
-                    id="feedBtn"
-                    type="button"
-                    class="hud-button feed-button"
-                >
-                    ●
-                    <span>FEED</span>
-                </button>
-
-
-                <button
-                    id="playBtn"
-                    type="button"
-                    class="hud-button play-button"
-                >
-                    ★
-                    <span>PLAY</span>
-                </button>
-
-
-                <button
-                    id="cleanBtn"
-                    type="button"
-                    class="hud-button clean-button"
-                >
-                    ✧
-                    <span>CLEAN</span>
-                </button>
-
-
-                <button
-                    id="sleepBtn"
-                    type="button"
-                    class="hud-button sleep-button"
-                >
-                    ☾
-                    <span>SLEEP</span>
-                </button>
-
-
-                <button
-                    id="renameBtn"
-                    type="button"
-                    class="hud-button rename-button"
-                >
-                    ✎
-                    <span>NAME</span>
-                </button>
-
-
-                <button
-                    id="resetBtn"
-                    type="button"
-                    class="hud-button reset-button"
-                >
-                    ↻
-                    <span>RESET</span>
-                </button>
-
-
-            </div>
-
-        </header>
-
-
-        <!-- =================================================
-             STATS HUD
-        ================================================== -->
-
-        <section class="stats-hud">
-
-
-            <!-- HEALTH -->
-
-            <div class="hud-stat">
-
-                <div class="hud-stat-title">
-                    ♥ HEALTH
-                </div>
-
-                <div class="pixel-bar">
-
+            <div class="stat">
+                <span class="stat-label">HEALTH</span>
+                <div class="bar">
                     <div
-                        id="healthBar"
-                        class="bar health"
-                    ></div>
-
-                </div>
-
-                <strong id="healthValue">
-                    82
-                </strong>
-
-            </div>
-
-
-            <!-- HUNGER -->
-
-            <div class="hud-stat">
-
-                <div class="hud-stat-title">
-                    ● HUNGER
-                </div>
-
-                <div class="pixel-bar">
-
-                    <div
-                        id="hungerBar"
-                        class="bar hunger"
-                    ></div>
-
-                </div>
-
-                <strong id="hungerValue">
-                    68
-                </strong>
-
-            </div>
-
-
-            <!-- LOVE -->
-
-            <div class="hud-stat">
-
-                <div class="hud-stat-title">
-                    ♥ LOVE
-                </div>
-
-                <div class="pixel-bar">
-
-                    <div
-                        id="affectionBar"
-                        class="bar affection"
-                    ></div>
-
-                </div>
-
-                <strong id="affectionValue">
-                    55
-                </strong>
-
-            </div>
-
-
-            <!-- ENERGY -->
-
-            <div class="hud-stat">
-
-                <div class="hud-stat-title">
-                    ★ ENERGY
-                </div>
-
-                <div class="pixel-bar">
-
-                    <div
-                        id="energyBar"
-                        class="bar energy"
-                    ></div>
-
-                </div>
-
-                <strong id="energyValue">
-                    76
-                </strong>
-
-            </div>
-
-
-            <!-- CLEANLINESS -->
-
-            <div class="hud-stat">
-
-                <div class="hud-stat-title">
-                    ✧ CLEAN
-                </div>
-
-                <div class="pixel-bar">
-
-                    <div
-                        id="cleanlinessBar"
-                        class="bar cleanliness"
-                    ></div>
-
-                </div>
-
-                <strong id="cleanlinessValue">
-                    75
-                </strong>
-
-            </div>
-
-
-        </section>
-
-
-        <!-- =================================================
-             BUBBLES
-        ================================================== -->
-
-        <div class="bubble bubble1"></div>
-        <div class="bubble bubble2"></div>
-        <div class="bubble bubble3"></div>
-        <div class="bubble bubble4"></div>
-        <div class="bubble bubble5"></div>
-        <div class="bubble bubble6"></div>
-
-
-        <!-- =================================================
-             CASTLE
-        ================================================== -->
-
-        <div class="castle">
-
-            <div class="castle-top"></div>
-
-            <div class="castle-body">
-
-                <div class="castle-window"></div>
-
-                <div class="castle-window"></div>
-
-                <div class="castle-door"></div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             PLANTS
-        ================================================== -->
-
-        <div class="plant plant-left">
-
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-
-        </div>
-
-
-        <div class="plant plant-right">
-
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-
-        </div>
-
-
-        <!-- =================================================
-             SAND
-        ================================================== -->
-
-        <div class="sand"></div>
-
-
-        <!-- =================================================
-             FISH
-        ================================================== -->
-
-        <div
-            id="fish"
-            class="fish-container"
-            role="button"
-            tabindex="0"
-            aria-label="Pet your fish"
-        >
-
-
-            <!-- SHADOW -->
-
-            <div class="fish-shadow"></div>
-
-
-            <!-- PILLOW -->
-
-            <div
-                id="fishPillow"
-                class="fish-pillow hidden"
-            >
-
-                <div class="pillow-detail"></div>
-
-            </div>
-
-
-            <!-- FISH -->
-
-            <div class="fish">
-
-
-                <!-- TAIL -->
-
-                <div class="fish-tail"></div>
-
-
-                <!-- BODY -->
-
-                <div class="fish-body">
-
-
-                    <!-- TOP FIN -->
-
-                    <div class="fish-fin-top"></div>
-
-
-                    <!-- BOTTOM FIN -->
-
-                    <div class="fish-fin-bottom"></div>
-
-
-                    <!-- EYE -->
-
-                    <div class="fish-eye">
-
-                        <span></span>
-
+                        id="health-bar"
+                        class="bar-fill health-fill">
                     </div>
-
-
-                    <!-- CHEEK -->
-
-                    <div class="fish-cheek"></div>
-
-
-                    <!-- SCALES -->
-
-                    <div class="fish-scale scale1"></div>
-
-                    <div class="fish-scale scale2"></div>
-
-                    <div class="fish-scale scale3"></div>
-
-
-                    <!-- MOUTH -->
-
-                    <div
-                        id="fishMouth"
-                        class="fish-mouth"
-                    ></div>
-
                 </div>
-
             </div>
 
-
-            <!-- BLANKET -->
-
-            <div
-                id="fishBlanket"
-                class="fish-blanket hidden"
-            >
-
-                <div class="blanket-stripe"></div>
-                <div class="blanket-stripe"></div>
-                <div class="blanket-stripe"></div>
-
+            <div class="stat">
+                <span class="stat-label">HUNGER</span>
+                <div class="bar">
+                    <div
+                        id="hunger-bar"
+                        class="bar-fill hunger-fill">
+                    </div>
+                </div>
             </div>
 
-
-        </div>
-
-
-        <!-- =================================================
-             SLEEP ZZZ
-        ================================================== -->
-
-        <div
-            id="sleepZzz"
-            class="sleep-zzz hidden"
-        >
-            Z
-            <span>Z</span>
-            <span>Z</span>
-        </div>
-
-
-        <!-- =================================================
-             SPEECH BUBBLE
-        ================================================== -->
-
-        <div
-            id="speech"
-            class="speech"
-        >
-            HELLO!
-        </div>
-
-
-        <!-- =================================================
-             FOOD TRAY
-        ================================================== -->
-
-        <div
-            id="foodTray"
-            class="food-tray hidden"
-        >
-
-            <div class="food-title">
-                FOOD!
+            <div class="stat">
+                <span class="stat-label">HAPPY</span>
+                <div class="bar">
+                    <div
+                        id="happiness-bar"
+                        class="bar-fill happiness-fill">
+                    </div>
+                </div>
             </div>
 
-            <div class="food-subtitle">
-                PICK A SNACK
+            <div class="stat">
+                <span class="stat-label">AFFECTION</span>
+                <div class="bar">
+                    <div
+                        id="affection-bar"
+                        class="bar-fill affection-fill">
+                    </div>
+                </div>
             </div>
 
-            <div
-                id="foodPieces"
-                class="food-pieces"
-            ></div>
-
-        </div>
-
-
-        <!-- =================================================
-             FOOD MESSAGE
-        ================================================== -->
-
-        <div
-            id="foodMessage"
-            class="food-message hidden"
-        >
-            CHOOSE FOOD
-        </div>
-
-
-        <!-- =================================================
-             PETTING HEARTS CONTAINER
-        ================================================== -->
-
-        <div
-            id="heartContainer"
-            class="heart-container"
-        ></div>
-
-
-        <!-- =================================================
-             CARE MISSION
-        ================================================== -->
-
-        <div class="mission-hud">
-
-            <div class="mission-title">
-                TODAY'S CARE
+            <div class="stat">
+                <span class="stat-label">CLEAN</span>
+                <div class="bar">
+                    <div
+                        id="clean-bar"
+                        class="bar-fill clean-fill">
+                    </div>
+                </div>
             </div>
 
-            <div class="mission-row">
-
-                <span>
-                    FOOD
-                </span>
-
-                <strong id="foodCount">
-                    0 / 3
-                </strong>
-
-            </div>
-
-            <div class="mission-row">
-
-                <span>
-                    LOVE
-                </span>
-
-                <strong id="loveCount">
-                    0 / 3
-                </strong>
-
+            <div class="stat">
+                <span class="stat-label">ENERGY</span>
+                <div class="bar">
+                    <div
+                        id="energy-bar"
+                        class="bar-fill energy-fill">
+                    </div>
+                </div>
             </div>
 
         </div>
 
+        <!-- TIME -->
 
-        <!-- =================================================
-             SLEEP WARNING
-        ================================================== -->
+        <div id="time-panel">
 
-        <div
-            id="sleepWarning"
-            class="sleep-warning hidden"
-        >
+            <div id="fish-time">
+                08:00 AM
+            </div>
 
-            <span>
-                ☾
-            </span>
-
-            <strong>
-                I'M GETTING SLEEPY...
-            </strong>
-
-            <small>
-                LET ME REST
-            </small>
+            <div id="day-counter">
+                DAY 1
+            </div>
 
         </div>
 
+        <!-- CONTROLS -->
 
-        <!-- =================================================
-             BOTTOM HELP
-        ================================================== -->
+        <div id="controls">
 
-        <div class="bottom-help">
+            <button
+                id="food-button"
+                class="pixel-button food">
+                🍤 FOOD
+            </button>
 
-            CLICK YOUR FISH TO PET ♥
+            <button
+                id="clean-button"
+                class="pixel-button clean">
+                ✦ CLEAN
+            </button>
 
-        </div>
-
-
-    </main>
-
-
-    <!-- =================================================
-         NAME MODAL
-    ================================================== -->
-
-    <div
-        id="nameModal"
-        class="modal hidden"
-    >
-
-        <div class="modal-box">
-
-            <div class="modal-title">
-                NAME YOUR FISH
-            </div>
-
-            <input
-                id="nameInput"
-                type="text"
-                maxlength="12"
-                value="BUBBLES"
-            >
-
-            <div class="modal-buttons">
-
-                <button
-                    id="cancelName"
-                    type="button"
-                >
-                    CANCEL
-                </button>
-
-                <button
-                    id="saveName"
-                    type="button"
-                >
-                    OK!
-                </button>
-
-            </div>
+            <button
+                id="play-button"
+                class="pixel-button play">
+                ★ PLAY
+            </button>
 
         </div>
 
     </div>
 
+    <!-- ===================================================
+         FOOD MENU
+    =================================================== -->
 
-    <!-- =================================================
-         TOAST
-    ================================================== -->
+    <div id="food-panel">
 
-    <div
-        id="toast"
-        class="toast"
-    ></div>
+        <button
+            class="food-choice"
+            data-food="flake">
+            🟨 FLAKE
+        </button>
+
+        <button
+            class="food-choice"
+            data-food="pellet">
+            🟤 PELLET
+        </button>
+
+        <button
+            class="food-choice"
+            data-food="treat">
+            🟧 TREAT
+        </button>
+
+    </div>
+
+    <!-- ===================================================
+         FISH
+    =================================================== -->
+
+    <div id="fish-container">
+
+        <div id="fish-shadow"></div>
+
+        <canvas
+            id="fish-canvas"
+            width="105"
+            height="85">
+        </canvas>
+
+    </div>
+
+    <!-- ===================================================
+         SLEEP AREA
+    =================================================== -->
+
+    <div id="sleep-zone">
+
+        <div id="pillow"></div>
+
+        <div id="blanket"></div>
+
+        <div id="sleep-text">
+            Z Z Z...
+        </div>
+
+    </div>
+
+    <!-- MESSAGE -->
+
+    <div id="message"></div>
+
+</div>
+
+<!-- CUSTOM CURSOR -->
+
+<div id="hand-cursor">☝</div>
 
 
-    <script src="game.js"></script>
+<script>
+
+/* =========================================================
+   GAME DATA
+========================================================= */
+
+const DEFAULT_STATE = {
+
+    fishHour: 8,
+
+    fishMinute: 0,
+
+    day: 1,
+
+    health: 100,
+
+    hunger: 80,
+
+    happiness: 75,
+
+    affection: 35,
+
+    cleanliness: 90,
+
+    energy: 100,
+
+    sleeping: false,
+
+    lastUpdate: Date.now()
+
+};
+
+let state = loadGame();
+
+
+/* =========================================================
+   DOM REFERENCES
+========================================================= */
+
+const aquarium =
+    document.getElementById("aquarium");
+
+const fishContainer =
+    document.getElementById("fish-container");
+
+const fishCanvas =
+    document.getElementById("fish-canvas");
+
+const ctx =
+    fishCanvas.getContext("2d");
+
+const foodButton =
+    document.getElementById("food-button");
+
+const foodPanel =
+    document.getElementById("food-panel");
+
+const cleanButton =
+    document.getElementById("clean-button");
+
+const playButton =
+    document.getElementById("play-button");
+
+const sleepZone =
+    document.getElementById("sleep-zone");
+
+const message =
+    document.getElementById("message");
+
+const handCursor =
+    document.getElementById("hand-cursor");
+
+
+/* =========================================================
+   SAVE / LOAD
+========================================================= */
+
+function loadGame() {
+
+    try {
+
+        const saved =
+            localStorage.getItem("goldiePixelFish");
+
+        if (saved) {
+
+            return {
+                ...DEFAULT_STATE,
+                ...JSON.parse(saved)
+            };
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Save data could not be loaded.",
+            error
+        );
+
+    }
+
+    return {
+        ...DEFAULT_STATE
+    };
+
+}
+
+
+function saveGame() {
+
+    state.lastUpdate = Date.now();
+
+    localStorage.setItem(
+        "goldiePixelFish",
+        JSON.stringify(state)
+    );
+
+}
+
+
+/* =========================================================
+   CUSTOM CURSOR
+========================================================= */
+
+document.addEventListener(
+    "pointermove",
+    function(event) {
+
+        handCursor.style.left =
+            event.clientX + "px";
+
+        handCursor.style.top =
+            event.clientY + "px";
+
+    }
+);
+
+
+/* =========================================================
+   PIXEL FISH DRAWING
+========================================================= */
+
+function drawFish() {
+
+    ctx.clearRect(
+        0,
+        0,
+        fishCanvas.width,
+        fishCanvas.height
+    );
+
+    /*
+        We deliberately draw with rectangles instead
+        of smooth shapes.
+
+        This creates the chunky old-school
+        handheld-game look.
+    */
+
+    const p = 5;
+
+    /*
+        Fish body
+    */
+
+    ctx.fillStyle = "#bf641f";
+
+    pixelRect(20, 25, 60, 40);
+
+    pixelRect(15, 30, 70, 30);
+
+    pixelRect(25, 20, 50, 50);
+
+
+    /*
+        Body highlight
+    */
+
+    ctx.fillStyle = "#e89a32";
+
+    pixelRect(30, 25, 35, 30);
+
+    pixelRect(25, 35, 40, 20);
+
+
+    /*
+        Belly
+    */
+
+    ctx.fillStyle = "#f3bd52";
+
+    pixelRect(35, 45, 28, 18);
+
+    pixelRect(40, 55, 20, 10);
+
+
+    /*
+        Dark orange shading
+    */
+
+    ctx.fillStyle = "#9d481f";
+
+    pixelRect(20, 35, 8, 22);
+
+    pixelRect(28, 60, 12, 8);
+
+    pixelRect(65, 34, 15, 23);
+
+
+    /*
+        Tail
+    */
+
+    ctx.fillStyle = "#d77c27";
+
+    pixelRect(78, 25, 12, 10);
+
+    pixelRect(84, 20, 10, 10);
+
+    pixelRect(84, 55, 10, 10);
+
+    pixelRect(78, 60, 12, 10);
+
+
+    /*
+        Tail highlights
+    */
+
+    ctx.fillStyle = "#f0aa36";
+
+    pixelRect(87, 23, 7, 7);
+
+    pixelRect(87, 59, 7, 7);
+
+
+    /*
+        Top fin
+    */
+
+    ctx.fillStyle = "#c96b22";
+
+    pixelRect(40, 15, 25, 8);
+
+    pixelRect(45, 10, 15, 7);
+
+    pixelRect(50, 5, 8, 7);
+
+
+    /*
+        Bottom fin
+    */
+
+    ctx.fillStyle = "#b9561e";
+
+    pixelRect(45, 65, 20, 8);
+
+    pixelRect(50, 72, 12, 6);
+
+
+    /*
+        Face
+    */
+
+    ctx.fillStyle = "#efad42";
+
+    pixelRect(12, 32, 18, 25);
+
+
+    /*
+        Eye
+    */
+
+    ctx.fillStyle = "#f4d88a";
+
+    pixelRect(18, 31, 12, 12);
+
+    ctx.fillStyle = "#17282c";
+
+    pixelRect(21, 34, 7, 8);
+
+    /*
+        Eye highlight
+    */
+
+    ctx.fillStyle = "#ffffff";
+
+    pixelRect(22, 34, 3, 3);
+
+
+    /*
+        Mouth
+    */
+
+    ctx.fillStyle = "#69352b";
+
+    pixelRect(10, 50, 8, 5);
+
+    pixelRect(15, 55, 8, 4);
+
+
+    /*
+        Pixel outline details
+    */
+
+    ctx.fillStyle = "#4b352d";
+
+    pixelRect(28, 20, 8, 5);
+
+    pixelRect(28, 65, 8, 5);
+
+}
+
+
+/*
+    Helper for crisp pixel rectangles.
+*/
+
+function pixelRect(x, y, width, height) {
+
+    ctx.fillRect(
+        x,
+        y,
+        width,
+        height
+    );
+
+}
+
+
+/* =========================================================
+   FISH MOVEMENT
+========================================================= */
+
+let targetX =
+    window.innerWidth * 0.5;
+
+let targetY =
+    window.innerHeight * 0.55;
+
+
+function moveFishRandomly() {
+
+    if (state.sleeping) {
+        return;
+    }
+
+    const padding = 130;
+
+    targetX =
+        padding +
+        Math.random() *
+        Math.max(
+            100,
+            window.innerWidth -
+            padding * 2
+        );
+
+    targetY =
+        200 +
+        Math.random() *
+        Math.max(
+            100,
+            window.innerHeight -
+            330
+        );
+
+    fishContainer.style.left =
+        targetX + "px";
+
+    fishContainer.style.top =
+        targetY + "px";
+
+}
+
+
+/*
+    Move fish periodically.
+*/
+
+setInterval(
+    moveFishRandomly,
+    3500
+);
+
+
+/* =========================================================
+   FISH PETTING
+========================================================= */
+
+fishCanvas.addEventListener(
+    "click",
+    function(event) {
+
+        if (state.sleeping) {
+
+            showMessage(
+                "SHHH... GOLDIE IS SLEEPING ♥"
+            );
+
+            return;
+
+        }
+
+        state.affection =
+            clamp(
+                state.affection + 5
+            );
+
+        state.happiness =
+            clamp(
+                state.happiness + 4
+            );
+
+        state.energy =
+            clamp(
+                state.energy + 1
+            );
+
+        createHeart();
+
+        createHeart();
+
+        showMessage(
+            "GOLDIE LIKES THAT ♥"
+        );
+
+        saveGame();
+
+        updateUI();
+
+    }
+);
+
+
+/* =========================================================
+   HEART CREATION
+========================================================= */
+
+function createHeart() {
+
+    const heart =
+        document.createElement("div");
+
+    heart.className =
+        "heart";
+
+    heart.textContent =
+        Math.random() > 0.5
+            ? "♥"
+            : "♡";
+
+    const rect =
+        fishContainer.getBoundingClientRect();
+
+    heart.style.left =
+        (
+            rect.left +
+            rect.width / 2 +
+            (Math.random() * 70 - 35)
+        ) + "px";
+
+    heart.style.top =
+        (
+            rect.top +
+            30 +
+            (Math.random() * 30)
+        ) + "px";
+
+    heart.style.setProperty(
+        "--x",
+        (Math.random() * 80 - 40) + "px"
+    );
+
+    aquarium.appendChild(heart);
+
+    setTimeout(
+        () => heart.remove(),
+        1400
+    );
+
+}
+
+
+/* =========================================================
+   FOOD SYSTEM
+========================================================= */
+
+foodButton.addEventListener(
+    "click",
+    function() {
+
+        foodPanel.style.display =
+            foodPanel.style.display === "block"
+                ? "none"
+                : "block";
+
+    }
+);
+
+
+document.querySelectorAll(
+    ".food-choice"
+).forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const type =
+                    button.dataset.food;
+
+                spawnFood(type);
+
+                foodPanel.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+);
+
+
+/*
+    Spawn a food item near the top
+    of the aquarium.
+*/
+
+function spawnFood(type) {
+
+    if (state.sleeping) {
+
+        showMessage(
+            "GOLDIE IS ASLEEP — TRY LATER!"
+        );
+
+        return;
+
+    }
+
+    const food =
+        document.createElement("div");
+
+    food.className =
+        "food-item";
+
+    food.innerHTML =
+        `<div class="food-flake"></div>`;
+
+    const x =
+        15 +
+        Math.random() *
+        (window.innerWidth - 50);
+
+    const y = 140;
+
+    food.style.left =
+        x + "px";
+
+    food.style.top =
+        y + "px";
+
+    aquarium.appendChild(food);
+
+    /*
+        Food slowly sinks.
+    */
+
+    let currentY = y;
+
+    const fall =
+        setInterval(
+            function() {
+
+                if (!document.body.contains(food)) {
+
+                    clearInterval(fall);
+
+                    return;
+
+                }
+
+                currentY += 1.2;
+
+                food.style.top =
+                    currentY + "px";
+
+                /*
+                    When food reaches lower
+                    part of aquarium, stop.
+                */
+
+                if (
+                    currentY >
+                    window.innerHeight - 180
+                ) {
+
+                    clearInterval(fall);
+
+                }
+
+            },
+            40
+        );
+
+
+    /*
+        Fish automatically swims
+        toward the food.
+    */
+
+    const chase =
+        setTimeout(
+            function() {
+
+                if (state.sleeping) {
+                    return;
+                }
+
+                targetX = x;
+
+                targetY =
+                    Math.min(
+                        currentY,
+                        window.innerHeight - 220
+                    );
+
+                fishContainer.style.left =
+                    targetX + "px";
+
+                fishContainer.style.top =
+                    targetY + "px";
+
+
+                /*
+                    Eat after swimming toward it.
+                */
+
+                setTimeout(
+                    function() {
+
+                        if (
+                            document.body.contains(food)
+                        ) {
+
+                            food.remove();
+
+                        }
+
+                        clearInterval(fall);
+
+                        eatFood(type);
+
+                    },
+                    1400
+                );
+
+            },
+            500
+        );
+
+}
+
+
+/* =========================================================
+   EAT FOOD
+========================================================= */
+
+function eatFood(type) {
+
+    let hungerGain = 15;
+    let happinessGain = 2;
+
+    if (type === "pellet") {
+
+        hungerGain = 18;
+
+    }
+
+    if (type === "treat") {
+
+        hungerGain = 25;
+        happinessGain = 8;
+
+    }
+
+    state.hunger =
+        clamp(
+            state.hunger +
+            hungerGain
+        );
+
+    state.happiness =
+        clamp(
+            state.happiness +
+            happinessGain
+        );
+
+    state.health =
+        clamp(
+            state.health + 2
+        );
+
+    showMessage(
+        "GOLDIE ATE IT! NOM NOM!"
+    );
+
+    createBubbleBurst();
+
+    saveGame();
+
+    updateUI();
+
+}
+
+
+/* =========================================================
+   CLEANING
+========================================================= */
+
+cleanButton.addEventListener(
+    "click",
+    function() {
+
+        state.cleanliness =
+            100;
+
+        state.health =
+            clamp(
+                state.health + 4
+            );
+
+        state.happiness =
+            clamp(
+                state.happiness + 3
+            );
+
+        /*
+            Temporarily remove dirty-looking
+            atmosphere and make bubbles.
+        */
+
+        createBubbleBurst();
+
+        createBubbleBurst();
+
+        showMessage(
+            "THE TANK IS SPARKLY CLEAN!"
+        );
+
+        saveGame();
+
+        updateUI();
+
+    }
+);
+
+
+/* =========================================================
+   PLAY
+========================================================= */
+
+let playing = false;
+
+playButton.addEventListener(
+    "click",
+    function() {
+
+        if (state.sleeping) {
+
+            showMessage(
+                "GOLDIE IS TOO SLEEPY TO PLAY."
+            );
+
+            return;
+
+        }
+
+        if (playing) {
+            return;
+        }
+
+        playing = true;
+
+        state.happiness =
+            clamp(
+                state.happiness + 10
+            );
+
+        state.affection =
+            clamp(
+                state.affection + 3
+            );
+
+        state.energy =
+            clamp(
+                state.energy - 8
+            );
+
+        showMessage(
+            "PLAY TIME! ★"
+        );
+
+        /*
+            Make Goldie swim around
+            quickly for a little game.
+        */
+
+        let rounds = 0;
+
+        const playInterval =
+            setInterval(
+                function() {
+
+                    moveFishRandomly();
+
+                    rounds++;
+
+                    if (rounds >= 5) {
+
+                        clearInterval(
+                            playInterval
+                        );
+
+                        playing = false;
+
+                        createHeart();
+
+                        saveGame();
+
+                        updateUI();
+
+                    }
+
+                },
+                500
+            );
+
+    }
+);
+
+
+/* =========================================================
+   BUBBLE BURST
+========================================================= */
+
+function createBubbleBurst() {
+
+    const rect =
+        fishContainer.getBoundingClientRect();
+
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
+
+        const bubble =
+            document.createElement("div");
+
+        bubble.className =
+            "bubble";
+
+        bubble.style.left =
+            (
+                rect.left +
+                rect.width / 2 +
+                Math.random() * 60 -
+                30
+            ) + "px";
+
+        bubble.style.top =
+            (
+                rect.top +
+                Math.random() * 50
+            ) + "px";
+
+        bubble.style.animationDuration =
+            (
+                1 +
+                Math.random() * 1.5
+            ) + "s";
+
+        aquarium.appendChild(
+            bubble
+        );
+
+        setTimeout(
+            () => bubble.remove(),
+            3000
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   BACKGROUND BUBBLES
+========================================================= */
+
+function createBackgroundBubbles() {
+
+    const container =
+        document.getElementById(
+            "bubble-container"
+        );
+
+    for (
+        let i = 0;
+        i < 18;
+        i++
+    ) {
+
+        const bubble =
+            document.createElement("div");
+
+        bubble.className =
+            "bubble";
+
+        bubble.style.left =
+            (
+                Math.random() * 100
+            ) + "%";
+
+        bubble.style.bottom =
+            (
+                Math.random() * 20
+            ) + "%";
+
+        bubble.style.animationDuration =
+            (
+                5 +
+                Math.random() * 7
+            ) + "s";
+
+        bubble.style.animationDelay =
+            (
+                Math.random() * 7
+            ) + "s";
+
+        container.appendChild(
+            bubble
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   FISH CLOCK
+========================================================= */
+
+/*
+    IMPORTANT:
+
+    2 REAL MINUTES = 1 FISH HOUR.
+
+    120,000 milliseconds = 1 fish hour.
+*/
+
+const REAL_MS_PER_FISH_HOUR =
+    2 * 60 * 1000;
+
+
+/*
+    Update the fish clock.
+
+    We use elapsed real-world time so
+    refreshing the page does not freeze
+    the fish's internal clock.
+*/
+
+let previousRealTime =
+    Date.now();
+
+
+function updateFishClock() {
+
+    const now =
+        Date.now();
+
+    const elapsed =
+        now -
+        previousRealTime;
+
+    previousRealTime =
+        now;
+
+    /*
+        Convert real milliseconds
+        into fish hours.
+    */
+
+    const fishHoursPassed =
+        elapsed /
+        REAL_MS_PER_FISH_HOUR;
+
+    /*
+        Convert fish hours into minutes.
+
+        One fish hour = 60 fish minutes.
+    */
+
+    const fishMinutesPassed =
+        fishHoursPassed * 60;
+
+    state.fishMinute +=
+        fishMinutesPassed;
+
+    /*
+        Handle hour rollover.
+    */
+
+    while (
+        state.fishMinute >= 60
+    ) {
+
+        state.fishMinute -= 60;
+
+        state.fishHour++;
+
+        /*
+            New day after 24 hours.
+        */
+
+        if (
+            state.fishHour >= 24
+        ) {
+
+            state.fishHour = 0;
+
+            state.day++;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   NEEDS / STATS
+========================================================= */
+
+function updateNeeds() {
+
+    /*
+        Hunger slowly decreases.
+    */
+
+    state.hunger =
+        clamp(
+            state.hunger - 0.012
+        );
+
+    /*
+        Cleanliness decreases
+        a little faster.
+    */
+
+    state.cleanliness =
+        clamp(
+            state.cleanliness - 0.006
+        );
+
+    /*
+        Energy changes depending
+        on whether Goldie is asleep.
+    */
+
+    if (state.sleeping) {
+
+        state.energy =
+            clamp(
+                state.energy + 0.04
+            );
+
+        state.happiness =
+            clamp(
+                state.happiness + 0.008
+            );
+
+    } else {
+
+        state.energy =
+            clamp(
+                state.energy - 0.009
+            );
+
+    }
+
+
+    /*
+        Happiness depends on
+        hunger and cleanliness.
+    */
+
+    if (
+        state.hunger < 30
+    ) {
+
+        state.happiness =
+            clamp(
+                state.happiness - 0.02
+            );
+
+    }
+
+    if (
+        state.cleanliness < 30
+    ) {
+
+        state.happiness =
+            clamp(
+                state.happiness - 0.015
+            );
+
+    }
+
+
+    /*
+        Health suffers if neglected.
+    */
+
+    if (
+        state.hunger < 15 ||
+        state.cleanliness < 15
+    ) {
+
+        state.health =
+            clamp(
+                state.health - 0.025
+            );
+
+    } else if (
+        state.hunger > 40 &&
+        state.cleanliness > 40
+    ) {
+
+        state.health =
+            clamp(
+                state.health + 0.004
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   SLEEP SYSTEM
+========================================================= */
+
+function checkSleep() {
+
+    /*
+        Fish sleeps automatically
+        from 22:00 to 07:00.
+
+        It also sleeps early if
+        energy becomes very low.
+    */
+
+    const hour =
+        state.fishHour;
+
+    const nighttime =
+        hour >= 22 ||
+        hour < 7;
+
+    const exhausted =
+        state.energy <= 12;
+
+
+    if (
+        (nighttime || exhausted) &&
+        !state.sleeping
+    ) {
+
+        startSleeping();
+
+    }
+
+
+    /*
+        Wake up once daytime arrives
+        and energy has recovered.
+    */
+
+    if (
+        state.sleeping &&
+        hour >= 7 &&
+        hour < 22 &&
+        state.energy >= 60
+    ) {
+
+        wakeUp();
+
+    }
+
+}
+
+
+/* =========================================================
+   START SLEEP
+========================================================= */
+
+function startSleeping() {
+
+    state.sleeping = true;
+
+    sleepZone.style.display =
+        "block";
+
+    /*
+        Put fish near the sleeping
+        area at the bottom.
+    */
+
+    fishContainer.style.left =
+        "50%";
+
+    fishContainer.style.top =
+        (
+            window.innerHeight -
+            150
+        ) + "px";
+
+    showMessage(
+        "GOLDIE IS SLEEPY... Z Z Z"
+    );
+
+    saveGame();
+
+    updateUI();
+
+}
+
+
+/* =========================================================
+   WAKE UP
+========================================================= */
+
+function wakeUp() {
+
+    state.sleeping = false;
+
+    sleepZone.style.display =
+        "none";
+
+    state.happiness =
+        clamp(
+            state.happiness + 8
+        );
+
+    showMessage(
+        "GOOD MORNING, GOLDIE! ♥"
+    );
+
+    moveFishRandomly();
+
+    saveGame();
+
+    updateUI();
+
+}
+
+
+/* =========================================================
+   UPDATE UI
+========================================================= */
+
+function updateUI() {
+
+    setBar(
+        "health-bar",
+        state.health
+    );
+
+    setBar(
+        "hunger-bar",
+        state.hunger
+    );
+
+    setBar(
+        "happiness-bar",
+        state.happiness
+    );
+
+    setBar(
+        "affection-bar",
+        state.affection
+    );
+
+    setBar(
+        "clean-bar",
+        state.cleanliness
+    );
+
+    setBar(
+        "energy-bar",
+        state.energy
+    );
+
+
+    /*
+        Format fish clock.
+    */
+
+    let hour =
+        Math.floor(
+            state.fishHour
+        );
+
+    const minute =
+        Math.floor(
+            state.fishMinute
+        );
+
+    const ampm =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+    let displayHour =
+        hour % 12;
+
+    if (
+        displayHour === 0
+    ) {
+
+        displayHour = 12;
+
+    }
+
+    const minuteText =
+        String(minute).padStart(
+            2,
+            "0"
+        );
+
+    document.getElementById(
+        "fish-time"
+    ).textContent =
+        `${displayHour}:${minuteText} ${ampm}`;
+
+
+    document.getElementById(
+        "day-counter"
+    ).textContent =
+        `DAY ${state.day}`;
+
+
+    /*
+        Change aquarium mood
+        slightly at night.
+    */
+
+    if (
+        state.fishHour >= 20 ||
+        state.fishHour < 7
+    ) {
+
+        aquarium.style.filter =
+            "brightness(0.72)";
+
+    } else {
+
+        aquarium.style.filter =
+            "brightness(1)";
+
+    }
+
+}
+
+
+/* =========================================================
+   PROGRESS BAR HELPER
+========================================================= */
+
+function setBar(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+    element.style.width =
+        clamp(value) + "%";
+
+}
+
+
+/* =========================================================
+   CLAMP
+========================================================= */
+
+function clamp(
+    value,
+    minimum = 0,
+    maximum = 100
+) {
+
+    return Math.max(
+        minimum,
+        Math.min(
+            maximum,
+            value
+        )
+    );
+
+}
+
+
+/* =========================================================
+   MESSAGE SYSTEM
+========================================================= */
+
+let messageTimer = null;
+
+function showMessage(
+    text
+) {
+
+    message.textContent =
+        text;
+
+    message.classList.add(
+        "show"
+    );
+
+    clearTimeout(
+        messageTimer
+    );
+
+    messageTimer =
+        setTimeout(
+            function() {
+
+                message.classList.remove(
+                    "show"
+                );
+
+            },
+            1800
+        );
+
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+setInterval(
+    function() {
+
+        updateFishClock();
+
+        updateNeeds();
+
+        checkSleep();
+
+        updateUI();
+
+        saveGame();
+
+    },
+    1000
+);
+
+
+/* =========================================================
+   WINDOW RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        if (
+            targetX >
+            window.innerWidth
+        ) {
+
+            targetX =
+                window.innerWidth / 2;
+
+        }
+
+        if (
+            targetY >
+            window.innerHeight
+        ) {
+
+            targetY =
+                window.innerHeight / 2;
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALISE GAME
+========================================================= */
+
+drawFish();
+
+createBackgroundBubbles();
+
+updateUI();
+
+moveFishRandomly();
+
+checkSleep();
+
+
+/*
+    Welcome message.
+*/
+
+setTimeout(
+    function() {
+
+        showMessage(
+            "HELLO! TAKE CARE OF GOLDIE ♥"
+        );
+
+    },
+    700
+);
+
+</script>
 
 </body>
-
 </html>
