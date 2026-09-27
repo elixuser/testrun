@@ -1,24 +1,12 @@
 /* =====================================================
    FIN & FRIENDS
-   RETRO FISH CARE GAME
-   VERSION 3 - STABLE INTERACTION SYSTEM
+   FULL SCREEN RETRO FISH GAME
 ===================================================== */
 
 
-/*
-    IMPORTANT:
-
-    The entire game is started from DOMContentLoaded.
-
-    This guarantees that:
-
-    1. index.html has finished loading.
-    2. Every button exists.
-    3. Every stat bar exists.
-    4. The fish exists.
-    5. Event listeners can safely be attached.
-*/
-
+/* =====================================================
+   START WHEN HTML IS READY
+===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -31,16 +19,44 @@ document.addEventListener(
 
 
 /* =====================================================
-   START GAME
+   MAIN GAME
 ===================================================== */
 
 function startGame() {
 
-    /*
-        Find every HTML element that the game needs.
-    */
+
+    /* =================================================
+       GET HTML ELEMENTS
+    ================================================= */
 
     const elements = {
+
+        aquarium:
+            document.getElementById("aquarium"),
+
+        handCursor:
+            document.getElementById("handCursor"),
+
+        fish:
+            document.getElementById("fish"),
+
+        fishMouth:
+            document.getElementById("fishMouth"),
+
+        fishBlanket:
+            document.getElementById("fishBlanket"),
+
+        fishPillow:
+            document.getElementById("fishPillow"),
+
+        sleepZzz:
+            document.getElementById("sleepZzz"),
+
+        speech:
+            document.getElementById("speech"),
+
+        heartContainer:
+            document.getElementById("heartContainer"),
 
         feedButton:
             document.getElementById("feedBtn"),
@@ -51,32 +67,14 @@ function startGame() {
         cleanButton:
             document.getElementById("cleanBtn"),
 
-        petButton:
-            document.getElementById("petBtn"),
-
-        resetButton:
-            document.getElementById("resetBtn"),
+        sleepButton:
+            document.getElementById("sleepBtn"),
 
         renameButton:
             document.getElementById("renameBtn"),
 
-        saveNameButton:
-            document.getElementById("saveName"),
-
-        cancelNameButton:
-            document.getElementById("cancelName"),
-
-        nameModal:
-            document.getElementById("nameModal"),
-
-        nameInput:
-            document.getElementById("nameInput"),
-
-        fish:
-            document.getElementById("fish"),
-
-        fishMouth:
-            document.getElementById("fishMouth"),
+        resetButton:
+            document.getElementById("resetBtn"),
 
         foodTray:
             document.getElementById("foodTray"),
@@ -86,15 +84,6 @@ function startGame() {
 
         foodMessage:
             document.getElementById("foodMessage"),
-
-        aquarium:
-            document.getElementById("aquarium"),
-
-        speech:
-            document.getElementById("speech"),
-
-        toast:
-            document.getElementById("toast"),
 
         fishName:
             document.getElementById("fishName"),
@@ -117,6 +106,9 @@ function startGame() {
         energyValue:
             document.getElementById("energyValue"),
 
+        cleanlinessValue:
+            document.getElementById("cleanlinessValue"),
+
         healthBar:
             document.getElementById("healthBar"),
 
@@ -128,6 +120,9 @@ function startGame() {
 
         energyBar:
             document.getElementById("energyBar"),
+
+        cleanlinessBar:
+            document.getElementById("cleanlinessBar"),
 
         moodIcon:
             document.getElementById("moodIcon"),
@@ -142,39 +137,64 @@ function startGame() {
             document.getElementById("foodCount"),
 
         loveCount:
-            document.getElementById("loveCount")
+            document.getElementById("loveCount"),
+
+        sleepWarning:
+            document.getElementById("sleepWarning"),
+
+        nameModal:
+            document.getElementById("nameModal"),
+
+        nameInput:
+            document.getElementById("nameInput"),
+
+        saveName:
+            document.getElementById("saveName"),
+
+        cancelName:
+            document.getElementById("cancelName"),
+
+        toast:
+            document.getElementById("toast")
 
     };
 
 
-    /*
-        Before doing anything else,
-        verify that the important buttons exist.
+    /* =================================================
+       VERIFY IMPORTANT ELEMENTS
+    ================================================= */
 
-        This makes errors much easier to find.
-    */
+    const required = [
 
-    const requiredElements = [
+        "aquarium",
+
+        "fish",
 
         "feedButton",
+
         "playButton",
+
         "cleanButton",
-        "petButton",
-        "fish",
+
+        "sleepButton",
+
         "foodTray",
-        "foodPieces"
+
+        "foodPieces",
+
+        "heartContainer"
 
     ];
 
 
     for (
         let i = 0;
-        i < requiredElements.length;
+        i < required.length;
         i++
     ) {
 
         const name =
-            requiredElements[i];
+            required[i];
 
 
         if (
@@ -182,7 +202,7 @@ function startGame() {
         ) {
 
             console.error(
-                "FIN & FRIENDS ERROR: Missing HTML element:",
+                "FIN & FRIENDS: Missing element:",
                 name
             );
 
@@ -194,7 +214,7 @@ function startGame() {
 
 
     /* =================================================
-       GAME STATE
+       DEFAULT GAME STATE
     ================================================= */
 
     const defaultState = {
@@ -202,6 +222,10 @@ function startGame() {
         name: "BUBBLES",
 
         day: 1,
+
+        /*
+            08:00 in-game start time.
+        */
 
         minutes: 480,
 
@@ -219,36 +243,40 @@ function startGame() {
 
         loveToday: 0,
 
-        lastSaved: Date.now()
+        sleeping: false,
+
+        lastSaved:
+            Date.now()
 
     };
 
+
+    /* =================================================
+       LOAD SAVE
+    ================================================= */
 
     let state =
         loadState();
 
 
-    /*
-        This tells the feeding system whether
-        food is currently available.
-    */
+    /* =================================================
+       LOCAL VARIABLES
+    ================================================= */
 
-    let foodOpen = false;
-
-
-    /*
-        This prevents the player from clicking
-        multiple food pieces at exactly the same time.
-    */
-
-    let eating = false;
+    let foodOpen =
+        false;
 
 
-    let toastTimer = null;
+    let eating =
+        false;
+
+
+    let toastTimer =
+        null;
 
 
     /* =================================================
-       HELPER: CLAMP NUMBER
+       NUMBER CLAMP
     ================================================= */
 
     function clamp(
@@ -269,7 +297,7 @@ function startGame() {
 
 
     /* =================================================
-       LOAD SAVE
+       LOAD GAME
     ================================================= */
 
     function loadState() {
@@ -283,7 +311,7 @@ function startGame() {
 
 
             if (
-                saved === null
+                !saved
             ) {
 
                 return {
@@ -310,7 +338,7 @@ function startGame() {
         catch (error) {
 
             console.error(
-                "Could not load save:",
+                "Save loading error:",
                 error
             );
 
@@ -325,7 +353,7 @@ function startGame() {
 
 
     /* =================================================
-       SAVE
+       SAVE GAME
     ================================================= */
 
     function saveState() {
@@ -346,7 +374,7 @@ function startGame() {
         catch (error) {
 
             console.error(
-                "Could not save game:",
+                "Save error:",
                 error
             );
 
@@ -360,12 +388,12 @@ function startGame() {
     ================================================= */
 
     function updateBar(
-        barElement,
-        valueElement,
+        bar,
+        number,
         value
     ) {
 
-        const safeValue =
+        const safe =
             clamp(
                 Number(value) || 0,
                 0,
@@ -373,43 +401,38 @@ function startGame() {
             );
 
 
-        barElement.style.width =
-            safeValue + "%";
+        bar.style.width =
+            safe + "%";
 
 
-        valueElement.textContent =
+        number.textContent =
             Math.round(
-                safeValue
+                safe
             );
 
     }
 
 
     /* =================================================
-       RENDER EVERYTHING
+       RENDER
     ================================================= */
 
     function render() {
 
-        /*
-            Name
-        */
+
+        /* NAME */
 
         elements.fishName.textContent =
             state.name;
 
 
-        /*
-            Day
-        */
+        /* DAY */
 
         elements.day.textContent =
             state.day;
 
 
-        /*
-            Clock
-        */
+        /* TIME */
 
         const hours =
             Math.floor(
@@ -436,9 +459,7 @@ function startGame() {
                 .padStart(2, "0");
 
 
-        /*
-            Health
-        */
+        /* HEALTH */
 
         updateBar(
             elements.healthBar,
@@ -447,9 +468,7 @@ function startGame() {
         );
 
 
-        /*
-            Hunger
-        */
+        /* HUNGER */
 
         updateBar(
             elements.hungerBar,
@@ -458,9 +477,7 @@ function startGame() {
         );
 
 
-        /*
-            Affection
-        */
+        /* LOVE */
 
         updateBar(
             elements.affectionBar,
@@ -469,9 +486,7 @@ function startGame() {
         );
 
 
-        /*
-            Energy
-        */
+        /* ENERGY */
 
         updateBar(
             elements.energyBar,
@@ -480,15 +495,23 @@ function startGame() {
         );
 
 
-        /*
-            Missions
-        */
+        /* CLEAN */
+
+        updateBar(
+            elements.cleanlinessBar,
+            elements.cleanlinessValue,
+            state.cleanliness
+        );
+
+
+        /* MISSIONS */
 
         elements.foodCount.textContent =
             Math.min(
                 state.foodToday,
                 3
-            ) +
+            )
+            +
             " / 3";
 
 
@@ -496,11 +519,59 @@ function startGame() {
             Math.min(
                 state.loveToday,
                 3
-            ) +
+            )
+            +
             " / 3";
 
 
+        /* SLEEP VISUALS */
+
+        if (
+            state.sleeping
+        ) {
+
+            elements.fish.classList.add(
+                "sleeping"
+            );
+
+            elements.fishBlanket.classList.remove(
+                "hidden"
+            );
+
+            elements.fishPillow.classList.remove(
+                "hidden"
+            );
+
+            elements.sleepZzz.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        else {
+
+            elements.fish.classList.remove(
+                "sleeping"
+            );
+
+            elements.fishBlanket.classList.add(
+                "hidden"
+            );
+
+            elements.fishPillow.classList.add(
+                "hidden"
+            );
+
+            elements.sleepZzz.classList.add(
+                "hidden"
+            );
+
+        }
+
+
         updateMood();
+
+        updateSleepWarning();
 
     }
 
@@ -511,19 +582,42 @@ function startGame() {
 
     function updateMood() {
 
+        if (
+            state.sleeping
+        ) {
+
+            elements.moodIcon.textContent =
+                "☾";
+
+            elements.moodText.textContent =
+                "SLEEPING";
+
+            elements.statusText.textContent =
+                "Z Z Z...";
+
+            return;
+
+        }
+
+
         const average =
 
             (
                 state.health +
                 state.hunger +
                 state.affection +
-                state.energy
-            ) / 4;
+                state.energy +
+                state.cleanliness
+            ) / 5;
 
 
-        let icon = "♥";
+        let icon =
+            "♥";
 
-        let mood = "HAPPY";
+
+        let mood =
+            "HAPPY";
+
 
         let message =
             "READY TO PLAY!";
@@ -533,9 +627,11 @@ function startGame() {
             state.health <= 25
         ) {
 
-            icon = "☹";
+            icon =
+                "☹";
 
-            mood = "SICK";
+            mood =
+                "SICK";
 
             message =
                 "I DON'T FEEL GOOD!";
@@ -546,9 +642,11 @@ function startGame() {
             state.hunger <= 20
         ) {
 
-            icon = "●";
+            icon =
+                "●";
 
-            mood = "HUNGRY";
+            mood =
+                "HUNGRY";
 
             message =
                 "MY TUMMY IS EMPTY!";
@@ -556,12 +654,29 @@ function startGame() {
         }
 
         else if (
-            state.cleanliness <= 25
+            state.energy <= 18
         ) {
 
-            icon = "×";
+            icon =
+                "☾";
 
-            mood = "GRUMPY";
+            mood =
+                "SLEEPY";
+
+            message =
+                "I NEED A NAP!";
+
+        }
+
+        else if (
+            state.cleanliness <= 20
+        ) {
+
+            icon =
+                "×";
+
+            mood =
+                "GRUMPY";
 
             message =
                 "MY TANK IS DIRTY!";
@@ -572,9 +687,11 @@ function startGame() {
             average >= 75
         ) {
 
-            icon = "♥";
+            icon =
+                "♥";
 
-            mood = "DELIGHTED";
+            mood =
+                "DELIGHTED";
 
             message =
                 "I LOVE YOU!";
@@ -585,9 +702,11 @@ function startGame() {
             average >= 50
         ) {
 
-            icon = "♡";
+            icon =
+                "♡";
 
-            mood = "HAPPY";
+            mood =
+                "HAPPY";
 
             message =
                 "READY TO PLAY!";
@@ -596,9 +715,11 @@ function startGame() {
 
         else {
 
-            icon = "…";
+            icon =
+                "…";
 
-            mood = "LONELY";
+            mood =
+                "LONELY";
 
             message =
                 "COME PLAY WITH ME!";
@@ -616,6 +737,46 @@ function startGame() {
 
         elements.statusText.textContent =
             message;
+
+    }
+
+
+    /* =================================================
+       SLEEP WARNING
+    ================================================= */
+
+    function updateSleepWarning() {
+
+        if (
+            state.sleeping
+        ) {
+
+            elements.sleepWarning.classList.add(
+                "hidden"
+            );
+
+            return;
+
+        }
+
+
+        if (
+            state.energy <= 25
+        ) {
+
+            elements.sleepWarning.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        else {
+
+            elements.sleepWarning.classList.add(
+                "hidden"
+            );
+
+        }
 
     }
 
@@ -665,53 +826,420 @@ function startGame() {
                     );
 
                 },
-                1600
+                1500
             );
 
     }
 
 
     /* =================================================
-       BUTTON: FEED
+       CUSTOM CURSOR
+    ================================================= */
+
+    if (
+        window.matchMedia(
+            "(pointer: fine)"
+        ).matches
+    ) {
+
+        document.addEventListener(
+            "mousemove",
+            function (event) {
+
+                elements.handCursor.style.left =
+                    event.clientX + "px";
+
+
+                elements.handCursor.style.top =
+                    event.clientY + "px";
+
+            }
+        );
+
+
+        document.addEventListener(
+            "mousedown",
+            function () {
+
+                elements.handCursor.classList.add(
+                    "clicking"
+                );
+
+            }
+        );
+
+
+        document.addEventListener(
+            "mouseup",
+            function () {
+
+                elements.handCursor.classList.remove(
+                    "clicking"
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       PET FISH BY CLICKING FISH
+    ================================================= */
+
+    elements.fish.addEventListener(
+        "click",
+        function (event) {
+
+            /*
+                If sleeping, clicking the fish
+                should wake it instead of petting it.
+            */
+
+            if (
+                state.sleeping
+            ) {
+
+                wakeFish();
+
+                return;
+
+            }
+
+
+            petFish(
+                event.clientX,
+                event.clientY
+            );
+
+        }
+    );
+
+
+    /* =================================================
+       KEYBOARD PETTING
+    ================================================= */
+
+    elements.fish.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+
+                event.preventDefault();
+
+
+                if (
+                    state.sleeping
+                ) {
+
+                    wakeFish();
+
+                }
+
+                else {
+
+                    const rect =
+                        elements.fish.getBoundingClientRect();
+
+
+                    petFish(
+                        rect.left +
+                        rect.width / 2,
+
+                        rect.top +
+                        rect.height / 2
+                    );
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =================================================
+       PET FUNCTION
+    ================================================= */
+
+    function petFish(
+        x,
+        y
+    ) {
+
+        /*
+            Increase affection.
+        */
+
+        state.affection =
+            clamp(
+                state.affection + 7,
+                0,
+                100
+            );
+
+
+        /*
+            A little happiness gives
+            the fish energy.
+        */
+
+        state.energy =
+            clamp(
+                state.energy + 2,
+                0,
+                100
+            );
+
+
+        /*
+            Daily love mission.
+        */
+
+        state.loveToday +=
+            1;
+
+
+        /*
+            Animate fish.
+        */
+
+        elements.fish.classList.remove(
+            "petted"
+        );
+
+
+        void elements.fish.offsetWidth;
+
+
+        elements.fish.classList.add(
+            "petted"
+        );
+
+
+        /*
+            Create several hearts
+            around the fish.
+        */
+
+        createPetHearts(
+            x,
+            y
+        );
+
+
+        /*
+            Update state.
+        */
+
+        render();
+
+        saveState();
+
+
+        /*
+            Feedback.
+        */
+
+        speak(
+            "THAT TICKLES! ♥"
+        );
+
+
+        showToast(
+            "+7 LOVE"
+        );
+
+
+        /*
+            Remove animation class
+            after it finishes.
+        */
+
+        setTimeout(
+            function () {
+
+                elements.fish.classList.remove(
+                    "petted"
+                );
+
+            },
+            600
+        );
+
+    }
+
+
+    /* =================================================
+       CREATE PET HEARTS
+    ================================================= */
+
+    function createPetHearts(
+        x,
+        y
+    ) {
+
+        const aquariumRect =
+            elements.aquarium.getBoundingClientRect();
+
+
+        /*
+            Create 5 hearts.
+        */
+
+        for (
+            let i = 0;
+            i < 5;
+            i++
+        ) {
+
+            const heart =
+                document.createElement(
+                    "div"
+                );
+
+
+            heart.className =
+                "pet-heart";
+
+
+            heart.textContent =
+                i % 2 === 0
+                    ? "♥"
+                    : "♡";
+
+
+            /*
+                Position relative to aquarium.
+            */
+
+            const randomX =
+                x -
+                aquariumRect.left +
+                (
+                    Math.random() * 80
+                ) -
+                40;
+
+
+            const randomY =
+                y -
+                aquariumRect.top +
+                (
+                    Math.random() * 45
+                ) -
+                20;
+
+
+            heart.style.left =
+                randomX + "px";
+
+
+            heart.style.top =
+                randomY + "px";
+
+
+            /*
+                Random horizontal movement.
+            */
+
+            const movement =
+                (
+                    Math.random() * 100
+                ) - 50;
+
+
+            heart.style.setProperty(
+                "--heart-x",
+                movement + "px"
+            );
+
+
+            /*
+                Slightly different sizes.
+            */
+
+            heart.style.fontSize =
+                (
+                    17 +
+                    Math.random() * 12
+                ) +
+                "px";
+
+
+            elements.heartContainer.appendChild(
+                heart
+            );
+
+
+            /*
+                Remove after animation.
+            */
+
+            setTimeout(
+                function () {
+
+                    heart.remove();
+
+                },
+                1500
+            );
+
+        }
+
+    }
+
+
+    /* =================================================
+       FEED BUTTON
     ================================================= */
 
     elements.feedButton.addEventListener(
         "click",
         function () {
 
-            handleFeedButton();
+            if (
+                state.sleeping
+            ) {
+
+                speak(
+                    "Z Z Z... I'M ASLEEP!"
+                );
+
+                showToast(
+                    "FISH IS SLEEPING"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                foodOpen
+            ) {
+
+                speak(
+                    "PICK A SNACK!"
+                );
+
+                return;
+
+            }
+
+
+            createFoodTray();
 
         }
     );
 
 
-    function handleFeedButton() {
-
-        /*
-            If food is already on screen,
-            don't create another tray.
-        */
-
-        if (
-            foodOpen
-        ) {
-
-            speak(
-                "CHOOSE A SNACK!"
-            );
-
-            return;
-
-        }
-
-
-        createFoodTray();
-
-    }
-
-
     /* =================================================
-       CREATE FOOD
+       CREATE FOOD TRAY
     ================================================= */
 
     function createFoodTray() {
@@ -743,11 +1271,6 @@ function startGame() {
         );
 
 
-        /*
-            Create exactly three
-            clickable food pieces.
-        */
-
         for (
             let i = 0;
             i < 3;
@@ -773,13 +1296,6 @@ function startGame() {
                 "Feed fish"
             );
 
-
-            /*
-                THIS IS THE IMPORTANT EVENT:
-
-                Clicking the food calls
-                feedFish().
-            */
 
             food.addEventListener(
                 "click",
@@ -817,24 +1333,15 @@ function startGame() {
         foodElement
     ) {
 
-        /*
-            Don't allow two foods to
-            be eaten simultaneously.
-        */
-
         if (
-            eating
+            eating ||
+            state.sleeping
         ) {
 
             return;
 
         }
 
-
-        /*
-            Make sure the clicked element
-            still exists.
-        */
 
         if (
             !foodElement ||
@@ -850,26 +1357,16 @@ function startGame() {
             true;
 
 
-        /*
-            Get the position of the
-            food before moving it.
-        */
-
         const foodRect =
             foodElement.getBoundingClientRect();
 
-
-        /*
-            Get the position of the fish.
-        */
 
         const fishRect =
             elements.fish.getBoundingClientRect();
 
 
         /*
-            Turn the food into a floating
-            fixed-position object.
+            Move food to fixed screen coordinates.
         */
 
         foodElement.style.position =
@@ -892,52 +1389,27 @@ function startGame() {
             "none";
 
 
-        /*
-            Move the food into the body
-            so aquarium positioning cannot
-            interfere with it.
-        */
-
         document.body.appendChild(
             foodElement
         );
 
 
-        /*
-            Force the browser to apply
-            the starting position before
-            changing it.
-        */
-
         void foodElement.offsetWidth;
 
-
-        /*
-            Calculate the target position.
-        */
 
         const targetLeft =
 
             fishRect.left +
-            (
-                fishRect.width / 2
-            ) -
+            fishRect.width / 2 -
             12;
 
 
         const targetTop =
 
             fishRect.top +
-            (
-                fishRect.height / 2
-            ) -
+            fishRect.height / 2 -
             12;
 
-
-        /*
-            Animate the food toward
-            the fish.
-        */
 
         foodElement.style.transition =
 
@@ -959,20 +1431,11 @@ function startGame() {
 
 
         /*
-            After the food reaches the fish,
-            actually update the GAME STATE.
+            Food reaches fish.
         */
 
         setTimeout(
             function () {
-
-                /*
-                    IMPORTANT:
-
-                    The actual hunger increase
-                    happens here, not when the
-                    FEED button is pressed.
-                */
 
                 state.hunger =
                     clamp(
@@ -1002,10 +1465,6 @@ function startGame() {
                     1;
 
 
-                /*
-                    Open fish mouth.
-                */
-
                 elements.fish.classList.add(
                     "fish-eating"
                 );
@@ -1021,16 +1480,7 @@ function startGame() {
                 );
 
 
-                /*
-                    Update bars immediately.
-                */
-
                 render();
-
-
-                /*
-                    Save immediately.
-                */
 
                 saveState();
 
@@ -1040,8 +1490,7 @@ function startGame() {
 
 
         /*
-            Remove the food after
-            the eating animation.
+            Remove food.
         */
 
         setTimeout(
@@ -1062,19 +1511,9 @@ function startGame() {
                 );
 
 
-                /*
-                    Allow another food
-                    to be selected.
-                */
-
                 eating =
                     false;
 
-
-                /*
-                    Check whether any
-                    food pieces remain.
-                */
 
                 const remaining =
                     elements.foodPieces.querySelectorAll(
@@ -1128,375 +1567,362 @@ function startGame() {
 
 
     /* =================================================
-       BUTTON: PLAY
+       PLAY BUTTON
     ================================================= */
 
     elements.playButton.addEventListener(
         "click",
         function () {
 
-            playWithFish();
+            if (
+                state.sleeping
+            ) {
+
+                speak(
+                    "Z Z Z... I'M ASLEEP!"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                state.energy < 15
+            ) {
+
+                speak(
+                    "Zzz... I'M TOO TIRED!"
+                );
+
+
+                showToast(
+                    "NOT ENOUGH ENERGY"
+                );
+
+
+                return;
+
+            }
+
+
+            state.affection =
+                clamp(
+                    state.affection + 10,
+                    0,
+                    100
+                );
+
+
+            state.energy =
+                clamp(
+                    state.energy - 12,
+                    0,
+                    100
+                );
+
+
+            state.hunger =
+                clamp(
+                    state.hunger - 3,
+                    0,
+                    100
+                );
+
+
+            state.loveToday +=
+                1;
+
+
+            render();
+
+            saveState();
+
+
+            speak(
+                "WHEEEEE! ★"
+            );
+
+
+            showToast(
+                "+10 LOVE"
+            );
+
+
+            elements.fish.animate(
+                [
+                    {
+                        transform:
+                            "rotate(0deg)"
+                    },
+
+                    {
+                        transform:
+                            "rotate(-8deg)"
+                    },
+
+                    {
+                        transform:
+                            "rotate(8deg)"
+                    },
+
+                    {
+                        transform:
+                            "rotate(-5deg)"
+                    },
+
+                    {
+                        transform:
+                            "rotate(0deg)"
+                    }
+                ],
+                {
+                    duration: 700,
+
+                    easing:
+                        "steps(5,end)"
+                }
+            );
 
         }
     );
 
 
-    function playWithFish() {
-
-        /*
-            Playing requires energy.
-        */
-
-        if (
-            state.energy < 15
-        ) {
-
-            speak(
-                "Zzz... I'M TIRED!"
-            );
-
-
-            showToast(
-                "NOT ENOUGH ENERGY"
-            );
-
-
-            return;
-
-        }
-
-
-        /*
-            GAME STATE CHANGES.
-        */
-
-        state.affection =
-            clamp(
-                state.affection + 10,
-                0,
-                100
-            );
-
-
-        state.energy =
-            clamp(
-                state.energy - 12,
-                0,
-                100
-            );
-
-
-        state.hunger =
-            clamp(
-                state.hunger - 3,
-                0,
-                100
-            );
-
-
-        state.loveToday +=
-            1;
-
-
-        /*
-            Update screen.
-        */
-
-        render();
-
-
-        /*
-            Save.
-        */
-
-        saveState();
-
-
-        /*
-            Feedback.
-        */
-
-        speak(
-            "WHEEEEE! ★"
-        );
-
-
-        showToast(
-            "+10 LOVE"
-        );
-
-
-        /*
-            Animate the fish.
-        */
-
-        elements.fish.animate(
-            [
-                {
-                    transform:
-                        "rotate(0deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(-8deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(8deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(-5deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(0deg)"
-                }
-            ],
-            {
-                duration: 700,
-
-                easing:
-                    "steps(5, end)"
-            }
-        );
-
-    }
-
-
     /* =================================================
-       BUTTON: CLEAN
+       CLEAN BUTTON
     ================================================= */
 
     elements.cleanButton.addEventListener(
         "click",
         function () {
 
-            cleanTank();
+            if (
+                state.sleeping
+            ) {
+
+                speak(
+                    "SHHH... I'M SLEEPING!"
+                );
+
+                return;
+
+            }
+
+
+            state.cleanliness =
+                clamp(
+                    state.cleanliness + 35,
+                    0,
+                    100
+                );
+
+
+            state.health =
+                clamp(
+                    state.health + 6,
+                    0,
+                    100
+                );
+
+
+            state.affection =
+                clamp(
+                    state.affection + 3,
+                    0,
+                    100
+                );
+
+
+            render();
+
+            saveState();
+
+
+            speak(
+                "SPARKLY! ✧"
+            );
+
+
+            showToast(
+                "TANK CLEANED!"
+            );
+
+
+            elements.aquarium.animate(
+                [
+                    {
+                        filter:
+                            "brightness(1)"
+                    },
+
+                    {
+                        filter:
+                            "brightness(1.4)"
+                    },
+
+                    {
+                        filter:
+                            "brightness(1)"
+                    }
+                ],
+                {
+                    duration: 500
+                }
+            );
 
         }
     );
 
 
-    function cleanTank() {
+    /* =================================================
+       SLEEP BUTTON
+    ================================================= */
 
-        /*
-            Improve cleanliness.
-        */
+    elements.sleepButton.addEventListener(
+        "click",
+        function () {
 
-        state.cleanliness =
-            clamp(
-                state.cleanliness + 35,
-                0,
-                100
-            );
+            if (
+                state.sleeping
+            ) {
 
+                wakeFish();
 
-        /*
-            Cleaning also slightly
-            improves health.
-        */
+                return;
 
-        state.health =
-            clamp(
-                state.health + 6,
-                0,
-                100
-            );
+            }
 
 
-        /*
-            Fish likes having a clean home.
-        */
+            sleepFish();
 
-        state.affection =
-            clamp(
-                state.affection + 3,
-                0,
-                100
-            );
+        }
+    );
 
 
-        /*
-            Update game.
-        */
+    /* =================================================
+       SLEEP FISH
+    ================================================= */
+
+    function sleepFish() {
+
+        if (
+            state.sleeping
+        ) {
+
+            return;
+
+        }
+
+
+        state.sleeping =
+            true;
+
+
+        foodOpen =
+            false;
+
+
+        eating =
+            false;
+
+
+        elements.foodTray.classList.add(
+            "hidden"
+        );
+
+
+        elements.foodMessage.classList.add(
+            "hidden"
+        );
+
+
+        speak(
+            "GOODNIGHT... ♥"
+        );
+
+
+        showToast(
+            "SLEEP TIGHT!"
+        );
+
 
         render();
-
 
         saveState();
 
 
         /*
-            Feedback.
+            Change the button to WAKE.
         */
 
-        speak(
-            "SPARKLY! ✧"
-        );
-
-
-        showToast(
-            "TANK CLEANED!"
-        );
-
-
-        /*
-            Visual flash.
-
-            This animation is NOT required
-            for the actual cleaning to work.
-        */
-
-        elements.aquarium.animate(
-            [
-                {
-                    filter:
-                        "brightness(1)"
-                },
-
-                {
-                    filter:
-                        "brightness(1.5)"
-                },
-
-                {
-                    filter:
-                        "brightness(1)"
-                }
-            ],
-            {
-                duration: 500
-            }
-        );
+        elements.sleepButton.innerHTML =
+            "☀<span>WAKE</span>";
 
     }
 
 
     /* =================================================
-       BUTTON: PET
+       WAKE FISH
     ================================================= */
 
-    elements.petButton.addEventListener(
-        "click",
-        function () {
+    function wakeFish() {
 
-            petFish();
+        if (
+            !state.sleeping
+        ) {
+
+            return;
 
         }
-    );
 
 
-    function petFish() {
-
-        /*
-            Increase affection.
-        */
-
-        state.affection =
-            clamp(
-                state.affection + 7,
-                0,
-                100
-            );
+        state.sleeping =
+            false;
 
 
         /*
-            Small energy bonus.
+            Sleeping restores energy.
         */
 
         state.energy =
             clamp(
-                state.energy + 2,
+                state.energy + 45,
                 0,
                 100
             );
 
 
-        /*
-            Daily love counter.
-        */
+        state.health =
+            clamp(
+                state.health + 5,
+                0,
+                100
+            );
 
-        state.loveToday +=
-            1;
-
-
-        /*
-            Update immediately.
-        */
 
         render();
-
-
-        /*
-            Save immediately.
-        */
 
         saveState();
 
 
-        /*
-            Feedback.
-        */
+        elements.sleepButton.innerHTML =
+            "☾<span>SLEEP</span>";
+
 
         speak(
-            "THAT TICKLES! ♥"
+            "GOOD MORNING! ☀"
         );
 
 
         showToast(
-            "+7 LOVE"
-        );
-
-
-        /*
-            Fish wiggle.
-        */
-
-        elements.fish.animate(
-            [
-                {
-                    transform:
-                        "rotate(0deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(-10deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(10deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(-6deg)"
-                },
-
-                {
-                    transform:
-                        "rotate(0deg)"
-                }
-            ],
-            {
-                duration: 550,
-
-                easing:
-                    "steps(5, end)"
-            }
+            "+45 ENERGY"
         );
 
     }
 
 
     /* =================================================
-       RENAME BUTTON
+       NAME BUTTON
     ================================================= */
 
     elements.renameButton.addEventListener(
@@ -1514,7 +1940,6 @@ function startGame() {
 
             elements.nameInput.focus();
 
-
             elements.nameInput.select();
 
         }
@@ -1525,7 +1950,7 @@ function startGame() {
        CANCEL NAME
     ================================================= */
 
-    elements.cancelNameButton.addEventListener(
+    elements.cancelName.addEventListener(
         "click",
         function () {
 
@@ -1541,24 +1966,20 @@ function startGame() {
        SAVE NAME
     ================================================= */
 
-    elements.saveNameButton.addEventListener(
+    elements.saveName.addEventListener(
         "click",
-        function () {
-
-            saveName();
-
-        }
+        saveName
     );
 
 
     function saveName() {
 
-        const enteredName =
+        const name =
             elements.nameInput.value.trim();
 
 
         if (
-            enteredName.length === 0
+            name.length === 0
         ) {
 
             showToast(
@@ -1571,7 +1992,7 @@ function startGame() {
 
 
         state.name =
-            enteredName
+            name
                 .toUpperCase()
                 .substring(
                     0,
@@ -1586,12 +2007,11 @@ function startGame() {
 
         render();
 
-
         saveState();
 
 
         speak(
-            "THAT'S A CUTE NAME! ♥"
+            "I LOVE MY NEW NAME! ♥"
         );
 
 
@@ -1603,7 +2023,7 @@ function startGame() {
 
 
     /* =================================================
-       NAME KEYBOARD
+       ENTER / ESCAPE NAME
     ================================================= */
 
     elements.nameInput.addEventListener(
@@ -1634,7 +2054,7 @@ function startGame() {
 
 
     /* =================================================
-       RESET BUTTON
+       RESET
     ================================================= */
 
     elements.resetButton.addEventListener(
@@ -1683,8 +2103,11 @@ function startGame() {
             );
 
 
-            render();
+            elements.sleepButton.innerHTML =
+                "☾<span>SLEEP</span>";
 
+
+            render();
 
             saveState();
 
@@ -1704,27 +2127,54 @@ function startGame() {
 
 
     /* =================================================
-       GAME CLOCK
+       GAME TIME
+    ==================================================
+
+       IMPORTANT:
+
+       120000 milliseconds = 2 minutes.
+
+       Every 2 real-world minutes:
+       +1 in-game hour.
+
+       So:
+
+       2 real minutes = 1 fish hour
+       24 real minutes = 12 fish hours
+       48 real minutes = 24 fish hours
+
     ================================================= */
+
+    const GAME_TIME_INTERVAL =
+        120000;
+
 
     setInterval(
         function () {
 
-            advanceTime();
+            advanceFishTime();
 
         },
-        60000
+        GAME_TIME_INTERVAL
     );
 
 
-    function advanceTime() {
+    /* =================================================
+       ADVANCE FISH TIME
+    ================================================= */
+
+    function advanceFishTime() {
 
         /*
-            10 minutes pass every real minute.
+            If the fish is asleep,
+            time still passes.
+
+            Sleeping is actually useful
+            because the fish restores energy.
         */
 
         state.minutes +=
-            10;
+            60;
 
 
         /*
@@ -1754,74 +2204,139 @@ function startGame() {
 
 
         /*
-            Fish gets gradually hungry.
-        */
+            The fish's needs change each
+            in-game hour.
 
-        state.hunger =
-            clamp(
-                state.hunger - 1,
-                0,
-                100
-            );
-
-
-        /*
-            Energy slowly decreases.
-        */
-
-        state.energy =
-            clamp(
-                state.energy - .5,
-                0,
-                100
-            );
-
-
-        /*
-            Tank slowly becomes dirty.
-        */
-
-        state.cleanliness =
-            clamp(
-                state.cleanliness - .5,
-                0,
-                100
-            );
-
-
-        /*
-            Hunger that gets too low
-            eventually affects health.
+            Sleeping greatly reduces the
+            negative effects.
         */
 
         if (
-            state.hunger < 20
+            state.sleeping
         ) {
+
+            /*
+                While sleeping:
+
+                Energy increases.
+                Health slowly improves.
+                Hunger falls slightly.
+            */
+
+            state.energy =
+                clamp(
+                    state.energy + 12,
+                    0,
+                    100
+                );
+
 
             state.health =
                 clamp(
-                    state.health - 1,
+                    state.health + 2,
+                    0,
+                    100
+                );
+
+
+            state.hunger =
+                clamp(
+                    state.hunger - 2,
                     0,
                     100
                 );
 
         }
 
+        else {
 
-        /*
-            Dirty water affects health.
-        */
+            /*
+                Awake fish uses energy.
+            */
 
-        if (
-            state.cleanliness < 20
-        ) {
-
-            state.health =
+            state.energy =
                 clamp(
-                    state.health - 1,
+                    state.energy - 7,
                     0,
                     100
                 );
+
+
+            /*
+                Fish gets hungry.
+            */
+
+            state.hunger =
+                clamp(
+                    state.hunger - 5,
+                    0,
+                    100
+                );
+
+
+            /*
+                Tank gets gradually dirtier.
+            */
+
+            state.cleanliness =
+                clamp(
+                    state.cleanliness - 3,
+                    0,
+                    100
+                );
+
+
+            /*
+                Very low hunger damages health.
+            */
+
+            if (
+                state.hunger < 20
+            ) {
+
+                state.health =
+                    clamp(
+                        state.health - 3,
+                        0,
+                        100
+                    );
+
+            }
+
+
+            /*
+                Very dirty tank damages health.
+            */
+
+            if (
+                state.cleanliness < 20
+            ) {
+
+                state.health =
+                    clamp(
+                        state.health - 2,
+                        0,
+                        100
+                    );
+
+            }
+
+        }
+
+
+        /*
+            If energy gets critically low,
+            tell the player.
+        */
+
+        if (
+            state.energy <= 20 &&
+            !state.sleeping
+        ) {
+
+            speak(
+                "I'M REALLY SLEEPY... ☾"
+            );
 
         }
 
@@ -1834,18 +2349,14 @@ function startGame() {
 
 
     /* =================================================
-       RANDOM FISH TALK
+       RANDOM FISH CHAT
     ================================================= */
 
     setInterval(
         function () {
 
-            /*
-                Don't interrupt the feeding
-                interface.
-            */
-
             if (
+                state.sleeping ||
                 foodOpen
             ) {
 
@@ -1858,24 +2369,24 @@ function startGame() {
 
                 "BLOOP BLOOP!",
 
-                "LOOK AT MY FINS!",
-
                 "HELLO HUMAN!",
+
+                "LOOK AT MY FINS!",
 
                 "CAN WE PLAY?",
 
-                "I LOVE MY TANK ♥",
+                "I LOVE YOU ♥",
 
                 "THE WATER IS NICE!",
 
                 "DID YOU SEE THAT?",
 
-                "♥ ♥ ♥"
+                "BLOOP!"
 
             ];
 
 
-            const randomIndex =
+            const index =
                 Math.floor(
                     Math.random() *
                     messages.length
@@ -1883,7 +2394,7 @@ function startGame() {
 
 
             speak(
-                messages[randomIndex]
+                messages[index]
             );
 
         },
@@ -1892,17 +2403,53 @@ function startGame() {
 
 
     /* =================================================
-       FIRST RENDER
+       AUTO SLEEP SUGGESTION
+    ================================================= */
+
+    setInterval(
+        function () {
+
+            if (
+                state.sleeping
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                state.energy <= 10
+            ) {
+
+                speak(
+                    "I CAN'T STAY AWAKE... ☾"
+                );
+
+
+                /*
+                    We don't force sleep immediately.
+
+                    The player still chooses to
+                    press SLEEP.
+
+                    This makes sleep a game mechanic
+                    rather than an interruption.
+                */
+
+            }
+
+        },
+        5000
+    );
+
+
+    /* =================================================
+       INITIAL RENDER
     ================================================= */
 
     render();
 
-
-    /*
-        Give the player an immediate
-        confirmation that the game
-        has initialized.
-    */
 
     console.log(
         "FIN & FRIENDS loaded successfully."
