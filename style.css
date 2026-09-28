@@ -1,10 +1,4 @@
 /* =========================================================
-   GOL-DIE
-   PIXEL AQUARIUM
-========================================================= */
-
-
-/* =========================================================
    RESET
 ========================================================= */
 
@@ -20,6 +14,7 @@
 
 html,
 body {
+
     width: 100%;
     height: 100%;
 
@@ -34,9 +29,11 @@ body {
 
 
 body {
+
     cursor: none;
 
     user-select: none;
+
     -webkit-user-select: none;
 }
 
@@ -59,18 +56,17 @@ body {
     background:
         linear-gradient(
             180deg,
-            #274a55 0%,
-            #315963 30%,
-            #38656d 58%,
-            #315b63 78%,
-            #25494f 100%
+            #284b56 0%,
+            #315a64 28%,
+            #386670 55%,
+            #315d65 75%,
+            #254b51 100%
         );
-
 }
 
 
 /* =========================================================
-   GLASS
+   GLASS BORDER
 ========================================================= */
 
 #aquarium::after {
@@ -81,12 +77,18 @@ body {
 
     inset: 0;
 
-    border: 6px solid rgba(10, 25, 29, 0.78);
+    border:
+        6px solid
+        rgba(
+            12,
+            27,
+            31,
+            0.8
+        );
 
     pointer-events: none;
 
     z-index: 900;
-
 }
 
 
@@ -104,14 +106,13 @@ body {
 
     height: 3px;
 
-    background: #b5ddd4;
+    background: #a7d3cb;
 
     opacity: 0.11;
 
     pointer-events: none;
 
     z-index: 1;
-
 }
 
 
@@ -131,7 +132,7 @@ body {
 
 
 /* =========================================================
-   LIGHT RAYS
+   WATER LIGHT
 ========================================================= */
 
 .light {
@@ -140,35 +141,31 @@ body {
 
     top: -20%;
 
-    width: 110px;
+    width: 100px;
     height: 150%;
 
-    background: #d8eee6;
+    background: #cce8df;
 
     opacity: 0.035;
 
     pointer-events: none;
 
-    z-index: 1;
+    transform: rotate(9deg);
 
+    z-index: 1;
 }
 
 
 .light-one {
-
     left: 10%;
-
-    transform: rotate(9deg);
-
 }
 
 
 .light-two {
 
-    left: 40%;
+    left: 39%;
 
     transform: rotate(-7deg);
-
 }
 
 
@@ -177,7 +174,6 @@ body {
     right: 12%;
 
     transform: rotate(11deg);
-
 }
 
 
@@ -195,14 +191,13 @@ body {
 
     background: #315d49;
 
+    z-index: 3;
+
     opacity: 0.85;
 
     pointer-events: none;
 
     transform-origin: bottom;
-
-    z-index: 3;
-
 }
 
 
@@ -217,7 +212,6 @@ body {
     height: 12px;
 
     background: #3a6b51;
-
 }
 
 
@@ -227,7 +221,6 @@ body {
     bottom: 30px;
 
     transform: rotate(-20deg);
-
 }
 
 
@@ -237,39 +230,69 @@ body {
     bottom: 65px;
 
     transform: rotate(20deg);
-
 }
 
 
 .plant-one {
 
     left: 7%;
-    height: 150px;
 
+    height: 150px;
 }
 
 
 .plant-two {
 
     left: 13%;
-    height: 100px;
 
+    height: 100px;
 }
 
 
 .plant-three {
 
     right: 8%;
-    height: 175px;
 
+    height: 175px;
 }
 
 
 .plant-four {
 
     right: 15%;
-    height: 115px;
 
+    height: 115px;
+}
+
+
+/* =========================================================
+   GRAVEL
+========================================================= */
+
+#gravel {
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+
+    height: 58px;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #283f3d 0 9px,
+            #354e48 9px 18px,
+            #41584b 18px 27px,
+            #2b4542 27px 38px
+        );
+
+    border-top:
+        5px solid #1e3539;
+
+    z-index: 5;
 }
 
 
@@ -284,50 +307,31 @@ body {
     width: 7px;
     height: 7px;
 
-    border: 2px solid rgba(190, 225, 216, 0.45);
+    border:
+        2px solid
+        rgba(
+            190,
+            225,
+            216,
+            0.45
+        );
 
     pointer-events: none;
 
     z-index: 4;
 
     animation:
-        rise 7s linear infinite;
-
-}
-
-
-.bubble-one {
-    left: 18%;
-    bottom: 15%;
-    animation-delay: 0s;
-}
-
-
-.bubble-two {
-    left: 31%;
-    bottom: 10%;
-    animation-delay: 2s;
-}
-
-
-.bubble-three {
-    left: 67%;
-    bottom: 18%;
-    animation-delay: 4s;
-}
-
-
-.bubble-four {
-    left: 83%;
-    bottom: 25%;
-    animation-delay: 1s;
+        rise 6s linear infinite;
 }
 
 
 @keyframes rise {
 
     0% {
-        transform: translateY(20px);
+
+        transform:
+            translateY(20px);
+
         opacity: 0;
     }
 
@@ -336,10 +340,12 @@ body {
     }
 
     100% {
-        transform: translateY(-110vh);
+
+        transform:
+            translateY(-110vh);
+
         opacity: 0;
     }
-
 }
 
 
@@ -351,26 +357,27 @@ body {
 
     position: absolute;
 
-    top: 22px;
+    top: 16px;
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
-    width: min(
-        1120px,
-        calc(100% - 40px)
-    );
+    width:
+        min(
+            1180px,
+            calc(100% - 35px)
+        );
 
     display: flex;
 
     align-items: flex-start;
 
-    gap: 28px;
+    gap: 18px;
 
     z-index: 100;
 
     pointer-events: none;
-
 }
 
 
@@ -380,14 +387,12 @@ body {
 
 
 /* =========================================================
-   STAT AREA
-   IMPORTANT:
-   NO BLOCK/BACKGROUND HERE
+   STATUS
 ========================================================= */
 
 #status-panel {
 
-    width: 345px;
+    width: 330px;
 
     display: flex;
 
@@ -398,19 +403,12 @@ body {
     background: transparent;
 
     border: none;
-
-    box-shadow: none;
-
 }
 
 
-/* =========================================================
-   FISH NAME
-========================================================= */
-
 #fish-name {
 
-    color: #f2d681;
+    color: #f0d47c;
 
     font-size: 17px;
 
@@ -419,10 +417,9 @@ body {
     letter-spacing: 3px;
 
     text-shadow:
-        2px 2px 0 #17282d;
+        2px 2px 0 #172b2f;
 
     margin-bottom: 3px;
-
 }
 
 
@@ -438,20 +435,19 @@ body {
 
     gap: 7px;
 
-    width: 340px;
+    width: 320px;
 
     height: 39px;
-
 }
 
 
 /* =========================================================
-   PIXEL ICON
+   STAT ICON
 ========================================================= */
 
 .stat-icon {
 
-    flex: 0 0 34px;
+    flex-shrink: 0;
 
     width: 34px;
     height: 34px;
@@ -459,11 +455,13 @@ body {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     background: #a97959;
 
-    border: 3px solid #16191c;
+    border:
+        3px solid #15191d;
 
     box-shadow:
         3px 0 #d1a65d,
@@ -471,20 +469,19 @@ body {
         0 3px #d1a65d,
         0 -3px #d1a65d;
 
-    color: #ed6884;
-
     font-size: 19px;
 
     font-weight: bold;
 
+    color: #ed6884;
+
     text-shadow:
         2px 2px 0 #573039;
-
 }
 
 
 /* =========================================================
-   STAT TEXT/BAR
+   STAT INFO
 ========================================================= */
 
 .stat-info {
@@ -492,7 +489,6 @@ body {
     flex: 1;
 
     min-width: 0;
-
 }
 
 
@@ -512,7 +508,6 @@ body {
 
     text-shadow:
         1px 1px 0 #182b2f;
-
 }
 
 
@@ -530,21 +525,21 @@ body {
 
     background: #45435e;
 
-    border: 3px solid #17191c;
+    border:
+        3px solid #15191d;
 
     box-shadow:
-        3px 0 #d3a754,
-        -3px 0 #d3a754,
-        0 3px #d3a754,
-        0 -3px #d3a754;
+        3px 0 #d2a653,
+        -3px 0 #d2a653,
+        0 3px #d2a653,
+        0 -3px #d2a653;
 
     overflow: hidden;
-
 }
 
 
 /* =========================================================
-   BAR FILL
+   STAT FILL
 ========================================================= */
 
 .pixel-stat-fill {
@@ -554,17 +549,17 @@ body {
     left: 0;
     top: 0;
 
-    width: 100%;
     height: 100%;
+
+    width: 100%;
 
     transition:
         width 0.35s steps(5);
-
 }
 
 
 /* =========================================================
-   PIXEL BAR SHINE
+   STAT HIGHLIGHT
 ========================================================= */
 
 .pixel-stat-fill::before {
@@ -576,12 +571,17 @@ body {
     left: 0;
     top: 2px;
 
-    width: 100%;
+    width: 72%;
+
     height: 5px;
 
     background:
-        rgba(255, 255, 255, 0.18);
-
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
 }
 
 
@@ -595,11 +595,16 @@ body {
     bottom: 0;
 
     width: 100%;
+
     height: 4px;
 
     background:
-        rgba(70, 20, 30, 0.20);
-
+        rgba(
+            50,
+            20,
+            30,
+            0.18
+        );
 }
 
 
@@ -608,80 +613,32 @@ body {
 ========================================================= */
 
 #health-bar {
-
-    background:
-        linear-gradient(
-            180deg,
-            #e45870 0%,
-            #d34460 60%,
-            #bd3854 100%
-        );
-
+    background: #d84d68;
 }
 
 
 #hunger-bar {
-
-    background:
-        linear-gradient(
-            180deg,
-            #f0ad53 0%,
-            #df913d 60%,
-            #c97932 100%
-        );
-
+    background: #e09a48;
 }
 
 
 #happiness-bar {
-
-    background:
-        linear-gradient(
-            180deg,
-            #e66b91 0%,
-            #d7537b 60%,
-            #c44268 100%
-        );
-
+    background: #dc6387;
 }
 
 
 #affection-bar {
-
-    background:
-        linear-gradient(
-            180deg,
-            #f080a2 0%,
-            #df6388 60%,
-            #c94c73 100%
-        );
-
+    background: #e87599;
 }
 
 
 #clean-bar {
-
-    background:
-        linear-gradient(
-            180deg,
-            #73c1b5 0%,
-            #58a99e 60%,
-            #408f88 100%
-        );
-
+    background: #63aaa0;
 }
 
 
 #energy-bar {
-
-    background:
-        linear-gradient(
-            180deg,
-            #a19fd7 0%,
-            #8584bd 60%,
-            #6d6ba4 100%
-        );
-
+    background: #8b8bc5;
 }
 
 
@@ -691,7 +648,7 @@ body {
 
 #time-panel {
 
-    min-width: 135px;
+    min-width: 120px;
 
     padding-top: 8px;
 
@@ -701,7 +658,6 @@ body {
 
     text-shadow:
         2px 2px 0 #182b2f;
-
 }
 
 
@@ -712,7 +668,6 @@ body {
     font-size: 19px;
 
     font-weight: bold;
-
 }
 
 
@@ -725,12 +680,11 @@ body {
     letter-spacing: 2px;
 
     color: #bfcdb6;
-
 }
 
 
 /* =========================================================
-   CONTROLS
+   BUTTONS
 ========================================================= */
 
 #controls {
@@ -742,7 +696,6 @@ body {
     gap: 8px;
 
     padding-top: 4px;
-
 }
 
 
@@ -750,11 +703,13 @@ body {
 
     height: 38px;
 
-    min-width: 72px;
+    min-width: 70px;
 
-    padding: 5px 9px;
+    padding:
+        5px 8px;
 
-    border: 3px solid #17191d;
+    border:
+        3px solid #17191d;
 
     box-shadow:
         3px 3px 0 #d0a451;
@@ -777,45 +732,40 @@ body {
         transform 0.08s,
         box-shadow 0.08s,
         filter 0.1s;
-
 }
 
 
 .pixel-button:hover {
 
-    filter: brightness(1.18);
-
+    filter:
+        brightness(1.18);
 }
 
 
 .pixel-button:active {
 
     transform:
-        translate(3px, 3px);
+        translate(
+            3px,
+            3px
+        );
 
     box-shadow: none;
-
 }
 
 
-.food-button {
-
+#food-button {
     background: #d69d4d;
-
 }
 
 
-.clean-button {
-
+#clean-button {
     background: #70aaa4;
-
 }
 
 
-.sleep-button {
-
+#sleep-button {
     background: #8a87b4;
-
 }
 
 
@@ -823,24 +773,41 @@ body {
    FISH
 ========================================================= */
 
+/*
+   IMPORTANT FIX:
+
+   The fish is fixed relative to the viewport.
+
+   left/top represent its CENTER.
+*/
+
 #fish-container {
 
-    position: absolute;
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
 
     width: 220px;
     height: 160px;
 
     transform:
-        translate(-50%, -50%);
+        translate(
+            -50%,
+            -50%
+        );
 
     z-index: 40;
 
     cursor: none;
 
-    touch-action: manipulation;
-
+    pointer-events: auto;
 }
 
+
+/* =========================================================
+   FISH CANVAS
+========================================================= */
 
 #fish-canvas {
 
@@ -851,6 +818,7 @@ body {
 
     cursor: none;
 
+    pointer-events: auto;
 }
 
 
@@ -869,10 +837,14 @@ body {
     height: 12px;
 
     background:
-        rgba(11, 29, 32, 0.25);
+        rgba(
+            11,
+            29,
+            32,
+            0.25
+        );
 
     z-index: -1;
-
 }
 
 
@@ -902,8 +874,8 @@ body {
         2px 2px 0 #542c38;
 
     animation:
-        heart-pop 1.2s steps(8) forwards;
-
+        heart-pop 1.2s steps(8)
+        forwards;
 }
 
 
@@ -914,17 +886,21 @@ body {
         opacity: 1;
 
         transform:
-            translate(0, 0)
+            translate(
+                0,
+                0
+            )
             scale(0.7);
-
     }
 
     25% {
 
         transform:
-            translate(0, -12px)
+            translate(
+                0,
+                -12px
+            )
             scale(1.1);
-
     }
 
     100% {
@@ -937,9 +913,7 @@ body {
                 -85px
             )
             scale(1.3);
-
     }
-
 }
 
 
@@ -956,12 +930,11 @@ body {
 
     z-index: 35;
 
-    pointer-events: none;
+    cursor: none;
 
     animation:
         food-appear
         0.25s steps(3);
-
 }
 
 
@@ -977,12 +950,17 @@ body {
 
     background: #dfa94c;
 
-    border: 3px solid #66452a;
+    border:
+        3px solid #66452a;
 
     box-shadow:
         2px 2px 0
-        rgba(20, 25, 20, 0.3);
-
+        rgba(
+            20,
+            25,
+            20,
+            0.3
+        );
 }
 
 
@@ -994,7 +972,6 @@ body {
 
         transform:
             translateY(-20px);
-
     }
 
     to {
@@ -1003,9 +980,7 @@ body {
 
         transform:
             translateY(0);
-
     }
-
 }
 
 
@@ -1017,59 +992,39 @@ body {
 
     position: absolute;
 
-    top: 78px;
-
+    top: 72px;
     left: 50%;
 
     transform:
-        translateX(-50%)
-        translateY(-5px);
+        translateX(-50%);
 
-    display: block;
+    display: none;
 
     padding: 8px;
 
     background: #183138;
 
-    border: 3px solid #111b1e;
+    border:
+        3px solid #111b1e;
 
     z-index: 150;
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-    transition:
-        opacity 0.15s,
-        transform 0.15s;
-
 }
 
 
 #food-panel.open {
-
-    opacity: 1;
-
-    visibility: visible;
-
-    pointer-events: auto;
-
-    transform:
-        translateX(-50%)
-        translateY(0);
-
+    display: block;
 }
 
 
 .food-choice {
 
-    padding: 7px 10px;
+    padding:
+        7px 10px;
 
     background: #d09a4e;
 
-    border: 3px solid #513b29;
+    border:
+        3px solid #513b29;
 
     color: #241d20;
 
@@ -1082,19 +1037,17 @@ body {
     font-weight: bold;
 
     cursor: none;
-
 }
 
 
 .food-choice:hover {
 
     background: #e6b865;
-
 }
 
 
 /* =========================================================
-   SLEEP AREA
+   SLEEP
 ========================================================= */
 
 #sleep-zone {
@@ -1114,14 +1067,11 @@ body {
     display: none;
 
     z-index: 30;
-
 }
 
 
-#sleep-zone.active {
-
+#sleep-zone.sleeping {
     display: block;
-
 }
 
 
@@ -1137,11 +1087,11 @@ body {
 
     background: #d8cec2;
 
-    border: 4px solid #4b4848;
+    border:
+        4px solid #4b4848;
 
     box-shadow:
         inset 6px 5px 0 #eee5d9;
-
 }
 
 
@@ -1162,14 +1112,14 @@ body {
             #7e94ac 12px 24px
         );
 
-    border: 5px solid #35495b;
+    border:
+        5px solid #35495b;
 
     border-radius:
         35px 35px 12px 12px;
 
     box-shadow:
         inset 7px 0 #526d86;
-
 }
 
 
@@ -1185,8 +1135,8 @@ body {
     font-size: 13px;
 
     animation:
-        sleepy 1.5s steps(2) infinite;
-
+        sleepy 1.5s steps(2)
+        infinite;
 }
 
 
@@ -1195,60 +1145,6 @@ body {
     50% {
         opacity: 0.3;
     }
-
-}
-
-
-/* =========================================================
-   CLEANING BUBBLES
-========================================================= */
-
-.clean-bubble {
-
-    position: absolute;
-
-    width: 10px;
-    height: 10px;
-
-    border: 2px solid #d5eee9;
-
-    pointer-events: none;
-
-    z-index: 60;
-
-    animation:
-        clean-rise
-        1.5s steps(8)
-        forwards;
-
-}
-
-
-@keyframes clean-rise {
-
-    0% {
-
-        opacity: 1;
-
-        transform:
-            translate(0, 0)
-            scale(0.5);
-
-    }
-
-    100% {
-
-        opacity: 0;
-
-        transform:
-            translate(
-                var(--bubble-x),
-                -100px
-            )
-            scale(1.3);
-
-    }
-
 }
 
 
@@ -1261,7 +1157,7 @@ body {
     position: absolute;
 
     left: 50%;
-    bottom: 27px;
+    bottom: 28px;
 
     transform:
         translateX(-50%);
@@ -1271,7 +1167,8 @@ body {
 
     background: #162d33;
 
-    border: 3px solid #0c1d21;
+    border:
+        3px solid #0c1d21;
 
     color: #d7e7de;
 
@@ -1285,20 +1182,24 @@ body {
 
     transition:
         opacity 0.2s;
-
 }
 
 
 #message.show {
-
     opacity: 1;
-
 }
 
 
 /* =========================================================
-   CURSOR
+   HAND CURSOR
 ========================================================= */
+
+/*
+   FIXED means it follows the browser viewport.
+
+   pointer-events:none means it can never block
+   buttons or the fish.
+*/
 
 #hand-cursor {
 
@@ -1307,23 +1208,25 @@ body {
     left: 0;
     top: 0;
 
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
 
-    z-index: 9999;
+    z-index: 99999;
 
     pointer-events: none;
 
     font-size: 26px;
 
     transform:
-        translate(-4px, -4px);
+        translate(
+            -4px,
+            -4px
+        );
 
     filter:
         drop-shadow(
             2px 2px 0 #14282d
         );
-
 }
 
 
@@ -1334,17 +1237,7 @@ body {
 #aquarium.night {
 
     filter:
-        brightness(0.62)
-        saturate(0.8);
-
-}
-
-
-#aquarium.night #fish-container {
-
-    filter:
-        brightness(0.9);
-
+        brightness(0.68);
 }
 
 
@@ -1356,34 +1249,30 @@ body {
 
     #hud {
 
-        top: 10px;
-        left: 10px;
+        top: 8px;
+        left: 8px;
 
         transform: none;
 
         width:
-            calc(100% - 20px);
+            calc(100% - 16px);
 
-        gap: 8px;
+        gap: 5px;
 
         flex-wrap: wrap;
-
     }
 
 
     #status-panel {
-
-        width: 245px;
-
+        width: 235px;
     }
 
 
     .stat {
 
-        width: 240px;
+        width: 225px;
 
         height: 34px;
-
     }
 
 
@@ -1392,17 +1281,12 @@ body {
         width: 30px;
         height: 30px;
 
-        flex-basis: 30px;
-
         font-size: 16px;
-
     }
 
 
     .pixel-stat-bar {
-
         height: 17px;
-
     }
 
 
@@ -1411,28 +1295,21 @@ body {
         font-size: 7px;
 
         height: 9px;
-
     }
 
 
     #fish-name {
-
         font-size: 12px;
-
     }
 
 
     #time-panel {
-
-        min-width: 90px;
-
+        min-width: 85px;
     }
 
 
     #fish-time {
-
         font-size: 13px;
-
     }
 
 
@@ -1443,68 +1320,61 @@ body {
         justify-content: center;
 
         flex-wrap: wrap;
-
     }
 
 
     .pixel-button {
 
-        min-width: 60px;
+        min-width: 58px;
 
         height: 31px;
 
         font-size: 7px;
-
     }
 
 
     #fish-container {
 
         transform:
-            translate(-50%, -50%)
-            scale(0.82);
-
+            translate(
+                -50%,
+                -50%
+            )
+            scale(0.78);
     }
-
 }
 
 
 @media (max-width: 500px) {
 
     #status-panel {
-
         width: 205px;
-
     }
 
 
     .stat {
-
         width: 200px;
-
     }
 
 
     #fish-container {
 
         transform:
-            translate(-50%, -50%)
-            scale(0.68);
-
+            translate(
+                -50%,
+                -50%
+            )
+            scale(0.65);
     }
 
 
     #time-panel {
-
         min-width: 70px;
-
     }
 
 
     #fish-time {
-
         font-size: 11px;
-
     }
 
 
@@ -1517,7 +1387,5 @@ body {
         padding: 3px;
 
         font-size: 6px;
-
     }
-
 }
