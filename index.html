@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Gol-Die - Pixel Aquarium</title>
 
@@ -11,223 +16,338 @@
 
 <body>
 
-<main id="aquarium">
+    <main id="aquarium">
 
-    <!-- WATER -->
-    <div class="water-line water-line-1"></div>
-    <div class="water-line water-line-2"></div>
-    <div class="water-line water-line-3"></div>
+        <!-- WATER EFFECTS -->
+        <div class="water-line water-line-1"></div>
+        <div class="water-line water-line-2"></div>
+        <div class="water-line water-line-3"></div>
 
-    <div class="light light-one"></div>
-    <div class="light light-two"></div>
-    <div class="light light-three"></div>
+        <div class="light light-one"></div>
+        <div class="light light-two"></div>
+        <div class="light light-three"></div>
 
-    <!-- PLANTS -->
-    <div class="plant plant-one"></div>
-    <div class="plant plant-two"></div>
-    <div class="plant plant-three"></div>
-    <div class="plant plant-four"></div>
 
-    <!-- BUBBLES -->
-    <div class="bubble bubble-one"></div>
-    <div class="bubble bubble-two"></div>
-    <div class="bubble bubble-three"></div>
-    <div class="bubble bubble-four"></div>
+        <!-- BACKGROUND PLANTS -->
 
-    <!-- ==================================================
-         HUD
-    =================================================== -->
+        <div class="plant plant-one"></div>
+        <div class="plant plant-two"></div>
+        <div class="plant plant-three"></div>
+        <div class="plant plant-four"></div>
 
-    <section id="hud">
 
-        <!-- STATS -->
+        <!-- BUBBLES -->
 
-        <div id="status-panel">
+        <div
+            class="bubble"
+            style="left:18%; bottom:20%; animation-delay:0s;"
+        ></div>
 
-            <div id="fish-name">GOL-DIE</div>
+        <div
+            class="bubble"
+            style="left:31%; bottom:12%; animation-delay:2s;"
+        ></div>
 
-            <div class="stat">
-                <div class="stat-icon heart-icon">♥</div>
+        <div
+            class="bubble"
+            style="left:67%; bottom:18%; animation-delay:4s;"
+        ></div>
 
-                <div class="stat-info">
-                    <div class="stat-name">HEALTH</div>
+        <div
+            class="bubble"
+            style="left:83%; bottom:25%; animation-delay:1s;"
+        ></div>
 
-                    <div class="pixel-stat-bar">
-                        <div id="health-bar" class="pixel-stat-fill"></div>
-                    </div>
+
+        <!-- =================================================
+             HUD
+        ================================================== -->
+
+        <section id="hud">
+
+            <!-- STATS -->
+
+            <div id="status-panel">
+
+                <div id="fish-name">
+                    GOL-DIE
                 </div>
+
+
+                <!-- HEALTH -->
+
+                <div class="stat">
+
+                    <div class="stat-icon health-icon">
+                        ♥
+                    </div>
+
+                    <div class="stat-info">
+
+                        <div class="stat-name">
+                            HEALTH
+                        </div>
+
+                        <div class="pixel-stat-bar">
+                            <div
+                                id="health-bar"
+                                class="pixel-stat-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HUNGER -->
+
+                <div class="stat">
+
+                    <div class="stat-icon hunger-icon">
+                        ●
+                    </div>
+
+                    <div class="stat-info">
+
+                        <div class="stat-name">
+                            HUNGER
+                        </div>
+
+                        <div class="pixel-stat-bar">
+                            <div
+                                id="hunger-bar"
+                                class="pixel-stat-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HAPPINESS -->
+
+                <div class="stat">
+
+                    <div class="stat-icon happiness-icon">
+                        ♥
+                    </div>
+
+                    <div class="stat-info">
+
+                        <div class="stat-name">
+                            HAPPY
+                        </div>
+
+                        <div class="pixel-stat-bar">
+                            <div
+                                id="happiness-bar"
+                                class="pixel-stat-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AFFECTION -->
+
+                <div class="stat">
+
+                    <div class="stat-icon affection-icon">
+                        ♥
+                    </div>
+
+                    <div class="stat-info">
+
+                        <div class="stat-name">
+                            AFFECTION
+                        </div>
+
+                        <div class="pixel-stat-bar">
+                            <div
+                                id="affection-bar"
+                                class="pixel-stat-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CLEAN -->
+
+                <div class="stat">
+
+                    <div class="stat-icon clean-icon">
+                        ✦
+                    </div>
+
+                    <div class="stat-info">
+
+                        <div class="stat-name">
+                            CLEAN
+                        </div>
+
+                        <div class="pixel-stat-bar">
+                            <div
+                                id="clean-bar"
+                                class="pixel-stat-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ENERGY -->
+
+                <div class="stat">
+
+                    <div class="stat-icon energy-icon">
+                        ☀
+                    </div>
+
+                    <div class="stat-info">
+
+                        <div class="stat-name">
+                            ENERGY
+                        </div>
+
+                        <div class="pixel-stat-bar">
+                            <div
+                                id="energy-bar"
+                                class="pixel-stat-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="stat">
-                <div class="stat-icon food-icon">●</div>
 
-                <div class="stat-info">
-                    <div class="stat-name">HUNGER</div>
+            <!-- TIME -->
 
-                    <div class="pixel-stat-bar">
-                        <div id="hunger-bar" class="pixel-stat-fill"></div>
-                    </div>
+            <div id="time-panel">
+
+                <div id="fish-time">
+                    08:00 AM
                 </div>
+
+                <div id="day-counter">
+                    DAY 1
+                </div>
+
             </div>
 
-            <div class="stat">
-                <div class="stat-icon happy-icon">♥</div>
 
-                <div class="stat-info">
-                    <div class="stat-name">HAPPY</div>
+            <!-- CONTROLS -->
 
-                    <div class="pixel-stat-bar">
-                        <div id="happiness-bar" class="pixel-stat-fill"></div>
-                    </div>
-                </div>
+            <div id="controls">
+
+                <button
+                    id="food-button"
+                    class="pixel-button"
+                    type="button"
+                >
+                    FOOD
+                </button>
+
+                <button
+                    id="clean-button"
+                    class="pixel-button"
+                    type="button"
+                >
+                    CLEAN
+                </button>
+
+                <button
+                    id="sleep-button"
+                    class="pixel-button"
+                    type="button"
+                >
+                    SLEEP
+                </button>
+
             </div>
 
-            <div class="stat">
-                <div class="stat-icon affection-icon">♥</div>
+        </section>
 
-                <div class="stat-info">
-                    <div class="stat-name">AFFECTION</div>
 
-                    <div class="pixel-stat-bar">
-                        <div id="affection-bar" class="pixel-stat-fill"></div>
-                    </div>
-                </div>
-            </div>
+        <!-- FOOD MENU -->
 
-            <div class="stat">
-                <div class="stat-icon clean-icon">✦</div>
-
-                <div class="stat-info">
-                    <div class="stat-name">CLEAN</div>
-
-                    <div class="pixel-stat-bar">
-                        <div id="clean-bar" class="pixel-stat-fill"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-icon energy-icon">☀</div>
-
-                <div class="stat-info">
-                    <div class="stat-name">ENERGY</div>
-
-                    <div class="pixel-stat-bar">
-                        <div id="energy-bar" class="pixel-stat-fill"></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- TIME -->
-
-        <div id="time-panel">
-            <div id="fish-time">08:00 AM</div>
-            <div id="day-counter">DAY 1</div>
-        </div>
-
-        <!-- CONTROLS -->
-
-        <div id="controls">
+        <div id="food-panel">
 
             <button
-                id="food-button"
-                class="pixel-button food-button"
+                class="food-choice"
+                data-food="flake"
                 type="button"
             >
-                FOOD
-            </button>
-
-            <button
-                id="clean-button"
-                class="pixel-button clean-button"
-                type="button"
-            >
-                CLEAN
-            </button>
-
-            <button
-                id="sleep-button"
-                class="pixel-button sleep-button"
-                type="button"
-            >
-                SLEEP
+                FISH FLAKE
             </button>
 
         </div>
 
-    </section>
 
+        <!-- =================================================
+             FISH
+        ================================================== -->
 
-    <!-- ==================================================
-         FOOD MENU
-    =================================================== -->
+        <div id="fish-container">
 
-    <div id="food-panel">
+            <canvas
+                id="fish-canvas"
+                width="220"
+                height="160"
+            ></canvas>
 
-        <button
-            class="food-choice"
-            data-food="flake"
-            type="button"
-        >
-            FISH FLAKE
-        </button>
+            <div id="fish-shadow"></div>
 
-    </div>
-
-
-    <!-- ==================================================
-         FISH
-    =================================================== -->
-
-    <div id="fish-container">
-
-        <canvas
-            id="fish-canvas"
-            width="220"
-            height="160"
-        ></canvas>
-
-        <div id="fish-shadow"></div>
-
-    </div>
-
-
-    <!-- ==================================================
-         SLEEP
-    =================================================== -->
-
-    <div id="sleep-zone">
-
-        <div id="sleep-text">
-            Z Z Z...
         </div>
 
-        <div id="pillow"></div>
 
-        <div id="blanket"></div>
+        <!-- SLEEP AREA -->
 
-    </div>
+        <div id="sleep-zone">
+
+            <div id="sleep-text">
+                Z Z Z...
+            </div>
+
+            <div id="pillow"></div>
+
+            <div id="blanket"></div>
+
+        </div>
 
 
-    <!-- FLOOR -->
+        <!-- FLOOR -->
 
-    <div id="gravel"></div>
-
-
-    <!-- MESSAGE -->
-
-    <div id="message"></div>
+        <div id="gravel"></div>
 
 
-    <!-- CUSTOM CURSOR -->
+        <!-- MESSAGE -->
 
-    <div id="hand-cursor">☝</div>
+        <div id="message"></div>
 
-</main>
 
-<script src="script.js"></script>
+        <!-- CUSTOM HAND -->
+
+        <div id="hand-cursor">
+            ☝
+        </div>
+
+    </main>
+
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>
