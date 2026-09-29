@@ -1,6 +1,6 @@
 /* =========================================================
-   GOL-DIE
-   PIXEL AQUARIUM GAME
+   GOL-DIE: MY LITTLE AQUARIUM
+   SCRIPT.JS
 ========================================================= */
 
 
@@ -8,713 +8,846 @@
    ELEMENTS
 ========================================================= */
 
+const titleScreen = document.getElementById("titleScreen");
+const gameScreen = document.getElementById("gameScreen");
 const aquarium = document.getElementById("aquarium");
 
-const fishContainer =
-    document.getElementById("fish-container");
+const startButton = document.getElementById("startButton");
+const howToButton = document.getElementById("howToButton");
+const settingsButton = document.getElementById("settingsButton");
 
-const canvas =
-    document.getElementById("fish-canvas");
+const foodButton = document.getElementById("foodButton");
+const cleanButton = document.getElementById("cleanButton");
+const sleepButton = document.getElementById("sleepButton");
 
-const ctx =
-    canvas.getContext("2d");
+const sleepIcon = document.getElementById("sleepIcon");
+const sleepText = document.getElementById("sleepText");
 
-const cursor =
-    document.getElementById("hand-cursor");
+const goldie = document.getElementById("goldie");
 
-const message =
-    document.getElementById("message");
+const foodModal = document.getElementById("foodModal");
+const howToModal = document.getElementById("howToModal");
+const settingsModal = document.getElementById("settingsModal");
 
-const foodPanel =
-    document.getElementById("food-panel");
+const particleLayer = document.getElementById("particleLayer");
+const foodLayer = document.getElementById("foodLayer");
 
-const sleepZone =
-    document.getElementById("sleep-zone");
+const gameMessage = document.getElementById("gameMessage");
+const cleaningSponge = document.getElementById("cleaningSponge");
 
-const fishTime =
-    document.getElementById("fish-time");
+const clockDisplay = document.getElementById("clockDisplay");
+const dayDisplay = document.getElementById("dayDisplay");
 
-const dayCounter =
-    document.getElementById("day-counter");
+const transitionOverlay =
+  document.getElementById("transitionOverlay");
 
-const foodButton =
-    document.getElementById("food-button");
+const customCursor =
+  document.getElementById("customCursor");
 
-const cleanButton =
-    document.getElementById("clean-button");
+const motionToggle =
+  document.getElementById("motionToggle");
 
-const sleepButton =
-    document.getElementById("sleep-button");
+const bubbleToggle =
+  document.getElementById("bubbleToggle");
 
-
-/* =========================================================
-   STAT BARS
-========================================================= */
-
-const bars = {
-
-    health:
-        document.getElementById("health-bar"),
-
-    hunger:
-        document.getElementById("hunger-bar"),
-
-    happiness:
-        document.getElementById("happiness-bar"),
-
-    affection:
-        document.getElementById("affection-bar"),
-
-    clean:
-        document.getElementById("clean-bar"),
-
-    energy:
-        document.getElementById("energy-bar")
-};
+const resetButton =
+  document.getElementById("resetButton");
 
 
 /* =========================================================
    GAME STATE
 ========================================================= */
 
-const state = {
+const DEFAULT_STATE = {
+  health: 92,
+  hunger: 78,
+  happiness: 86,
+  affection: 60,
+  clean: 88,
+  energy: 82,
 
-    health: 100,
+  minutes: 8 * 60,
+  day: 1
+};
 
-    hunger: 82,
+let state = {
+  ...DEFAULT_STATE
+};
 
-    happiness: 76,
+let gameStarted = false;
+let sleeping = false;
+let cleaning = false;
 
-    affection: 58,
+let messageTimeout = null;
+let activeFood = null;
 
-    clean: 90,
 
-    energy: 85,
+/* =========================================================
+   FISH MOVEMENT DATA
+========================================================= */
 
-    sleeping: false,
+const fish = {
+  x: 0,
+  y: 0,
 
-    fishHour: 8,
+  targetX: 0,
+  targetY: 0,
 
-    day: 1,
+  speed: 0.65,
 
-    direction: 1,
-
-    x: window.innerWidth / 2,
-
-    y: window.innerHeight / 2,
-
-    targetX: window.innerWidth / 2,
-
-    targetY: window.innerHeight / 2
+  initialized: false
 };
 
 
 /* =========================================================
-   UTILITY
+   FOOD TYPES
 ========================================================= */
 
-function clamp(value, min = 0, max = 100) {
+const FOOD_DATA = {
+  flake: {
+    icon: "🌸",
+    hunger: 14,
+    health: 2,
+    happiness: 5,
+    energy: 1,
+    message: "YUMMY! ♥"
+  },
 
-    return Math.max(
-        min,
-        Math.min(max, value)
+  shrimp: {
+    icon: "🦐",
+    hunger: 23,
+    health: 4,
+    happiness: 10,
+    energy: 3,
+    message: "GOL-DIE LOVES IT! ♥"
+  },
+
+  pellet: {
+    icon: "🟡",
+    hunger: 18,
+    health: 3,
+    happiness: 6,
+    energy: 2,
+    message: "CRUNCH CRUNCH! ♥"
+  }
+};
+
+
+/* =========================================================
+   STAT ELEMENTS
+========================================================= */
+
+const stats = {
+  health: {
+    bar: document.getElementById("healthBar"),
+    value: document.getElementById("healthValue")
+  },
+
+  hunger: {
+    bar: document.getElementById("hungerBar"),
+    value: document.getElementById("hungerValue")
+  },
+
+  happiness: {
+    bar: document.getElementById("happinessBar"),
+    value: document.getElementById("happinessValue")
+  },
+
+  affection: {
+    bar: document.getElementById("affectionBar"),
+    value: document.getElementById("affectionValue")
+  },
+
+  clean: {
+    bar: document.getElementById("cleanBar"),
+    value: document.getElementById("cleanValue")
+  },
+
+  energy: {
+    bar: document.getElementById("energyBar"),
+    value: document.getElementById("energyValue")
+  }
+};
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+
+function distance(x1, y1, x2, y2) {
+  return Math.hypot(
+    x2 - x1,
+    y2 - y1
+  );
+}
+
+
+/* =========================================================
+   SAVE / LOAD
+========================================================= */
+
+function saveGame() {
+  try {
+    localStorage.setItem(
+      "goldieSave",
+      JSON.stringify(state)
     );
+  } catch (error) {
+    console.warn("Could not save game:", error);
+  }
+}
+
+
+function loadGame() {
+  try {
+    const save =
+      localStorage.getItem("goldieSave");
+
+    if (!save) {
+      return;
+    }
+
+    const parsed = JSON.parse(save);
+
+    state = {
+      ...DEFAULT_STATE,
+      ...parsed
+    };
+
+    Object.keys(stats).forEach((key) => {
+      state[key] =
+        clamp(Number(state[key]) || 0, 0, 100);
+    });
+
+    state.day =
+      Math.max(1, Number(state.day) || 1);
+
+    state.minutes =
+      clamp(
+        Number(state.minutes) || 0,
+        0,
+        1439
+      );
+
+  } catch (error) {
+    console.warn("Could not load save:", error);
+  }
 }
 
 
 /* =========================================================
-   MESSAGE
+   TITLE SCREEN
 ========================================================= */
 
-function showMessage(text) {
+startButton.addEventListener("click", startGame);
 
-    message.textContent = text;
+howToButton.addEventListener("click", () => {
+  openModal(howToModal);
+});
 
-    message.classList.add("show");
+settingsButton.addEventListener("click", () => {
+  openModal(settingsModal);
+});
 
-    clearTimeout(showMessage.timer);
 
-    showMessage.timer = setTimeout(() => {
+function startGame() {
 
-        message.classList.remove("show");
+  if (gameStarted) {
+    return;
+  }
 
-    }, 1800);
+  gameStarted = true;
+
+  transitionOverlay.classList.add("active");
+
+  setTimeout(() => {
+    titleScreen.classList.remove("active");
+    gameScreen.classList.add("active");
+
+    initializeFish();
+    updateUI();
+  }, 500);
+
+  setTimeout(() => {
+    transitionOverlay.classList.remove("active");
+
+    showMessage("HI! I'M GOL-DIE! ♥");
+  }, 1100);
 }
 
 
 /* =========================================================
-   UPDATE BARS
+   MODALS
 ========================================================= */
 
-function updateBars() {
-
-    bars.health.style.width =
-        `${state.health}%`;
-
-    bars.hunger.style.width =
-        `${state.hunger}%`;
-
-    bars.happiness.style.width =
-        `${state.happiness}%`;
-
-    bars.affection.style.width =
-        `${state.affection}%`;
-
-    bars.clean.style.width =
-        `${state.clean}%`;
-
-    bars.energy.style.width =
-        `${state.energy}%`;
+function openModal(modal) {
+  modal.classList.add("open");
 }
 
 
-/* =========================================================
-   CUSTOM HAND CURSOR
-========================================================= */
+function closeModal(modal) {
+  modal.classList.remove("open");
+}
 
-/*
-   IMPORTANT:
 
-   The old JavaScript stopped executing because it was
-   duplicated.
+document
+  .querySelectorAll("[data-close-modal]")
+  .forEach((button) => {
 
-   This version uses pointermove and directly positions
-   the hand on the screen.
-*/
+    button.addEventListener("click", () => {
+      const modalId =
+        button.dataset.closeModal;
 
-window.addEventListener("pointermove", (event) => {
+      closeModal(
+        document.getElementById(modalId)
+      );
+    });
 
-    cursor.style.left =
-        `${event.clientX}px`;
+  });
 
-    cursor.style.top =
-        `${event.clientY}px`;
 
+document
+  .querySelectorAll(".modal-backdrop")
+  .forEach((modal) => {
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeModal(modal);
+      }
+    });
+
+  });
+
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    document
+      .querySelectorAll(".modal-backdrop.open")
+      .forEach(closeModal);
+  }
 });
 
 
 /* =========================================================
-   FISH DRAWING
+   CUSTOM CURSOR
 ========================================================= */
 
-function drawFish() {
+let cursorX = -100;
+let cursorY = -100;
 
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
+let cursorDisplayX = -100;
+let cursorDisplayY = -100;
+
+
+document.addEventListener(
+  "pointermove",
+  (event) => {
+
+    cursorX = event.clientX;
+    cursorY = event.clientY;
+
+    const target =
+      event.target.closest(
+        "button, .interactive, #goldie"
+      );
+
+    customCursor.classList.toggle(
+      "is-interactive",
+      Boolean(target)
     );
 
-
-    ctx.save();
-
-
-    /*
-       Keep the fish facing the direction
-       in which it is swimming.
-    */
-
-    if (state.direction === -1) {
-
-        ctx.translate(220, 0);
-        ctx.scale(-1, 1);
-
-    }
-
-
-    ctx.translate(110, 80);
-
-
-    /* =====================================================
-       TAIL
-    ===================================================== */
-
-    ctx.fillStyle = "#e87525";
-
-    ctx.beginPath();
-
-    ctx.moveTo(45, -4);
-    ctx.lineTo(86, -35);
-    ctx.lineTo(73, -3);
-    ctx.lineTo(90, 25);
-    ctx.lineTo(48, 10);
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    /* Tail shadow */
-
-    ctx.fillStyle = "#bd4e20";
-
-    ctx.fillRect(
-        61,
-        2,
-        22,
-        8
+    customCursor.classList.toggle(
+      "pet-ready",
+      Boolean(event.target.closest("#goldie"))
     );
+  }
+);
 
 
-    /* =====================================================
-       BODY
-    ===================================================== */
+function animateCursor() {
 
-    ctx.fillStyle = "#f58a28";
+  cursorDisplayX +=
+    (cursorX - cursorDisplayX) * 0.35;
 
-    ctx.beginPath();
+  cursorDisplayY +=
+    (cursorY - cursorDisplayY) * 0.35;
 
-    ctx.ellipse(
-        0,
-        0,
-        62,
-        42,
-        0,
-        0,
-        Math.PI * 2
-    );
+  customCursor.style.transform =
+    `translate3d(
+      ${cursorDisplayX - 9}px,
+      ${cursorDisplayY - 7}px,
+      0
+    )`;
 
-    ctx.fill();
+  requestAnimationFrame(animateCursor);
+}
 
-
-    /* =====================================================
-       BODY SHADOW
-    ===================================================== */
-
-    ctx.fillStyle = "#d75a20";
-
-    ctx.fillRect(
-        -42,
-        18,
-        68,
-        14
-    );
+animateCursor();
 
 
-    /* =====================================================
-       BODY HIGHLIGHTS
-    ===================================================== */
+/* =========================================================
+   INITIAL FISH POSITION
+========================================================= */
 
-    ctx.fillStyle = "#ffbd3d";
+function initializeFish() {
 
-    ctx.fillRect(
-        -25,
-        -27,
-        35,
-        9
-    );
+  const bounds =
+    getFishMovementBounds();
 
-    ctx.fillRect(
-        -35,
-        -17,
-        25,
-        8
-    );
+  const width = goldie.offsetWidth;
+  const height = goldie.offsetHeight;
 
+  /*
+    IMPORTANT:
+    Position is calculated using the aquarium itself,
+    not screen coordinates.
+  */
 
-    /* =====================================================
-       TOP FIN
-    ===================================================== */
+  fish.x =
+    aquarium.clientWidth * 0.5 -
+    width * 0.5;
 
-    ctx.fillStyle = "#f26c20";
+  fish.y =
+    aquarium.clientHeight * 0.55 -
+    height * 0.5;
 
-    ctx.beginPath();
+  fish.x = clamp(
+    fish.x,
+    bounds.minX,
+    bounds.maxX
+  );
 
-    ctx.moveTo(-12, -34);
-    ctx.lineTo(12, -62);
-    ctx.lineTo(30, -33);
+  fish.y = clamp(
+    fish.y,
+    bounds.minY,
+    bounds.maxY
+  );
 
-    ctx.closePath();
+  fish.targetX = fish.x;
+  fish.targetY = fish.y;
 
-    ctx.fill();
+  fish.initialized = true;
 
-
-    /* =====================================================
-       LOWER FIN
-    ===================================================== */
-
-    ctx.fillStyle = "#e46521";
-
-    ctx.beginPath();
-
-    ctx.moveTo(-8, 30);
-    ctx.lineTo(10, 55);
-    ctx.lineTo(25, 30);
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    /* =====================================================
-       EYE
-    ===================================================== */
-
-    ctx.fillStyle = "#f9df7b";
-
-    ctx.fillRect(
-        -48,
-        -19,
-        23,
-        23
-    );
-
-
-    ctx.fillStyle = "#1e2527";
-
-    ctx.fillRect(
-        -43,
-        -15,
-        13,
-        15
-    );
-
-
-    /* Eye shine */
-
-    ctx.fillStyle = "#ffffff";
-
-    ctx.fillRect(
-        -40,
-        -13,
-        4,
-        4
-    );
-
-
-    /* =====================================================
-       MOUTH
-    ===================================================== */
-
-    ctx.fillStyle = "#7e3424";
-
-    ctx.fillRect(
-        -60,
-        8,
-        11,
-        6
-    );
-
-
-    /* =====================================================
-       PIXEL SCALES
-    ===================================================== */
-
-    ctx.fillStyle = "rgba(255,205,65,0.55)";
-
-    const scales = [
-
-        [-18, -5],
-        [0, -9],
-        [18, -2],
-        [-23, 12],
-        [-2, 10],
-        [18, 13],
-        [2, 25]
-
-    ];
-
-
-    for (const [x, y] of scales) {
-
-        ctx.fillRect(
-            x,
-            y,
-            8,
-            5
-        );
-
-    }
-
-
-    ctx.restore();
+  setFishPosition();
+  chooseNewFishTarget();
 }
 
 
 /* =========================================================
-   FISH POSITIONING
+   MOVEMENT BOUNDARIES
 ========================================================= */
 
-/*
-   The fish container is FIXED to the viewport.
+function getFishMovementBounds() {
 
-   This means x/y always represent the centre of
-   the actual browser window.
+  const aquariumWidth =
+    aquarium.clientWidth;
 
-   This fixes the fish appearing in the wrong place.
-*/
+  const aquariumHeight =
+    aquarium.clientHeight;
 
-function positionFish() {
+  const fishWidth =
+    goldie.offsetWidth;
 
-    fishContainer.style.left =
-        `${state.x}px`;
+  const fishHeight =
+    goldie.offsetHeight;
 
-    fishContainer.style.top =
-        `${state.y}px`;
+  const mobile =
+    window.innerWidth <= 800;
+
+  /*
+    Top boundary leaves room for HUD.
+    Bottom boundary leaves room for
+    floor and action buttons.
+  */
+
+  const minY =
+    mobile ? 185 : 130;
+
+  const floorSpace =
+    mobile ? 145 : 155;
+
+  return {
+    minX: 18,
+
+    maxX: Math.max(
+      18,
+      aquariumWidth -
+      fishWidth -
+      18
+    ),
+
+    minY: minY,
+
+    maxY: Math.max(
+      minY,
+      aquariumHeight -
+      fishHeight -
+      floorSpace
+    )
+  };
 }
 
 
 /* =========================================================
-   KEEP FISH INSIDE AQUARIUM
+   CHOOSE RANDOM SWIMMING TARGET
 ========================================================= */
 
-function keepFishOnScreen() {
+function chooseNewFishTarget() {
 
-    const width =
-        window.innerWidth;
+  if (!gameStarted || sleeping || activeFood) {
+    return;
+  }
 
-    const height =
-        window.innerHeight;
+  const bounds =
+    getFishMovementBounds();
 
-
-    /*
-       Fish canvas is 220px wide and 160px high.
-
-       Therefore we leave enough space around
-       the edges.
-    */
-
-    const minX = 130;
-
-    const maxX =
-        Math.max(
-            minX,
-            width - 130
-        );
-
-
-    /*
-       HUD is at the top.
-
-       Gravel is at the bottom.
-
-       The fish is therefore kept in the
-       central swimming area.
-    */
-
-    const minY = 190;
-
-    const maxY =
-        Math.max(
-            minY,
-            height - 130
-        );
-
-
-    state.x = clamp(
-        state.x,
-        minX,
-        maxX
+  const horizontalPadding =
+    Math.min(
+      aquarium.clientWidth * 0.08,
+      80
     );
 
-
-    state.y = clamp(
-        state.y,
-        minY,
-        maxY
+  fish.targetX =
+    randomBetween(
+      bounds.minX + horizontalPadding,
+      Math.max(
+        bounds.minX + horizontalPadding,
+        bounds.maxX - horizontalPadding
+      )
     );
 
-
-    state.targetX = clamp(
-        state.targetX,
-        minX,
-        maxX
-    );
-
-
-    state.targetY = clamp(
-        state.targetY,
-        minY,
-        maxY
+  fish.targetY =
+    randomBetween(
+      bounds.minY + 20,
+      Math.max(
+        bounds.minY + 20,
+        bounds.maxY - 15
+      )
     );
 }
 
 
 /* =========================================================
-   CHOOSE FISH TARGET
+   FISH ANIMATION LOOP
 ========================================================= */
 
-function chooseFishTarget() {
+function animateFish() {
 
-    const width =
-        window.innerWidth;
+  if (
+    gameStarted &&
+    fish.initialized
+  ) {
 
-    const height =
-        window.innerHeight;
+    if (activeFood) {
 
+      fish.targetX =
+        activeFood.x -
+        goldie.offsetWidth * 0.35;
 
-    state.targetX =
-        width *
-        (
-            0.25 +
-            Math.random() * 0.50
+      fish.targetY =
+        activeFood.y -
+        goldie.offsetHeight * 0.35;
+
+    } else if (sleeping) {
+
+      const bounds =
+        getFishMovementBounds();
+
+      fish.targetX =
+        clamp(
+          aquarium.clientWidth -
+          goldie.offsetWidth -
+          95,
+          bounds.minX,
+          bounds.maxX
         );
 
+      fish.targetY =
+        bounds.maxY;
 
-    state.targetY =
-        height *
-        (
-            0.38 +
-            Math.random() * 0.30
-        );
-
-
-    keepFishOnScreen();
-}
-
-
-/* =========================================================
-   MOVE FISH
-========================================================= */
-
-function moveFish() {
-
-    if (state.sleeping) {
-
-        positionFish();
-
-        return;
     }
 
 
     const dx =
-        state.targetX - state.x;
+      fish.targetX - fish.x;
 
     const dy =
-        state.targetY - state.y;
+      fish.targetY - fish.y;
+
+    const dist =
+      Math.hypot(dx, dy);
 
 
-    /*
-       Smooth fish movement.
-    */
+    let currentSpeed =
+      fish.speed;
 
-    state.x += dx * 0.012;
+    if (state.energy < 25) {
+      currentSpeed *= 0.45;
+    }
 
-    state.y += dy * 0.012;
+    if (state.happiness < 25) {
+      currentSpeed *= 0.65;
+    }
 
+    if (state.happiness > 85) {
+      currentSpeed *= 1.12;
+    }
 
-    /*
-       Turn fish according to movement.
-    */
+    if (activeFood) {
+      currentSpeed *= 2.4;
+    }
 
-    if (Math.abs(dx) > 1) {
-
-        state.direction =
-            dx > 0
-                ? 1
-                : -1;
-
+    if (sleeping) {
+      currentSpeed *= 1.6;
     }
 
 
-    positionFish();
+    if (dist > 2) {
+
+      fish.x +=
+        (dx / dist) *
+        currentSpeed;
+
+      fish.y +=
+        (dy / dist) *
+        currentSpeed;
 
 
-    /*
-       Pick another destination
-       when the fish arrives.
-    */
+      if (dx < -1) {
+        goldie.classList.add("facing-left");
+      }
 
-    if (
-        Math.abs(dx) < 4 &&
-        Math.abs(dy) < 4
-    ) {
+      if (dx > 1) {
+        goldie.classList.remove("facing-left");
+      }
 
-        chooseFishTarget();
 
+      setFishPosition();
+
+    } else {
+
+      if (sleeping) {
+
+        goldie.classList.add("asleep");
+
+      } else if (!activeFood) {
+
+        chooseNewFishTarget();
+      }
     }
+
+
+    updateActiveFood();
+  }
+
+
+  requestAnimationFrame(animateFish);
+}
+
+requestAnimationFrame(animateFish);
+
+
+/* =========================================================
+   APPLY FISH POSITION
+========================================================= */
+
+function setFishPosition() {
+
+  const bounds =
+    getFishMovementBounds();
+
+  fish.x =
+    clamp(
+      fish.x,
+      bounds.minX,
+      bounds.maxX
+    );
+
+  fish.y =
+    clamp(
+      fish.y,
+      bounds.minY,
+      bounds.maxY
+    );
+
+  goldie.style.left =
+    `${fish.x}px`;
+
+  goldie.style.top =
+    `${fish.y}px`;
 }
 
 
 /* =========================================================
-   PET FISH
+   WINDOW RESIZE PROTECTION
 ========================================================= */
 
-fishContainer.addEventListener(
-    "click",
-    (event) => {
+window.addEventListener("resize", () => {
 
-        if (state.sleeping) {
+  if (!fish.initialized) {
+    return;
+  }
 
-            showMessage(
-                "GOL-DIE IS SLEEPING..."
-            );
+  const bounds =
+    getFishMovementBounds();
 
-            return;
-        }
+  fish.x =
+    clamp(
+      fish.x,
+      bounds.minX,
+      bounds.maxX
+    );
 
+  fish.y =
+    clamp(
+      fish.y,
+      bounds.minY,
+      bounds.maxY
+    );
 
-        state.affection =
-            clamp(
-                state.affection + 6
-            );
+  fish.targetX =
+    clamp(
+      fish.targetX,
+      bounds.minX,
+      bounds.maxX
+    );
 
+  fish.targetY =
+    clamp(
+      fish.targetY,
+      bounds.minY,
+      bounds.maxY
+    );
 
-        state.happiness =
-            clamp(
-                state.happiness + 4
-            );
-
-
-        createHearts(
-            event.clientX,
-            event.clientY
-        );
-
-
-        showMessage(
-            "GOL-DIE LIKES THAT ♥"
-        );
-
-
-        updateBars();
-
-    }
-);
+  setFishPosition();
+});
 
 
 /* =========================================================
-   HEART EFFECT
+   PERIODIC RANDOM TARGET
 ========================================================= */
 
-function createHearts(x, y) {
+setInterval(() => {
 
-    for (let i = 0; i < 4; i++) {
+  if (
+    gameStarted &&
+    !sleeping &&
+    !activeFood
+  ) {
 
-        const heart =
-            document.createElement("div");
+    chooseNewFishTarget();
+  }
 
-
-        heart.className = "heart";
-
-        heart.textContent = "♥";
-
-
-        heart.style.left =
-            `${x + Math.random() * 40 - 20}px`;
+}, 4000);
 
 
-        heart.style.top =
-            `${y + Math.random() * 20 - 10}px`;
+/* =========================================================
+   BLINKING
+========================================================= */
+
+function blink() {
+
+  if (
+    gameStarted &&
+    !sleeping
+  ) {
+
+    goldie.classList.add("blinking");
+
+    setTimeout(() => {
+      goldie.classList.remove("blinking");
+    }, 130);
+  }
 
 
-        heart.style.setProperty(
-            "--heart-x",
-            `${Math.random() * 60 - 30}px`
-        );
+  const nextBlink =
+    randomBetween(2200, 5200);
+
+  setTimeout(blink, nextBlink);
+}
+
+setTimeout(blink, 2500);
 
 
-        document.body.appendChild(heart);
+/* =========================================================
+   PETTING
+========================================================= */
 
+goldie.addEventListener(
+  "click",
+  petGoldie
+);
 
-        setTimeout(() => {
+goldie.addEventListener(
+  "keydown",
+  (event) => {
 
-            heart.remove();
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
 
-        }, 1300);
-
+      event.preventDefault();
+      petGoldie();
     }
+  }
+);
+
+
+function petGoldie() {
+
+  if (!gameStarted) {
+    return;
+  }
+
+  if (sleeping) {
+    showMessage("SHHH... GOL-DIE IS SLEEPING... Z Z Z");
+    return;
+  }
+
+
+  state.affection =
+    clamp(
+      state.affection + 4,
+      0,
+      100
+    );
+
+  state.happiness =
+    clamp(
+      state.happiness + 3,
+      0,
+      100
+    );
+
+
+  goldie.classList.remove("petted");
+
+  void goldie.offsetWidth;
+
+  goldie.classList.add("petted");
+
+
+  createFishParticles("heart", 6);
+  createFishParticles("sparkle", 4);
+
+  showMessage("GOL-DIE LOVES YOU! ♥");
+
+  updateUI();
+
+  setTimeout(() => {
+    goldie.classList.remove("petted");
+  }, 500);
 }
 
 
@@ -723,247 +856,359 @@ function createHearts(x, y) {
 ========================================================= */
 
 foodButton.addEventListener(
-    "click",
-    () => {
+  "click",
+  () => {
 
-        const isOpen =
-            foodPanel.classList.contains("open");
-
-
-        if (isOpen) {
-
-            foodPanel.classList.remove("open");
-
-        } else {
-
-            foodPanel.classList.add("open");
-
-        }
-
+    if (sleeping) {
+      showMessage("GOL-DIE IS SLEEPING! Z Z Z");
+      return;
     }
+
+    if (activeFood) {
+      showMessage("THERE'S ALREADY FOOD IN THE TANK!");
+      return;
+    }
+
+    openModal(foodModal);
+  }
 );
 
 
-/* =========================================================
-   FOOD BUTTON
-========================================================= */
-
 document
-    .querySelectorAll(".food-choice")
-    .forEach((button) => {
+  .querySelectorAll(".food-choice")
+  .forEach((button) => {
 
-        button.addEventListener(
-            "click",
-            () => {
+    button.addEventListener(
+      "click",
+      () => {
 
-                spawnFood();
+        const foodType =
+          button.dataset.food;
 
-                foodPanel.classList.remove(
-                    "open"
-                );
+        closeModal(foodModal);
+        dropFood(foodType);
+      }
+    );
 
-                showMessage(
-                    "A FISH FLAKE APPEARED!"
-                );
-
-            }
-        );
-
-    });
+  });
 
 
 /* =========================================================
-   SPAWN FOOD
+   DROP FOOD
 ========================================================= */
 
-function spawnFood() {
+function dropFood(type) {
 
-    const food =
-        document.createElement("div");
+  if (
+    activeFood ||
+    !FOOD_DATA[type]
+  ) {
+    return;
+  }
 
+  const food =
+    FOOD_DATA[type];
 
-    food.className = "food-item";
+  const element =
+    document.createElement("div");
 
+  element.className =
+    "falling-food";
 
-    const pellet =
-        document.createElement("div");
+  element.textContent =
+    food.icon;
 
-
-    pellet.className = "food-pellet";
-
-
-    food.appendChild(pellet);
-
-
-    /*
-       Spawn food near the top-middle.
-    */
-
-    let x =
-        window.innerWidth / 2 +
-        Math.random() * 160 -
-        80;
+  foodLayer.appendChild(element);
 
 
-    let y = 120;
+  const bounds =
+    getFishMovementBounds();
 
+  const startX =
+    clamp(
+      fish.x +
+      goldie.offsetWidth * 0.5 +
+      randomBetween(-150, 150),
 
-    food.style.left =
-        `${x}px`;
+      30,
 
-    food.style.top =
-        `${y}px`;
+      aquarium.clientWidth - 50
+    );
 
+  const startY =
+    clamp(
+      fish.y -
+      randomBetween(110, 180),
 
-    aquarium.appendChild(food);
+      110,
 
-
-    const fall =
-        setInterval(() => {
-
-            y += 1.5;
-
-
-            food.style.top =
-                `${y}px`;
-
-
-            const distanceX =
-                Math.abs(
-                    x - state.x
-                );
-
-
-            const distanceY =
-                Math.abs(
-                    y - state.y
-                );
-
-
-            /*
-               Feed fish when food reaches it.
-            */
-
-            if (
-                distanceX < 90 &&
-                distanceY < 70
-            ) {
-
-                clearInterval(fall);
-
-                feedFish(food);
-
-                return;
-            }
-
-
-            /*
-               Food reaches floor.
-            */
-
-            if (
-                y >
-                window.innerHeight - 90
-            ) {
-
-                clearInterval(fall);
-
-                food.remove();
-
-                showMessage(
-                    "THE FOOD SANK..."
-                );
-
-            }
-
-        }, 25);
-
-}
-
-
-/* =========================================================
-   FEED FISH
-========================================================= */
-
-function feedFish(food) {
-
-    if (state.sleeping) {
-
-        food.remove();
-
-        showMessage(
-            "GOL-DIE IS SLEEPING!"
-        );
-
-        return;
-    }
-
-
-    state.hunger =
-        clamp(
-            state.hunger + 22
-        );
-
-
-    state.health =
-        clamp(
-            state.health + 4
-        );
-
-
-    state.happiness =
-        clamp(
-            state.happiness + 5
-        );
-
-
-    state.energy =
-        clamp(
-            state.energy + 2
-        );
-
-
-    food.remove();
-
-
-    showMessage(
-        "YUM! GOL-DIE ATE!"
+      bounds.maxY - 120
     );
 
 
-    updateBars();
+  activeFood = {
+    type: type,
+    element: element,
+
+    x: startX,
+    y: startY,
+
+    speed: 0.55
+  };
+
+
+  showMessage("SNACK TIME! 🍎");
+
+  positionFood();
 }
 
 
 /* =========================================================
-   CLEAN
+   FOOD ANIMATION
+========================================================= */
+
+function updateActiveFood() {
+
+  if (!activeFood) {
+    return;
+  }
+
+
+  activeFood.y +=
+    activeFood.speed;
+
+
+  positionFood();
+
+
+  const fishCenterX =
+    fish.x +
+    goldie.offsetWidth * 0.63;
+
+  const fishCenterY =
+    fish.y +
+    goldie.offsetHeight * 0.52;
+
+
+  const foodDistance =
+    distance(
+      fishCenterX,
+      fishCenterY,
+      activeFood.x,
+      activeFood.y
+    );
+
+
+  if (foodDistance < 46) {
+    eatFood();
+    return;
+  }
+
+
+  const floorY =
+    aquarium.clientHeight -
+    (
+      window.innerWidth <= 800
+        ? 88
+        : 110
+    );
+
+
+  if (activeFood.y >= floorY) {
+    foodSank();
+  }
+}
+
+
+function positionFood() {
+
+  if (!activeFood) {
+    return;
+  }
+
+  activeFood.element.style.left =
+    `${activeFood.x}px`;
+
+  activeFood.element.style.top =
+    `${activeFood.y}px`;
+}
+
+
+/* =========================================================
+   EATING
+========================================================= */
+
+function eatFood() {
+
+  if (!activeFood) {
+    return;
+  }
+
+
+  const food =
+    FOOD_DATA[activeFood.type];
+
+
+  activeFood.element.remove();
+  activeFood = null;
+
+
+  state.hunger =
+    clamp(
+      state.hunger + food.hunger,
+      0,
+      100
+    );
+
+  state.health =
+    clamp(
+      state.health + food.health,
+      0,
+      100
+    );
+
+  state.happiness =
+    clamp(
+      state.happiness + food.happiness,
+      0,
+      100
+    );
+
+  state.energy =
+    clamp(
+      state.energy + food.energy,
+      0,
+      100
+    );
+
+
+  goldie.classList.add("eating");
+  goldie.classList.add("excited");
+
+
+  createFishParticles("heart", 5);
+  createFishParticles("sparkle", 6);
+
+  showMessage(food.message);
+
+
+  updateUI();
+
+
+  setTimeout(() => {
+    goldie.classList.remove("eating");
+    goldie.classList.remove("excited");
+
+    chooseNewFishTarget();
+  }, 900);
+}
+
+
+function foodSank() {
+
+  if (!activeFood) {
+    return;
+  }
+
+  activeFood.element.remove();
+  activeFood = null;
+
+  state.clean =
+    clamp(
+      state.clean - 3,
+      0,
+      100
+    );
+
+  showMessage("OH NO! THE FOOD SANK!");
+
+  updateUI();
+  chooseNewFishTarget();
+}
+
+
+/* =========================================================
+   CLEANING
 ========================================================= */
 
 cleanButton.addEventListener(
-    "click",
-    () => {
-
-        state.clean =
-            clamp(
-                state.clean + 35
-            );
-
-
-        state.happiness =
-            clamp(
-                state.happiness + 4
-            );
-
-
-        showMessage(
-            "THE TANK IS SPARKLY!"
-        );
-
-
-        updateBars();
-
-    }
+  "click",
+  cleanAquarium
 );
+
+
+function cleanAquarium() {
+
+  if (cleaning) {
+    return;
+  }
+
+  if (sleeping) {
+    showMessage("LET GOL-DIE SLEEP FIRST! ♥");
+    return;
+  }
+
+
+  cleaning = true;
+
+  cleaningSponge.classList.remove(
+    "cleaning"
+  );
+
+  void cleaningSponge.offsetWidth;
+
+  cleaningSponge.classList.add(
+    "cleaning"
+  );
+
+
+  createCleaningParticles();
+
+
+  setTimeout(() => {
+
+    state.clean =
+      clamp(
+        state.clean + 34,
+        0,
+        100
+      );
+
+    state.happiness =
+      clamp(
+        state.happiness + 5,
+        0,
+        100
+      );
+
+
+    aquarium.style.filter =
+      "brightness(1.12) saturate(1.08)";
+
+    createFishParticles(
+      "sparkle",
+      8
+    );
+
+    showMessage("SPARKLY CLEAN! ✨");
+
+    updateUI();
+
+  }, 900);
+
+
+  setTimeout(() => {
+
+    cleaningSponge.classList.remove(
+      "cleaning"
+    );
+
+    aquarium.style.filter = "";
+
+    cleaning = false;
+
+  }, 1900);
+}
 
 
 /* =========================================================
@@ -971,137 +1216,397 @@ cleanButton.addEventListener(
 ========================================================= */
 
 sleepButton.addEventListener(
-    "click",
-    () => {
-
-        state.sleeping =
-            !state.sleeping;
-
-
-        if (state.sleeping) {
-
-            sleepZone.classList.add(
-                "sleeping"
-            );
-
-
-            aquarium.classList.add(
-                "night"
-            );
-
-
-            showMessage(
-                "GOODNIGHT GOL-DIE..."
-            );
-
-        } else {
-
-            sleepZone.classList.remove(
-                "sleeping"
-            );
-
-
-            aquarium.classList.remove(
-                "night"
-            );
-
-
-            showMessage(
-                "GOOD MORNING! ♥"
-            );
-
-        }
-
-    }
+  "click",
+  toggleSleep
 );
 
 
+function toggleSleep() {
+
+  if (!sleeping) {
+    startSleeping();
+  } else {
+    wakeGoldie();
+  }
+}
+
+
+function startSleeping() {
+
+  if (activeFood) {
+    activeFood.element.remove();
+    activeFood = null;
+  }
+
+
+  sleeping = true;
+
+  aquarium.classList.add("sleeping");
+
+  sleepText.textContent = "WAKE";
+  sleepIcon.textContent = "☀";
+
+  goldie.classList.remove("excited");
+
+  showMessage("SWEET DREAMS, GOL-DIE! ☾");
+}
+
+
+function wakeGoldie() {
+
+  sleeping = false;
+
+  aquarium.classList.remove("sleeping");
+
+  goldie.classList.remove("asleep");
+
+  sleepText.textContent = "SLEEP";
+  sleepIcon.textContent = "☾";
+
+  state.happiness =
+    clamp(
+      state.happiness + 3,
+      0,
+      100
+    );
+
+  createFishParticles(
+    "sparkle",
+    7
+  );
+
+  showMessage("GOOD MORNING! ☀️");
+
+  chooseNewFishTarget();
+
+  updateUI();
+}
+
+
 /* =========================================================
-   GAME TIME
+   SLEEP RECOVERY
 ========================================================= */
 
-const REAL_MS_PER_FISH_HOUR =
-    2 * 60 * 1000;
+setInterval(() => {
+
+  if (
+    !gameStarted ||
+    !sleeping
+  ) {
+    return;
+  }
 
 
-let lastTime = Date.now();
+  state.energy =
+    clamp(
+      state.energy + 4,
+      0,
+      100
+    );
 
-let elapsedFishTime = 0;
+  state.health =
+    clamp(
+      state.health + 1,
+      0,
+      100
+    );
 
-
-function updateFishTime() {
-
-    const now =
-        Date.now();
-
-
-    const delta =
-        now - lastTime;
-
-
-    lastTime = now;
-
-
-    elapsedFishTime += delta;
-
-
-    while (
-        elapsedFishTime >=
-        REAL_MS_PER_FISH_HOUR
-    ) {
-
-        elapsedFishTime -=
-            REAL_MS_PER_FISH_HOUR;
+  state.hunger =
+    clamp(
+      state.hunger - 0.3,
+      0,
+      100
+    );
 
 
-        state.fishHour++;
+  updateUI();
+
+}, 2000);
 
 
-        if (
-            state.fishHour >= 24
-        ) {
+/* =========================================================
+   PARTICLES
+========================================================= */
 
-            state.fishHour = 0;
+function createFishParticles(
+  type,
+  amount = 5
+) {
 
-            state.day++;
+  const fishCenterX =
+    fish.x +
+    goldie.offsetWidth * 0.55;
 
-        }
+  const fishCenterY =
+    fish.y +
+    goldie.offsetHeight * 0.42;
 
 
-        hourlyDecay();
+  for (
+    let i = 0;
+    i < amount;
+    i++
+  ) {
 
+    const particle =
+      document.createElement("div");
+
+    particle.className =
+      "particle";
+
+
+    if (type === "heart") {
+
+      particle.classList.add(
+        "heart-particle"
+      );
+
+      particle.textContent = "♥";
+
+    } else {
+
+      particle.classList.add(
+        "sparkle-particle"
+      );
+
+      particle.textContent =
+        Math.random() > 0.5
+          ? "✦"
+          : "✧";
     }
 
 
-    let hour =
-        state.fishHour;
+    particle.style.left =
+      `${fishCenterX +
+      randomBetween(-45, 45)}px`;
+
+    particle.style.top =
+      `${fishCenterY +
+      randomBetween(-15, 35)}px`;
+
+    particle.style.setProperty(
+      "--particle-x",
+      `${randomBetween(-55, 55)}px`
+    );
 
 
-    const ampm =
-        hour >= 12
-            ? "PM"
-            : "AM";
+    particleLayer.appendChild(
+      particle
+    );
 
 
-    let displayHour =
-        hour % 12;
+    setTimeout(() => {
+      particle.remove();
+    }, 1100);
+  }
+}
 
 
-    if (
-        displayHour === 0
-    ) {
+/* =========================================================
+   CLEANING PARTICLES
+========================================================= */
 
-        displayHour = 12;
+function createCleaningParticles() {
 
-    }
+  let count = 0;
+
+  const interval =
+    setInterval(() => {
+
+      count++;
+
+      const bubble =
+        document.createElement("div");
+
+      bubble.className =
+        "particle clean-bubble";
+
+      bubble.style.left =
+        `${randomBetween(
+          5,
+          95
+        )}%`;
+
+      bubble.style.top =
+        `${randomBetween(
+          25,
+          75
+        )}%`;
+
+      bubble.style.setProperty(
+        "--particle-x",
+        `${randomBetween(
+          -30,
+          30
+        )}px`
+      );
 
 
-    fishTime.textContent =
-        `${String(displayHour).padStart(2, "0")}:00 ${ampm}`;
+      particleLayer.appendChild(
+        bubble
+      );
 
 
-    dayCounter.textContent =
-        `DAY ${state.day}`;
+      setTimeout(() => {
+        bubble.remove();
+      }, 1100);
+
+
+      if (count >= 20) {
+        clearInterval(interval);
+      }
+
+    }, 65);
+}
+
+
+/* =========================================================
+   GAME MESSAGE
+========================================================= */
+
+function showMessage(text) {
+
+  clearTimeout(messageTimeout);
+
+  gameMessage.textContent = text;
+
+  gameMessage.classList.remove(
+    "show"
+  );
+
+  void gameMessage.offsetWidth;
+
+  gameMessage.classList.add(
+    "show"
+  );
+
+
+  messageTimeout =
+    setTimeout(() => {
+
+      gameMessage.classList.remove(
+        "show"
+      );
+
+    }, 1900);
+}
+
+
+/* =========================================================
+   GAME CLOCK
+========================================================= */
+
+/*
+  2 real minutes = 1 in-game hour.
+
+  Therefore:
+
+  120 real seconds = 60 game minutes
+  2 real seconds = 1 game minute
+*/
+
+setInterval(() => {
+
+  if (!gameStarted) {
+    return;
+  }
+
+
+  state.minutes += 1;
+
+
+  if (state.minutes >= 1440) {
+
+    state.minutes = 0;
+    state.day += 1;
+  }
+
+
+  updateClock();
+  updateDayNight();
+
+}, 2000);
+
+
+/* =========================================================
+   CLOCK DISPLAY
+========================================================= */
+
+function updateClock() {
+
+  const hours24 =
+    Math.floor(state.minutes / 60);
+
+  const minutes =
+    Math.floor(state.minutes % 60);
+
+  const period =
+    hours24 >= 12
+      ? "PM"
+      : "AM";
+
+  let hours12 =
+    hours24 % 12;
+
+  if (hours12 === 0) {
+    hours12 = 12;
+  }
+
+
+  clockDisplay.textContent =
+    `${String(hours12).padStart(2, "0")}:` +
+    `${String(minutes).padStart(2, "0")} ` +
+    period;
+
+  dayDisplay.textContent =
+    `DAY ${state.day}`;
+}
+
+
+/* =========================================================
+   AUTOMATIC DAY / NIGHT
+========================================================= */
+
+function updateDayNight() {
+
+  if (!gameStarted) {
+    return;
+  }
+
+  const hour =
+    Math.floor(state.minutes / 60);
+
+
+  const nightTime =
+    hour >= 20 ||
+    hour < 6;
+
+
+  aquarium.classList.toggle(
+    "night",
+    nightTime && !sleeping
+  );
+
+
+  /*
+    Morning reaction at exactly 06:00.
+  */
+
+  if (
+    hour === 6 &&
+    state.minutes % 60 === 0 &&
+    !sleeping
+  ) {
+
+    showMessage(
+      "GOOD MORNING! ☀️"
+    );
+
+    createFishParticles(
+      "sparkle",
+      6
+    );
+  }
 }
 
 
@@ -1109,177 +1614,369 @@ function updateFishTime() {
    STAT DECAY
 ========================================================= */
 
-function hourlyDecay() {
+setInterval(() => {
 
-    if (state.sleeping) {
-
-        state.energy =
-            clamp(
-                state.energy + 9
-            );
+  if (!gameStarted) {
+    return;
+  }
 
 
-        state.health =
-            clamp(
-                state.health + 2
-            );
+  if (!sleeping) {
+
+    state.hunger =
+      clamp(
+        state.hunger - 0.9,
+        0,
+        100
+      );
+
+    state.clean =
+      clamp(
+        state.clean - 0.5,
+        0,
+        100
+      );
+
+    state.energy =
+      clamp(
+        state.energy - 0.45,
+        0,
+        100
+      );
+
+    state.happiness =
+      clamp(
+        state.happiness - 0.25,
+        0,
+        100
+      );
+
+  }
 
 
-        state.hunger =
-            clamp(
-                state.hunger - 3
-            );
+  /*
+    CONSEQUENCES
+  */
 
-    } else {
+  if (state.hunger < 20) {
 
-        state.hunger =
-            clamp(
-                state.hunger - 5
-            );
-
-
-        state.clean =
-            clamp(
-                state.clean - 3
-            );
+    state.health =
+      clamp(
+        state.health - 0.65,
+        0,
+        100
+      );
+  }
 
 
-        state.energy =
-            clamp(
-                state.energy - 4
-            );
+  if (state.clean < 20) {
+
+    state.health =
+      clamp(
+        state.health - 0.5,
+        0,
+        100
+      );
+  }
 
 
-        state.happiness =
-            clamp(
-                state.happiness - 2
-            );
+  if (
+    state.happiness < 15 &&
+    state.affection > 0
+  ) {
+
+    state.affection =
+      clamp(
+        state.affection - 0.1,
+        0,
+        100
+      );
+  }
 
 
-        if (
-            state.hunger < 25
-        ) {
+  updateUI();
+  saveGame();
 
-            state.health =
-                clamp(
-                    state.health - 4
-                );
-
-        }
+}, 15000);
 
 
-        if (
-            state.clean < 25
-        ) {
+/* =========================================================
+   UI UPDATE
+========================================================= */
 
-            state.health =
-                clamp(
-                    state.health - 3
-                );
+function updateUI() {
 
-        }
+  Object.keys(stats).forEach(
+    (key) => {
 
+      state[key] =
+        clamp(
+          state[key],
+          0,
+          100
+        );
+
+      stats[key].bar.style.width =
+        `${state[key]}%`;
+
+      stats[key].value.textContent =
+        Math.round(state[key]);
     }
+  );
 
 
-    updateBars();
+  updateExpression();
+  updateClock();
+  updateDayNight();
 }
 
 
 /* =========================================================
-   RESIZE
+   EXPRESSIONS
 ========================================================= */
 
-window.addEventListener(
-    "resize",
-    () => {
+function updateExpression() {
 
-        /*
-           Re-centre if necessary.
-        */
+  const petStatus =
+    document.getElementById("petStatus");
 
-        keepFishOnScreen();
 
-        positionFish();
+  goldie.classList.toggle(
+    "hungry",
+    state.hunger < 28 &&
+    !sleeping
+  );
 
-    }
+
+  if (sleeping) {
+
+    petStatus.textContent =
+      "SLEEPING... Z Z Z";
+
+    return;
+  }
+
+
+  if (state.health < 25) {
+
+    petStatus.textContent =
+      "NOT FEELING GREAT...";
+
+  } else if (state.hunger < 20) {
+
+    petStatus.textContent =
+      "VERY HUNGRY!";
+
+  } else if (state.energy < 20) {
+
+    petStatus.textContent =
+      "SOOO SLEEPY...";
+
+  } else if (state.clean < 20) {
+
+    petStatus.textContent =
+      "MY TANK IS MESSY!";
+
+  } else if (state.happiness < 25) {
+
+    petStatus.textContent =
+      "NEEDS SOME LOVE";
+
+  } else if (state.affection > 85) {
+
+    petStatus.textContent =
+      "BEST FRIENDS FOREVER ♥";
+
+  } else if (state.happiness > 85) {
+
+    petStatus.textContent =
+      "SUPER HAPPY! ✦";
+
+  } else {
+
+    petStatus.textContent =
+      "HAPPY LITTLE FISH";
+  }
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+motionToggle.addEventListener(
+  "change",
+  () => {
+
+    document.body.classList.toggle(
+      "reduced-motion",
+      motionToggle.checked
+    );
+
+    localStorage.setItem(
+      "goldieReducedMotion",
+      String(motionToggle.checked)
+    );
+  }
+);
+
+
+bubbleToggle.addEventListener(
+  "change",
+  () => {
+
+    const visible =
+      bubbleToggle.checked;
+
+    document
+      .querySelectorAll(
+        ".title-bubbles, .background-bubbles"
+      )
+      .forEach((layer) => {
+
+        layer.style.display =
+          visible
+            ? ""
+            : "none";
+      });
+
+
+    localStorage.setItem(
+      "goldieBubbles",
+      String(visible)
+    );
+  }
 );
 
 
 /* =========================================================
-   GAME LOOP
+   RESET SAVE
 ========================================================= */
 
-function gameLoop() {
+resetButton.addEventListener(
+  "click",
+  () => {
 
-    updateFishTime();
+    const confirmed =
+      window.confirm(
+        "Reset GOL-DIE and start again?"
+      );
 
-    moveFish();
+    if (!confirmed) {
+      return;
+    }
 
-    drawFish();
 
-    requestAnimationFrame(
-        gameLoop
+    localStorage.removeItem(
+      "goldieSave"
     );
+
+    state = {
+      ...DEFAULT_STATE
+    };
+
+
+    sleeping = false;
+
+    aquarium.classList.remove(
+      "sleeping",
+      "night"
+    );
+
+    goldie.classList.remove(
+      "asleep",
+      "hungry",
+      "petted",
+      "excited",
+      "eating"
+    );
+
+    sleepText.textContent =
+      "SLEEP";
+
+    sleepIcon.textContent =
+      "☾";
+
+
+    updateUI();
+
+    closeModal(settingsModal);
+
+    if (gameStarted) {
+      initializeFish();
+      showMessage("A FRESH START! ♥");
+    }
+  }
+);
+
+
+/* =========================================================
+   LOAD SETTINGS
+========================================================= */
+
+function loadSettings() {
+
+  const reducedMotion =
+    localStorage.getItem(
+      "goldieReducedMotion"
+    );
+
+  const bubbles =
+    localStorage.getItem(
+      "goldieBubbles"
+    );
+
+
+  if (reducedMotion === "true") {
+
+    motionToggle.checked = true;
+
+    document.body.classList.add(
+      "reduced-motion"
+    );
+  }
+
+
+  if (bubbles === "false") {
+
+    bubbleToggle.checked = false;
+
+    document
+      .querySelectorAll(
+        ".title-bubbles, .background-bubbles"
+      )
+      .forEach((layer) => {
+
+        layer.style.display =
+          "none";
+      });
+  }
 }
 
 
 /* =========================================================
-   INITIALISE
+   AUTOSAVE
 ========================================================= */
 
-function initialise() {
+setInterval(() => {
 
-    /*
-       FORCE THE FISH TO THE
-       CENTRE OF THE SCREEN.
-    */
+  if (gameStarted) {
+    saveGame();
+  }
 
-    state.x =
-        window.innerWidth / 2;
+}, 10000);
 
 
-    state.y =
-        window.innerHeight / 2;
-
-
-    state.targetX =
-        state.x;
-
-
-    state.targetY =
-        state.y;
-
-
-    positionFish();
-
-
-    updateBars();
-
-
-    drawFish();
-
-
-    /*
-       Wait briefly before choosing
-       a swimming destination so the
-       fish is definitely visible in
-       the centre when the game loads.
-    */
-
-    setTimeout(() => {
-
-        chooseFishTarget();
-
-    }, 1500);
-
-
-    gameLoop();
-}
+window.addEventListener(
+  "beforeunload",
+  saveGame
+);
 
 
 /* =========================================================
-   START GAME
+   INITIAL PAGE SETUP
 ========================================================= */
 
-initialise();
+loadGame();
+loadSettings();
+updateUI();
