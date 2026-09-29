@@ -2,16 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
-
-  <meta
-    name="theme-color"
-    content="#75e7ee"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>GOL-DIE: My Little Aquarium</title>
 
@@ -21,122 +12,131 @@
 
 <body>
 
-  <!-- CUSTOM PIXEL HAND CURSOR -->
-  <div id="customCursor" class="custom-cursor" aria-hidden="true">
-    <div class="cursor-sparkle">✦</div>
-    <div class="cursor-hand">☝</div>
+  <!-- =====================================================
+       PIXEL HAND CURSOR
+  ====================================================== -->
+
+  <div id="pixelCursor" class="pixel-cursor" aria-hidden="true">
+
+    <span class="finger f1"></span>
+    <span class="finger f2"></span>
+    <span class="finger f3"></span>
+    <span class="finger f4"></span>
+
+    <span class="palm"></span>
+    <span class="thumb"></span>
+
+    <span class="cursor-label">PET!</span>
+
   </div>
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        TITLE SCREEN
-  ========================================================== -->
-  <section id="titleScreen" class="screen title-screen active">
+  ====================================================== -->
 
-    <div class="title-sunbeam beam-one"></div>
-    <div class="title-sunbeam beam-two"></div>
+  <section
+    id="titleScreen"
+    class="screen title-screen active"
+  >
 
-    <div class="title-bubbles" aria-hidden="true">
-      <span style="--x: 8%; --delay: 0s; --size: 18px;"></span>
-      <span style="--x: 17%; --delay: 2s; --size: 11px;"></span>
-      <span style="--x: 30%; --delay: 4s; --size: 25px;"></span>
-      <span style="--x: 42%; --delay: 1s; --size: 13px;"></span>
-      <span style="--x: 57%; --delay: 5s; --size: 20px;"></span>
-      <span style="--x: 66%; --delay: 2.5s; --size: 10px;"></span>
-      <span style="--x: 78%; --delay: 3.5s; --size: 24px;"></span>
-      <span style="--x: 91%; --delay: 1.5s; --size: 14px;"></span>
+    <div class="scanlines"></div>
+
+    <div
+      class="title-bubbles"
+      aria-hidden="true"
+    >
+      <i style="--x:8%;--d:0s"></i>
+      <i style="--x:20%;--d:1.4s"></i>
+      <i style="--x:36%;--d:3s"></i>
+      <i style="--x:55%;--d:.7s"></i>
+      <i style="--x:73%;--d:2.3s"></i>
+      <i style="--x:90%;--d:4s"></i>
     </div>
 
-    <div class="title-seaweed title-seaweed-left">
-      <i></i>
-      <i></i>
-      <i></i>
-    </div>
 
-    <div class="title-seaweed title-seaweed-right">
-      <i></i>
-      <i></i>
-      <i></i>
-    </div>
+    <div class="title-coral coral-left"></div>
+    <div class="title-coral coral-right"></div>
 
-    <div class="title-coral coral-left">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
 
-    <div class="title-coral coral-right">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+    <div class="title-card">
 
-    <div class="title-content">
-
-      <div class="tiny-title">✦ A TINY VIRTUAL PET ADVENTURE ✦</div>
-
-      <div class="logo-wrap">
-        <h1 class="game-logo">
-          <span class="logo-gol">GOL</span><span class="logo-die">-DIE</span>
-        </h1>
-
-        <div class="subtitle">
-          MY LITTLE AQUARIUM
-        </div>
+      <div class="tiny-label">
+        ★ VIRTUAL PET CARTRIDGE ★
       </div>
 
 
-      <!-- TITLE SCREEN FISH -->
-      <div class="title-fish-wrap">
-        <div class="title-fish" aria-hidden="true">
+      <h1>
+        <span>GOL</span><b>-DIE</b>
+      </h1>
 
-          <div class="title-tail"></div>
 
-          <div class="title-fish-body">
-            <div class="title-eye title-eye-one">
-              <span></span>
-            </div>
-
-            <div class="title-eye title-eye-two">
-              <span></span>
-            </div>
-
-            <div class="title-mouth"></div>
-
-            <div class="title-cheek title-cheek-one"></div>
-            <div class="title-cheek title-cheek-two"></div>
-
-            <div class="title-highlight"></div>
-          </div>
-
-          <div class="title-fin"></div>
-
-        </div>
-
-        <span class="title-fish-bubble bubble-a"></span>
-        <span class="title-fish-bubble bubble-b"></span>
-        <span class="title-fish-bubble bubble-c"></span>
+      <div class="subtitle">
+        MY LITTLE AQUARIUM
       </div>
 
 
-      <div class="title-buttons">
-        <button id="startButton" class="game-button start-button interactive">
-          <span class="button-icon">▶</span>
-          START GAME
-        </button>
+      <!-- TITLE FISH -->
 
-        <button id="howToButton" class="mini-button interactive">
+      <div
+        class="title-fish"
+        aria-hidden="true"
+      >
+
+        <div class="tf-tail"></div>
+
+        <div class="tf-body">
+
+          <i class="tf-eye e1"></i>
+          <i class="tf-eye e2"></i>
+
+          <i class="tf-mouth"></i>
+
+          <i class="tf-shine"></i>
+
+        </div>
+
+        <div class="tf-fin"></div>
+
+      </div>
+
+
+      <!-- START -->
+
+      <button
+        id="startGameBtn"
+        class="pixel-button start-btn"
+        type="button"
+      >
+        ▶ START GAME
+      </button>
+
+
+      <div class="title-small-buttons">
+
+        <button
+          id="howToBtn"
+          class="pixel-button small-btn"
+          type="button"
+        >
           HOW TO PLAY
         </button>
 
-        <button id="settingsButton" class="mini-button interactive">
+
+        <button
+          id="settingsBtn"
+          class="pixel-button small-btn alt"
+          type="button"
+        >
           SETTINGS
         </button>
+
       </div>
 
-      <div class="title-message">
-        Take care of your new little friend! ♥
-      </div>
+
+      <p class="title-copy">
+        FEED • PET • CLEAN • SLEEP • LOVE
+      </p>
 
     </div>
 
@@ -144,362 +144,379 @@
 
 
 
-  <!-- =========================================================
-       MAIN GAME SCREEN
-  ========================================================== -->
-  <main id="gameScreen" class="screen game-screen">
+  <!-- =====================================================
+       GAME SCREEN
+  ====================================================== -->
 
-    <div id="aquarium" class="aquarium">
+  <main
+    id="gameScreen"
+    class="screen game-screen"
+    aria-hidden="true"
+  >
 
-      <!-- BACKGROUND WATER DETAILS -->
-      <div class="water-light water-light-one"></div>
-      <div class="water-light water-light-two"></div>
-      <div class="water-light water-light-three"></div>
+    <div
+      id="aquarium"
+      class="aquarium"
+    >
 
-      <div class="background-bubbles" aria-hidden="true">
-        <span style="--x: 5%; --delay: 1s; --size: 10px;"></span>
-        <span style="--x: 14%; --delay: 6s; --size: 15px;"></span>
-        <span style="--x: 25%; --delay: 3s; --size: 8px;"></span>
-        <span style="--x: 37%; --delay: 0s; --size: 13px;"></span>
-        <span style="--x: 49%; --delay: 8s; --size: 9px;"></span>
-        <span style="--x: 61%; --delay: 4s; --size: 18px;"></span>
-        <span style="--x: 72%; --delay: 2s; --size: 11px;"></span>
-        <span style="--x: 84%; --delay: 7s; --size: 14px;"></span>
-        <span style="--x: 94%; --delay: 5s; --size: 9px;"></span>
-      </div>
+      <div class="scanlines"></div>
 
 
       <!-- NIGHT -->
-      <div id="nightOverlay" class="night-overlay">
+
+      <div
+        id="nightLayer"
+        class="night-layer"
+      >
+
         <span class="moon">☾</span>
-        <span class="night-star star-1">✦</span>
-        <span class="night-star star-2">✧</span>
-        <span class="night-star star-3">✦</span>
-        <span class="night-star star-4">✧</span>
-        <span class="night-star star-5">✦</span>
+
+        <span class="star s1">✦</span>
+        <span class="star s2">✧</span>
+        <span class="star s3">✦</span>
+
       </div>
 
 
-      <!-- HUD -->
+      <div class="water-rays"></div>
+
+
+      <!-- =================================================
+           HUD
+      ================================================== -->
+
       <section class="hud">
 
-        <div class="pet-card">
-          <div class="pet-name">
-            <span>🐟</span>
-            GOL-DIE
-          </div>
+        <div class="name-plate">
 
-          <div class="pet-status" id="petStatus">
-            HAPPY LITTLE FISH
-          </div>
+          <span>🐟</span>
+
+          GOL-DIE
+
+          <small id="moodText">
+            HAPPY!
+          </small>
+
         </div>
 
 
-        <div class="stats-panel">
+        <div class="stats">
 
-          <div class="stat-row">
-            <div class="stat-name">
-              <span>♥</span>
-              HEALTH
+          <div class="stat">
+
+            <label>
+              ♥ HP
+            </label>
+
+            <div class="bar">
+              <i id="healthBar"></i>
             </div>
 
-            <div class="pixel-bar health-bar">
-              <div
-                id="healthBar"
-                class="pixel-fill"
-                style="width: 92%;"
-              ></div>
-            </div>
+            <b id="healthValue">
+              92
+            </b>
 
-            <span id="healthValue" class="stat-number">92</span>
           </div>
 
 
-          <div class="stat-row">
-            <div class="stat-name">
-              <span>🍎</span>
-              HUNGER
+          <div class="stat">
+
+            <label>
+              ● FOOD
+            </label>
+
+            <div class="bar">
+              <i id="hungerBar"></i>
             </div>
 
-            <div class="pixel-bar hunger-bar">
-              <div
-                id="hungerBar"
-                class="pixel-fill"
-                style="width: 78%;"
-              ></div>
-            </div>
+            <b id="hungerValue">
+              78
+            </b>
 
-            <span id="hungerValue" class="stat-number">78</span>
           </div>
 
 
-          <div class="stat-row">
-            <div class="stat-name">
-              <span>☺</span>
-              HAPPY
+          <div class="stat">
+
+            <label>
+              ☻ HAPPY
+            </label>
+
+            <div class="bar">
+              <i id="happyBar"></i>
             </div>
 
-            <div class="pixel-bar happiness-bar">
-              <div
-                id="happinessBar"
-                class="pixel-fill"
-                style="width: 86%;"
-              ></div>
-            </div>
+            <b id="happyValue">
+              86
+            </b>
 
-            <span id="happinessValue" class="stat-number">86</span>
           </div>
 
 
-          <div class="stat-row">
-            <div class="stat-name">
-              <span>♥</span>
-              AFFECTION
+          <div class="stat">
+
+            <label>
+              ♥ LOVE
+            </label>
+
+            <div class="bar">
+              <i id="loveBar"></i>
             </div>
 
-            <div class="pixel-bar affection-bar">
-              <div
-                id="affectionBar"
-                class="pixel-fill"
-                style="width: 60%;"
-              ></div>
-            </div>
+            <b id="loveValue">
+              60
+            </b>
 
-            <span id="affectionValue" class="stat-number">60</span>
           </div>
 
 
-          <div class="stat-row">
-            <div class="stat-name">
-              <span>✦</span>
-              CLEAN
+          <div class="stat">
+
+            <label>
+              ✦ CLEAN
+            </label>
+
+            <div class="bar">
+              <i id="cleanBar"></i>
             </div>
 
-            <div class="pixel-bar clean-bar">
-              <div
-                id="cleanBar"
-                class="pixel-fill"
-                style="width: 88%;"
-              ></div>
-            </div>
+            <b id="cleanValue">
+              88
+            </b>
 
-            <span id="cleanValue" class="stat-number">88</span>
           </div>
 
 
-          <div class="stat-row">
-            <div class="stat-name">
-              <span>⚡</span>
-              ENERGY
+          <div class="stat">
+
+            <label>
+              ⚡ ENERGY
+            </label>
+
+            <div class="bar">
+              <i id="energyBar"></i>
             </div>
 
-            <div class="pixel-bar energy-bar">
-              <div
-                id="energyBar"
-                class="pixel-fill"
-                style="width: 82%;"
-              ></div>
-            </div>
+            <b id="energyValue">
+              82
+            </b>
 
-            <span id="energyValue" class="stat-number">82</span>
           </div>
 
         </div>
+
       </section>
 
 
       <!-- CLOCK -->
-      <section class="clock-card">
-        <div id="clockDisplay" class="clock-time">
+
+      <div class="clock-box">
+
+        <strong id="clockText">
           08:00 AM
-        </div>
+        </strong>
 
-        <div id="dayDisplay" class="clock-day">
+        <span id="dayText">
           DAY 1
-        </div>
-      </section>
+        </span>
+
+      </div>
 
 
-      <!-- GAME MESSAGE -->
-      <div id="gameMessage" class="game-message">
+      <!-- MESSAGE -->
+
+      <div
+        id="messageBox"
+        class="message-box"
+      >
         HI! I'M GOL-DIE! ♥
       </div>
 
 
-      <!-- SLEEPING AREA -->
-      <div id="fishBed" class="fish-bed">
+      <!-- =================================================
+           AQUARIUM DECORATIONS
+      ================================================== -->
 
-        <div class="bed-star">✦</div>
+      <div class="plants plant-a">
+        <i></i>
+        <i></i>
+        <i></i>
+      </div>
+
+
+      <div class="plants plant-b">
+        <i></i>
+        <i></i>
+        <i></i>
+      </div>
+
+
+      <div class="castle">
+        <i></i>
+        <b></b>
+      </div>
+
+
+      <div class="chest">
+        <span></span>
+      </div>
+
+
+      <div class="rock-face">
+
+        <i></i>
+        <i></i>
+
+        <b></b>
+
+      </div>
+
+
+      <div class="floor"></div>
+
+
+      <!-- BED -->
+
+      <div
+        id="fishBed"
+        class="fish-bed"
+      >
 
         <div class="pillow"></div>
 
         <div class="blanket">
-          <span>☾</span>
-        </div>
-
-        <div class="bed-label">
-          GOL-DIE'S BED
+          ☾
         </div>
 
       </div>
 
 
-      <!-- FISH -->
-      <div
+      <!-- =================================================
+           GOL-DIE
+           
+           CLICKING THIS BUTTON = PETTING
+      ================================================== -->
+
+      <button
         id="goldie"
-        class="goldie interactive"
-        role="button"
-        tabindex="0"
+        class="goldie"
+        type="button"
         aria-label="Pet GOL-DIE"
       >
 
-        <div class="fish-tail"></div>
+        <span class="fish-tail"></span>
 
-        <div class="fish-fin fish-fin-top"></div>
-        <div class="fish-fin fish-fin-bottom"></div>
 
-        <div class="fish-body">
+        <span class="fish-body">
 
-          <div class="fish-highlight"></div>
+          <i class="shine"></i>
 
-          <div class="fish-eye eye-left">
-            <span></span>
-          </div>
+          <i class="eye eye-1"></i>
+          <i class="eye eye-2"></i>
 
-          <div class="fish-eye eye-right">
-            <span></span>
-          </div>
+          <i class="mouth"></i>
 
-          <div class="fish-eyelid eyelid-left"></div>
-          <div class="fish-eyelid eyelid-right"></div>
+          <i class="cheek c1"></i>
+          <i class="cheek c2"></i>
 
-          <div class="fish-mouth"></div>
+        </span>
 
-          <div class="fish-cheek cheek-left"></div>
-          <div class="fish-cheek cheek-right"></div>
 
-        </div>
+        <span class="fin"></span>
 
-        <div class="fish-side-fin"></div>
 
-        <div class="thought-bubble">
+        <span class="thought">
           🍎
-        </div>
+        </span>
 
-        <div class="sleep-zs">
-          <span>Z</span>
-          <span>Z</span>
-          <span>Z</span>
-        </div>
 
+        <span class="zzz">
+          Z<br>
+          Z<br>
+          Z
+        </span>
+
+      </button>
+
+
+      <!-- FOOD -->
+
+      <div
+        id="foodLayer"
+        class="food-layer"
+      ></div>
+
+
+      <!-- PARTICLES -->
+
+      <div
+        id="particleLayer"
+        class="particle-layer"
+      ></div>
+
+
+      <!-- SPONGE -->
+
+      <div
+        id="sponge"
+        class="sponge"
+      >
+        ••
       </div>
 
 
-      <!-- PARTICLES ARE CREATED HERE -->
-      <div id="particleLayer" class="particle-layer"></div>
+      <!-- =================================================
+           CONTROLS
+      ================================================== -->
 
-      <!-- FOOD IS CREATED HERE -->
-      <div id="foodLayer" class="food-layer"></div>
-
-
-      <!-- DECORATIONS -->
-      <div class="castle decoration">
-        <div class="castle-tower tower-left"></div>
-        <div class="castle-main">
-          <div class="castle-window"></div>
-          <div class="castle-door"></div>
-        </div>
-        <div class="castle-tower tower-right"></div>
-      </div>
-
-      <div class="treasure-chest decoration">
-        <div class="chest-top"></div>
-        <div class="chest-bottom">
-          <div class="chest-lock"></div>
-        </div>
-      </div>
-
-      <div class="cute-rock rock-one decoration">
-        <span class="rock-eye left"></span>
-        <span class="rock-eye right"></span>
-        <span class="rock-mouth"></span>
-      </div>
-
-      <div class="cute-rock rock-two decoration"></div>
-
-      <div class="starfish decoration">★</div>
-      <div class="shell decoration">◒</div>
-
-
-      <!-- PLANTS -->
-      <div class="plant plant-one">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <div class="plant plant-two">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <div class="plant plant-three">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <div class="plant plant-four">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-
-      <!-- FLOOR -->
-      <div class="aquarium-floor">
-        <div class="sand-speckles"></div>
-      </div>
-
-
-      <!-- CLEANING TOOL -->
-      <div id="cleaningSponge" class="cleaning-sponge">
-        <div class="sponge-face">
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-
-
-      <!-- ACTION BUTTONS -->
-      <section class="action-bar">
+      <nav
+        class="action-bar"
+        aria-label="Pet actions"
+      >
 
         <button
-          id="foodButton"
-          class="action-button food-button interactive"
+          id="foodBtn"
+          class="action food"
+          type="button"
         >
-          <span class="action-icon">🍎</span>
-          <span>FOOD</span>
+
+          <span>🍎</span>
+
+          FOOD
+
         </button>
+
 
         <button
-          id="cleanButton"
-          class="action-button clean-button interactive"
+          id="cleanBtn"
+          class="action clean"
+          type="button"
         >
-          <span class="action-icon">🧽</span>
-          <span>CLEAN</span>
+
+          <span>🧽</span>
+
+          CLEAN
+
         </button>
+
 
         <button
-          id="sleepButton"
-          class="action-button sleep-button interactive"
+          id="sleepBtn"
+          class="action sleep"
+          type="button"
         >
-          <span id="sleepIcon" class="action-icon">☾</span>
-          <span id="sleepText">SLEEP</span>
+
+          <span id="sleepIcon">
+            ☾
+          </span>
+
+          <b id="sleepLabel">
+            SLEEP
+          </b>
+
         </button>
 
-      </section>
+      </nav>
 
     </div>
 
@@ -507,70 +524,108 @@
 
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        FOOD MENU
-  ========================================================== -->
-  <div id="foodModal" class="modal-backdrop">
+  ====================================================== -->
 
-    <div class="pixel-modal food-modal">
+  <div
+    id="foodModal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div class="modal-card">
 
       <button
-        class="modal-close interactive"
-        data-close-modal="foodModal"
-        aria-label="Close food menu"
+        class="modal-x"
+        data-close="foodModal"
+        type="button"
       >
-        ×
+        X
       </button>
 
-      <div class="modal-heading">
+
+      <h2>
         🍎 FOOD MENU
-      </div>
+      </h2>
+
+
+      <button
+        class="food-choice"
+        data-food="flake"
+        type="button"
+      >
+        🌸 FISH FLAKE
+      </button>
+
+
+      <button
+        class="food-choice"
+        data-food="shrimp"
+        type="button"
+      >
+        🦐 LITTLE SHRIMP
+      </button>
+
+
+      <button
+        class="food-choice"
+        data-food="pellet"
+        type="button"
+      >
+        🟡 FISH PELLET
+      </button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       HOW TO PLAY
+  ====================================================== -->
+
+  <div
+    id="howToModal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div class="modal-card">
+
+      <button
+        class="modal-x"
+        data-close="howToModal"
+        type="button"
+      >
+        X
+      </button>
+
+
+      <h2>
+        HOW TO PLAY
+      </h2>
+
 
       <p>
-        Pick a tasty snack for GOL-DIE!
+        🍎 Feed GOL-DIE before the FOOD meter drops.
       </p>
 
-      <div class="food-options">
 
-        <button
-          class="food-choice interactive"
-          data-food="flake"
-        >
-          <span class="food-choice-icon">🌸</span>
-
-          <span>
-            <strong>FISH FLAKE</strong>
-            <small>Light & crunchy</small>
-          </span>
-        </button>
+      <p>
+        ☝ Move the hand over GOL-DIE and click the fish to PET.
+      </p>
 
 
-        <button
-          class="food-choice interactive"
-          data-food="shrimp"
-        >
-          <span class="food-choice-icon">🦐</span>
-
-          <span>
-            <strong>LITTLE SHRIMP</strong>
-            <small>GOL-DIE's favourite!</small>
-          </span>
-        </button>
+      <p>
+        🧽 Clean the tank to keep GOL-DIE healthy.
+      </p>
 
 
-        <button
-          class="food-choice interactive"
-          data-food="pellet"
-        >
-          <span class="food-choice-icon">🟡</span>
-
-          <span>
-            <strong>FISH PELLET</strong>
-            <small>Super filling</small>
-          </span>
-        </button>
-
-      </div>
+      <p>
+        ☾ Put GOL-DIE to bed to recover energy.
+      </p>
 
     </div>
 
@@ -578,79 +633,34 @@
 
 
 
-  <!-- =========================================================
-       HOW TO PLAY
-  ========================================================== -->
-  <div id="howToModal" class="modal-backdrop">
-
-    <div class="pixel-modal info-modal">
-
-      <button
-        class="modal-close interactive"
-        data-close-modal="howToModal"
-        aria-label="Close how to play"
-      >
-        ×
-      </button>
-
-      <div class="modal-heading">
-        HOW TO PLAY
-      </div>
-
-      <div class="instruction-grid">
-
-        <div class="instruction">
-          <span>🍎</span>
-          <strong>FEED</strong>
-          <p>Give GOL-DIE tasty snacks before hunger gets too low.</p>
-        </div>
-
-        <div class="instruction">
-          <span>☝</span>
-          <strong>PET</strong>
-          <p>Click directly on GOL-DIE to build affection.</p>
-        </div>
-
-        <div class="instruction">
-          <span>🧽</span>
-          <strong>CLEAN</strong>
-          <p>Keep the aquarium sparkling and healthy.</p>
-        </div>
-
-        <div class="instruction">
-          <span>☾</span>
-          <strong>SLEEP</strong>
-          <p>Let GOL-DIE rest to recover energy.</p>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- =========================================================
+  <!-- =====================================================
        SETTINGS
-  ========================================================== -->
-  <div id="settingsModal" class="modal-backdrop">
+  ====================================================== -->
 
-    <div class="pixel-modal settings-modal">
+  <div
+    id="settingsModal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div class="modal-card">
 
       <button
-        class="modal-close interactive"
-        data-close-modal="settingsModal"
-        aria-label="Close settings"
+        class="modal-x"
+        data-close="settingsModal"
+        type="button"
       >
-        ×
+        X
       </button>
 
-      <div class="modal-heading">
-        SETTINGS
-      </div>
 
-      <label class="setting-row interactive">
+      <h2>
+        SETTINGS
+      </h2>
+
+
+      <label class="toggle-row">
+
         <span>
           REDUCED MOTION
         </span>
@@ -659,25 +669,16 @@
           id="motionToggle"
           type="checkbox"
         />
+
       </label>
 
-      <label class="setting-row interactive">
-        <span>
-          BACKGROUND BUBBLES
-        </span>
-
-        <input
-          id="bubbleToggle"
-          type="checkbox"
-          checked
-        />
-      </label>
 
       <button
-        id="resetButton"
-        class="reset-button interactive"
+        id="resetBtn"
+        class="pixel-button danger"
+        type="button"
       >
-        RESET SAVE
+        RESET PET
       </button>
 
     </div>
@@ -686,16 +687,22 @@
 
 
 
-  <!-- TITLE -> GAME TRANSITION -->
-  <div id="transitionOverlay" class="transition-overlay">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
+  <!-- =====================================================
+       SCREEN TRANSITION
+  ====================================================== -->
+
+  <div
+    id="transition"
+    class="transition"
+    aria-hidden="true"
+  >
+
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+
   </div>
 
 </body>
